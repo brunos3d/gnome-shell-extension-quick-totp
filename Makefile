@@ -20,6 +20,7 @@ PO_FILES := $(wildcard po/*.po)
 SOURCES := extension.js prefs.js
 EXTRA_SOURCES := \
 	base32.js \
+	codeController.js \
 	indicator.js \
 	myAlertDialog.js \
 	myEntryRow.js \
@@ -39,7 +40,8 @@ EXTRA_DIST := \
 	AUTHORS \
 	COPYING \
 	prefs.css \
-	README.md
+	README.md \
+	stylesheet.css
 
 
 .PHONY: all clean install update-po

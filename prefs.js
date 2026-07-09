@@ -19,6 +19,7 @@ import {
 } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
 import * as Base32      from './base32.js';
+import CodeController   from './codeController.js';
 import HOTP             from './hotp.js';
 import MyAlertDialog    from './myAlertDialog.js';
 import MyEntryRow       from './myEntryRow.js';
@@ -62,12 +63,6 @@ function reportError(root, e)
     catch (ee) {
         logError(ee);
     }
-}
-
-
-function now()
-{
-    return new Date().getTime() / 1000;
 }
 
 
@@ -559,12 +554,10 @@ class CopyCodeButton extends Gtk.Button {
     }
 
 
-    #code = null;
-    #expiry = 0;
+    #controller;
     #label;
     #level;
     #otp;
-    #update_source = 0;
 
 
     constructor(otp)
@@ -609,88 +602,38 @@ class CopyCodeButton extends Gtk.Button {
             box.append(this.#level);
         }
 
-        this.#update_source = GLib.timeout_add(GLib.PRIORITY_DEFAULT,
-                                               500,
-                                               () => {
-                                                   try {
-                                                       this.updateCode();
-                                                   }
-                                                   catch (e) {
-                                                       this.cancelUpdates();
-                                                       return GLib.SOURCE_REMOVE;
-                                                   }
-                                                   return GLib.SOURCE_CONTINUE;
-                                               });
+        // The countdown/refresh logic is shared with the panel indicator; see
+        // codeController.js.
+        this.#controller = new CodeController(this.#otp, this.render.bind(this));
+        this.#controller.start();
     }
 
 
     destroy()
     {
-        this.cancelUpdates();
+        this.#controller.stop();
     }
 
 
-    async updateCode()
+    render({locked, code, remaining, type, error})
     {
-        try {
-            const type = this.#otp.type;
-            if (this.expired()) {
-                const item = await SecretUtils.getOTPItem(this.#otp);
-                if (item.locked) {
-                    if (type == 'TOTP')
-                        this.#level.value = 0;
-                    this.#label.label = _('Unlock');
-                    this.#label.use_markup = false;
-                    return;
-                }
-
-                this.#otp.secret = await SecretUtils.getSecret(this.#otp);
-
-                if (type == 'TOTP') {
-                    const [code, expiry] = this.#otp.code_and_expiry();
-                    this.#expiry = expiry;
-                    this.#code = code;
-                } else if (type == 'HOTP') {
-                    this.#otp.counter = parseInt(item.get_attributes().counter);
-                    this.#code = this.#otp.code();
-                }
-            }
-
-            if (type == 'TOTP')
-                this.#level.value = Math.max(this.#expiry - now(), 0);
-            this.#label.label = `<tt>${this.#code}</tt>`;
-            this.#label.use_markup = true;
-        }
-        catch (e) {
-            /*
-             * Note: errors here are harmless, it usually means the item was deleted or
-             * edited while this async function was running. So we just disable the button
-             * and cancel future updates.
-             */
+        if (error) {
             this.sensitive = false;
-            this.cancelUpdates();
+            return;
         }
-    }
 
-
-    cancelUpdates()
-    {
-        if (this.#update_source) {
-            GLib.Source.remove(this.#update_source);
-            this.#update_source = 0;
+        if (locked) {
+            if (type == 'TOTP')
+                this.#level.value = 0;
+            this.#label.label = _('Unlock');
+            this.#label.use_markup = false;
+            return;
         }
-    }
 
-
-    expired()
-    {
-        if (this.#otp.type == 'HOTP')
-            return true;
-        if (!this.#expiry == 0 || !this.#code)
-            return true;
-        if (this.#expiry < now())
-            return true;
-        return false;
+        if (type == 'TOTP')
+            this.#level.value = remaining;
+        this.#label.label = `<tt>${code}</tt>`;
+        this.#label.use_markup = true;
     }
 
 
