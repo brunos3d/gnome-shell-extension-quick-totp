@@ -1,0 +1,109 @@
+/* stylesheet.css
+ * Copyright (C) 2025  Daniel K. O.
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * Styles for the panel indicator menu (St/Clutter widgets).
+ *
+ * Spacing follows GNOME's 6px scale (3 / 6 / 12) so the menu feels like a
+ * first-party component.
+ */
+
+
+/* --- Search row ------------------------------------------------------- */
+
+.totp-search-item {
+    padding-top: 6px;
+    padding-bottom: 6px;
+}
+
+.totp-search-entry {
+    min-width: 20em;
+}
+
+.totp-search-icon {
+    icon-size: 16px;
+}
+
+.totp-visibility-button {
+    padding: 4px 6px;
+    margin-left: 6px;
+    border-radius: 6px;
+}
+
+.totp-visibility-button:hover {
+    background-color: rgba(127, 127, 127, 0.15);
+}
+
+.totp-visibility-button:focus {
+    background-color: rgba(127, 127, 127, 0.20);
+}
+
+
+/* --- Scrollable OTP list ---------------------------------------------- */
+
+/* The maximum height is set dynamically in indicator.js so the list never
+ * exceeds the available screen height. */
+.totp-scroll {
+    margin-top: 3px;
+}
+
+
+/* --- OTP row ---------------------------------------------------------- */
+
+.totp-otp-item {
+    spacing: 12px;
+}
+
+.totp-text-box {
+    spacing: 1px;
+}
+
+/* Primary: the service/account identifier. Kept at normal weight so the
+ * monospace code below is the element that stands out. */
+.totp-title-label {
+    font-weight: normal;
+}
+
+.totp-subtitle-box {
+    spacing: 8px;
+}
+
+/* Secondary: the OTP code — monospace so it stands out as the value to copy. */
+.totp-code-label {
+    font-family: monospace;
+    font-size: 1.05em;
+    font-weight: bold;
+}
+
+/* Tertiary: remaining seconds (dimmed via actor opacity in JS). */
+.totp-remaining-label {
+    font-size: 0.85em;
+}
+
+/* Status: subtle countdown ring; color states mirror the LevelBar offsets
+ * used in the preferences window. */
+.totp-countdown {
+    width: 16px;
+    height: 16px;
+}
+
+.totp-countdown.full {
+    color: #2ec27e; /* success */
+}
+
+.totp-countdown.high {
+    color: #e5a50a; /* warning */
+}
+
+.totp-countdown.low {
+    color: #e01b24; /* error */
+}
+
+
+/* --- Empty state ------------------------------------------------------ */
+
+.totp-empty-item {
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
