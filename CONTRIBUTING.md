@@ -79,8 +79,8 @@ Prerequisites:
 Clone and install the extension into your user extensions directory:
 
 ```sh
-git clone https://github.com/brunos3d/gnome-shell-extension-totp.git
-cd gnome-shell-extension-totp
+git clone https://github.com/brunos3d/gnome-shell-extension-quick-totp.git
+cd gnome-shell-extension-quick-totp
 make install
 ```
 
@@ -144,10 +144,6 @@ fixture in `tests/fixtures/`).
 Some modules include self-contained reference vectors (see the RFC 4226 test
 cases in `otp/hotp.js` and the commented Base32 test in `utils/base32.js`) that
 are handy when changing code generation.
-
-Some modules include self-contained reference vectors (see the RFC 4226 test
-cases in `hotp.js` and the commented Base32 test in `base32.js`) that are handy
-when changing code generation.
 
 ## Code style
 
