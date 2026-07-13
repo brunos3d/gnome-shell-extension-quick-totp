@@ -7,6 +7,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - Unreleased
+
+Major feature release: comprehensive **import & export**, bringing Quick TOTP
+close to GNOME Authenticator's ecosystem compatibility while staying lightweight.
+
+### Added
+
+- **Backup & Restore** preferences group with a native Adwaita workflow:
+  auto-detecting file import with a confirmation summary, and per-format export
+  with an unencrypted-file warning.
+- **Import** from: `otpauth://` URIs (single/multiple/QR), URI-list files, Google
+  Authenticator migration QR codes (`otpauth-migration://`), GNOME Authenticator
+  (current and legacy), Aegis (plaintext), andOTP (plaintext), FreeOTP+,
+  Bitwarden (unencrypted), Raivo OTP (JSON), and Quick TOTP's own JSON. TOTP,
+  HOTP, and Steam tokens are all supported.
+- **Export** to: Quick TOTP JSON, `otpauth://` URI list, GNOME Authenticator /
+  andOTP, Aegis (plaintext), and FreeOTP+.
+- A clean, toolkit-agnostic import/export engine under `src/io/`
+  (shared model, parsers, serializers, validators, format registry, and
+  import/export services), with a minimal built-in Base64 and Protobuf decoder
+  (no new runtime dependencies).
+- A dependency-free test suite (`npm test`) covering parsers, serializers,
+  round-trips, validation, malformed input, and scaling (up to 1000 accounts).
+- `docs/import-export.md` documenting every format, the compatibility matrix,
+  limitations, and security notes.
+
+### Security
+
+- Imported files are treated as untrusted: every account is validated
+  (type, algorithm, digits, period/counter, issuer/name, Base32 secret) before
+  being stored, invalid entries are reported rather than dropped, and nothing in
+  a file is executed.
+- Exports are unencrypted and warn the user before writing; encrypted backup
+  variants are intentionally unsupported (documented in `src/io/crypto/`).
+
+### Notes
+
+- Imported accounts use the existing libsecret schema and `OTP` collection —
+  no keyring changes, and re-importing skips accounts that already exist.
+- Import/export concepts and some test fixtures are derived from GNOME
+  Authenticator (GPL-3.0-or-later); see the credits in `docs/import-export.md`.
+
 ## [1.0.0] - 2026-07-13
 
 First release of **Quick TOTP**, an independently maintained fork of the
@@ -66,5 +108,6 @@ and gathers the usability improvements made on top of the original project.
   README.
 - All original copyright notices and GPL-3.0-or-later licensing are preserved.
 
-[Unreleased]: https://github.com/brunos3d/gnome-shell-extension-totp/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/brunos3d/gnome-shell-extension-totp/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/brunos3d/gnome-shell-extension-totp/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/brunos3d/gnome-shell-extension-totp/releases/tag/v1.0.0

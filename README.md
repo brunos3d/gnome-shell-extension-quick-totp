@@ -71,6 +71,10 @@ if you run into a problem on any version, please
 - **Full keyboard navigation** — the search field is focused automatically, and
   Arrow keys, Tab, Enter, and Escape all work as expected.
 - **TOTP and HOTP** support, including custom digits, periods, and algorithms.
+- **Import & export in many formats** — Aegis, andOTP, FreeOTP+, Bitwarden,
+  GNOME Authenticator, Google Authenticator, Raivo OTP, `otpauth://` URIs, QR
+  codes, and Quick TOTP's own JSON (see
+  [Import & Export](docs/import-export.md)).
 - **Secure by design** — secrets are stored in the GNOME Keyring and wiped from
   memory immediately after use (see [Security](#security)).
 
@@ -128,12 +132,26 @@ their defaults; adjust them in the preferences window if you had customized them
 You may keep both extensions installed side by side, but to avoid duplicate panel
 indicators it is recommended to disable the original once Quick TOTP is enabled.
 
-## Importing and exporting URIs
+## Import & export
 
-It's possible to import and export OTP secrets that conform to [Google's Key URI
-Format](https://github.com/google/google-authenticator/wiki/Key-Uri-Format).
-This format is compatible with applications like Google Authenticator, FreeOTP,
-Authy, etc.
+Quick TOTP can move accounts in and out of the wider OTP ecosystem. Open
+**Settings → Backup & Restore** to import from a file (the format is
+auto-detected) or export a backup.
+
+Supported imports include **Aegis, andOTP, FreeOTP+, Bitwarden, GNOME
+Authenticator (current and legacy), Google Authenticator, Raivo OTP**, `otpauth://`
+URIs (single, multiple, and QR), URI-list files, and Quick TOTP's own JSON.
+Exports include Quick TOTP JSON, an `otpauth://` URI list, GNOME
+Authenticator / andOTP, Aegis, and FreeOTP+.
+
+Encrypted backups are intentionally not supported (a shell extension has no AES
+available); export an unencrypted variant instead. See the full
+**[Import & Export guide](docs/import-export.md)** for the compatibility matrix,
+examples, limitations, and security notes.
+
+It's also possible to import and export single OTP secrets that conform to
+[Google's Key URI Format](https://github.com/google/google-authenticator/wiki/Key-Uri-Format),
+compatible with applications like Google Authenticator, FreeOTP, Authy, etc.
 
 ## Scanning QR codes
 
@@ -172,6 +190,15 @@ Quick TOTP is a fork of the original
 [gnome-shell-extension-totp](https://github.com/dkosmari/gnome-shell-extension-totp)
 by Daniel Kosmari, whose work made this project possible. See
 [AUTHORS](AUTHORS) for authorship details.
+
+The import/export subsystem was designed after studying
+[GNOME Authenticator](https://gitlab.gnome.org/World/Authenticator)
+(GPL-3.0-or-later): its backup architecture, supported formats, and Backup &
+Restore workflow guided this feature, and some of its test fixtures are reused to
+verify compatibility. No code was copied verbatim; the concepts were
+re-implemented for Quick TOTP's architecture. With gratitude to Authenticator's
+authors and contributors. Details and attribution are in
+[docs/import-export.md](docs/import-export.md).
 
 ## License
 
