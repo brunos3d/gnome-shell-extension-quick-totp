@@ -11,7 +11,7 @@ import Indicator from './indicator.js';
 
 
 export default
-class TOTPExtension extends Extension {
+class QuickTotpExtension extends Extension {
 
     enable()
     {

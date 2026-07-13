@@ -428,7 +428,7 @@ class Indicator extends PanelMenu.Button {
 
     _init()
     {
-        super._init(0.5, 'TOTP');
+        super._init(0.5, 'Quick TOTP');
     }
 
 
