@@ -898,12 +898,6 @@ class SecretsGroup extends Adw.PreferencesGroup {
 
     this.install_action("otp.refresh", null, (obj) => obj.refreshRows());
 
-    this.install_action("otp.import", null, (obj) => obj.importSecrets());
-
-    this.install_action("otp.export-all", null, (obj) =>
-      obj.exportAllSecrets(),
-    );
-
     this.install_action("otp.copy-to-clipboard", "(ssb)", (obj, name, args) =>
       obj.copyToClipboard(...args.recursiveUnpack()),
     );
@@ -966,24 +960,6 @@ class SecretsGroup extends Adw.PreferencesGroup {
         icon_name: "view-refresh-symbolic",
         tooltip_text: _("Refresh secrets."),
         action_name: "otp.refresh",
-        valign: Gtk.Align.CENTER,
-      }),
-    );
-
-    box.append(
-      new Gtk.Button({
-        icon_name: "document-import-symbolic",
-        action_name: "otp.import",
-        tooltip_text: _("Import secrets..."),
-        valign: Gtk.Align.CENTER,
-      }),
-    );
-
-    box.append(
-      new Gtk.Button({
-        icon_name: "document-export-symbolic",
-        action_name: "otp.export-all",
-        tooltip_text: _("Export all secrets to the clipboard."),
         valign: Gtk.Align.CENTER,
       }),
     );
@@ -1077,21 +1053,47 @@ class SecretsGroup extends Adw.PreferencesGroup {
     }
   }
 
-  async exportAllSecrets() {
+  async removeAllSecrets() {
     try {
-      const uris = [];
       const items = await SecretUtils.getOTPItems();
-      for (let i = 0; i < items.length; ++i) {
-        const attrs = items[i].get_attributes();
-        attrs.secret = await SecretUtils.getSecret(attrs);
-        const otp = dict2OTP(attrs);
-        uris.push(otp.uri());
+      if (items.length === 0) {
+        this.root?.add_toast(
+          new Adw.Toast({ title: _("There are no secrets to remove.") }),
+        );
+        return;
       }
-      this.copyToClipboard(
-        uris.join("\n"),
-        _("Copied all OTP secrets to clipboard."),
-        true,
+
+      const cancel_response = 0;
+      const delete_response = 1;
+      const dialog = new AlertDialog({
+        message: _("Remove all OTP secrets?"),
+        detail:
+          _("This permanently deletes all") +
+          ` ${items.length} ` +
+          _("OTP secrets from the keyring. This cannot be undone."),
+        modal: true,
+        default_button: cancel_response,
+        cancel_button: cancel_response,
+        buttons: [_("_Cancel"), _("_Delete All")],
+      });
+
+      const response = await dialog.choose(this.root, null);
+      if (response != delete_response) return;
+
+      let removed = 0;
+      for (const item of items) {
+        try {
+          await SecretUtils.removeOTPItem(dict2OTP(item.get_attributes()));
+          ++removed;
+        } catch (e) {
+          logError(e);
+        }
+      }
+
+      this.root?.add_toast(
+        new Adw.Toast({ title: _("Removed secrets:") + ` ${removed}` }),
       );
+      await this.refreshRows();
     } catch (e) {
       reportError(this.root, e);
     }
@@ -1355,7 +1357,7 @@ class OptionsGroup extends Adw.PreferencesGroup {
   #qrimage;
   #qrscan;
 
-  constructor(settings) {
+  constructor(settings, onRemoveAll) {
     super({
       title: _("Options"),
     });
@@ -1417,6 +1419,20 @@ class OptionsGroup extends Adw.PreferencesGroup {
     );
 
     this.add(cb_clear_delay);
+
+    // Danger zone: permanently remove every stored OTP secret.
+    const remove_all_row = new Adw.ActionRow({
+      title: _("Remove all secrets"),
+      subtitle: _("Permanently delete every OTP secret from the keyring."),
+    });
+    const remove_all_button = new Gtk.Button({
+      label: _("Remove All"),
+      valign: Gtk.Align.CENTER,
+    });
+    remove_all_button.add_css_class("destructive-action");
+    remove_all_button.connect("clicked", () => onRemoveAll?.());
+    remove_all_row.add_suffix(remove_all_button);
+    this.add(remove_all_row);
   }
 
   destroy() {
@@ -1470,12 +1486,15 @@ class TOTPPreferencesPage extends Adw.PreferencesPage {
     this.#secrets_group = new SecretsGroup(application_id, this.#settings);
     this.add(this.#secrets_group);
 
-    this.#backup_group = new BackupRestoreGroup(() =>
-      this.#secrets_group?.refreshRows(),
+    this.#backup_group = new BackupRestoreGroup(
+      () => this.#secrets_group?.refreshRows(),
+      () => this.#secrets_group?.importSecrets(),
     );
     this.add(this.#backup_group);
 
-    this.#options_group = new OptionsGroup(this.#settings);
+    this.#options_group = new OptionsGroup(this.#settings, () =>
+      this.#secrets_group?.removeAllSecrets(),
+    );
     this.add(this.#options_group);
   }
 

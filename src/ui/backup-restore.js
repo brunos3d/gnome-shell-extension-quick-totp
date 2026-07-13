@@ -35,15 +35,17 @@ Gio._promisify(Adw.MessageDialog.prototype, "choose", "choose_finish");
 export const BackupRestoreGroup = GObject.registerClass(
   class BackupRestoreGroup extends Adw.PreferencesGroup {
     #onChanged;
+    #onImportUris;
 
     // onChanged() is invoked after a successful import so the caller can refresh
-    // its account list.
-    constructor(onChanged) {
+    // its account list. onImportUris() opens the "paste otpauth:// URIs" dialog.
+    constructor(onChanged, onImportUris) {
       super({
         title: _("Backup & Restore"),
         description: _("Import and export your OTP accounts in many formats."),
       });
       this.#onChanged = onChanged;
+      this.#onImportUris = onImportUris;
 
       this.add(this.#buildImportRow());
       this.add(this.#buildExportRow());
@@ -54,6 +56,18 @@ export const BackupRestoreGroup = GObject.registerClass(
         title: _("Restore / Import"),
         subtitle: _("Add accounts from another app or a backup file"),
       });
+
+      // Paste one or more otpauth:// URIs as text (also supports QR from the
+      // clipboard and camera, via the existing dialog).
+      const fromUris = new Adw.ActionRow({
+        title: _("Import otpauth:// URIs…"),
+        subtitle: _("Paste one or more otpauth:// URIs, or scan a QR code"),
+        activatable: true,
+      });
+      fromUris.add_prefix(new Gtk.Image({ icon_name: "edit-paste-symbolic" }));
+      fromUris.add_suffix(new Gtk.Image({ icon_name: "go-next-symbolic" }));
+      fromUris.connect("activated", () => this.#onImportUris?.());
+      expander.add_row(fromUris);
 
       const fromFile = new Adw.ActionRow({
         title: _("Import from a file…"),
@@ -172,7 +186,7 @@ export const BackupRestoreGroup = GObject.registerClass(
       dialog.set_default_response("import");
       dialog.set_close_response("cancel");
 
-      const response = await dialog.choose(window, null);
+      const response = await dialog.choose(null);
       return response === "import";
     }
 
@@ -246,7 +260,7 @@ export const BackupRestoreGroup = GObject.registerClass(
       dialog.set_default_response("cancel");
       dialog.set_close_response("cancel");
 
-      const response = await dialog.choose(window, null);
+      const response = await dialog.choose(null);
       return response === "export";
     }
 
