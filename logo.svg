@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="140" viewBox="0 0 560 140" role="img" aria-label="Quick TOTP">
+  <title>Quick TOTP</title>
+  <defs>
+    <linearGradient id="qt-logo-bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#62a0ea"/>
+      <stop offset="0.55" stop-color="#3584e4"/>
+      <stop offset="1" stop-color="#1a5fb4"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Mark -->
+  <g transform="translate(14 14)">
+    <rect x="0" y="0" width="112" height="112" rx="26" fill="url(#qt-logo-bg)"/>
+    <path d="M56 24.5 A31.5 31.5 0 1 1 28.7 40.25" fill="none" stroke="#ffffff"
+          stroke-width="7" stroke-linecap="round" opacity="0.96"/>
+    <circle cx="56" cy="24.5" r="4.8" fill="#2ec27e"/>
+    <path d="M43.75 56 L52.5 64.75 L70 43.75" fill="none" stroke="#ffffff"
+          stroke-width="7.4" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- Wordmark (Cantarell is GNOME's default UI font) -->
+  <text x="152" y="82" font-family="Cantarell, 'Inter', 'Segoe UI', system-ui, sans-serif"
+        font-size="46" fill="#3584e4">
+    <tspan font-weight="400">Quick</tspan><tspan font-weight="700" dx="10">TOTP</tspan>
+  </text>
+</svg>
