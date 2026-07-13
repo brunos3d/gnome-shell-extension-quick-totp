@@ -108,6 +108,6 @@ and gathers the usability improvements made on top of the original project.
   README.
 - All original copyright notices and GPL-3.0-or-later licensing are preserved.
 
-[Unreleased]: https://github.com/brunos3d/gnome-shell-extension-totp/compare/v1.1.0...HEAD
-[1.1.0]: https://github.com/brunos3d/gnome-shell-extension-totp/compare/v1.0.0...v1.1.0
-[1.0.0]: https://github.com/brunos3d/gnome-shell-extension-totp/releases/tag/v1.0.0
+[Unreleased]: https://github.com/brunos3d/gnome-shell-extension-quick-totp/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/brunos3d/gnome-shell-extension-quick-totp/compare/v1.0.0...v1.1.0
+[1.0.0]: https://github.com/brunos3d/gnome-shell-extension-quick-totp/releases/tag/v1.0.0

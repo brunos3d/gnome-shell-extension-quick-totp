@@ -5,7 +5,7 @@
 If you discover a security vulnerability in Quick TOTP, please report it
 responsibly and **privately** so it can be addressed before public disclosure.
 
-- Preferred: open a [GitHub security advisory](https://github.com/brunos3d/gnome-shell-extension-totp/security/advisories/new)
+- Preferred: open a [GitHub security advisory](https://github.com/brunos3d/gnome-shell-extension-quick-totp/security/advisories/new)
   ("Report a vulnerability"), which keeps the report private.
 - Please do **not** open a public issue for security-sensitive reports.
 

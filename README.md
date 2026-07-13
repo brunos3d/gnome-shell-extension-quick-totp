@@ -56,7 +56,7 @@ between GNOME 45 and 46+ are handled explicitly).
 Packaging and installation were verified locally on **GNOME Shell 50.3**. The
 other releases are targeted but not individually re-tested for this fork —
 if you run into a problem on any version, please
-[open an issue](https://github.com/brunos3d/gnome-shell-extension-totp/issues).
+[open an issue](https://github.com/brunos3d/gnome-shell-extension-quick-totp/issues).
 
 ## Features
 
@@ -113,8 +113,8 @@ Prerequisites:
 
 Run:
 
-    git clone https://github.com/brunos3d/gnome-shell-extension-totp.git
-    cd gnome-shell-extension-totp
+    git clone https://github.com/brunos3d/gnome-shell-extension-quick-totp.git
+    cd gnome-shell-extension-quick-totp
     make install
 
 Then log out and back in (or restart GNOME Shell) and enable **Quick TOTP** with
