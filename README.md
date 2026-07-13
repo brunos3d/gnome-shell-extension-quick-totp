@@ -144,6 +144,8 @@ URIs (single, multiple, and QR), URI-list files, and Quick TOTP's own JSON.
 Exports include Quick TOTP JSON, an `otpauth://` URI list, GNOME
 Authenticator / andOTP, Aegis, and FreeOTP+.
 
+![settings](assets/settings.png)
+
 Encrypted backups are intentionally not supported (a shell extension has no AES
 available); export an unencrypted variant instead. See the full
 **[Import & Export guide](docs/import-export.md)** for the compatibility matrix,
