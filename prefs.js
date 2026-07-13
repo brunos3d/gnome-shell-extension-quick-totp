@@ -1640,7 +1640,7 @@ class TOTPPreferencesPage extends Adw.PreferencesPage {
         this.#resource = Gio.Resource.load(`${path}/icons.gresource`);
         Gio.resources_register(this.#resource);
         const theme = Gtk.IconTheme.get_for_display(Gdk.Display.get_default());
-        const res_path = '/com/github/dkosmari/totp/icons';
+        const res_path = '/io/brunosilva/quicktotp/icons';
         if (!theme.get_resource_path().includes(res_path))
             theme.add_resource_path(res_path);
 
