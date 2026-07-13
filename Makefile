@@ -38,7 +38,10 @@ GSCHEMA_XML_FILE := schemas/$(SETTINGS_SCHEMA).gschema.xml
 EXTRA_DIST := \
 	$(GRESOURCE_FILE) \
 	AUTHORS \
+	CHANGELOG.md \
 	COPYING \
+	DISCLAIMER.md \
+	SECURITY.md \
 	prefs.css \
 	README.md \
 	stylesheet.css
