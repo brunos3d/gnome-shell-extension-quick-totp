@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="logo.svg" alt="Quick TOTP" width="440">
+  <img src="assets/logo.svg" alt="Quick TOTP" width="440">
 </p>
 
 <p align="center">
@@ -16,7 +16,7 @@ It generates the time-based (TOTP) and counter-based (HOTP) one-time codes used
 by services like Google, GitHub, Steam, and many others that support Two-Factor
 Authentication (2FA).
 
-![screenshot](screenshot.png)
+![screenshot](assets/screenshot.png)
 
 ## Project Status
 
