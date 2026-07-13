@@ -26,6 +26,7 @@ SRC_SOURCES := \
 	src/otp/totp.js \
 	src/services/code-controller.js \
 	src/services/secret-utils.js \
+	src/ui/backup-restore.js \
 	src/ui/indicator.js \
 	src/ui/widgets/my-alert-dialog.js \
 	src/ui/widgets/my-entry-row.js \

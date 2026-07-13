@@ -25,6 +25,7 @@ import MyEntryRow from "./src/ui/widgets/my-entry-row.js";
 import MySpinRow from "./src/ui/widgets/my-spin-row.js";
 import * as SecretUtils from "./src/services/secret-utils.js";
 import TOTP from "./src/otp/totp.js";
+import { BackupRestoreGroup } from "./src/ui/backup-restore.js";
 
 Gio._promisify(
   Gio.Subprocess.prototype,
@@ -1435,6 +1436,7 @@ class TOTPPreferencesPage extends Adw.PreferencesPage {
     GObject.registerClass(this);
   }
 
+  #backup_group;
   #options_group;
   #provider;
   #resource;
@@ -1468,6 +1470,11 @@ class TOTPPreferencesPage extends Adw.PreferencesPage {
     this.#secrets_group = new SecretsGroup(application_id, this.#settings);
     this.add(this.#secrets_group);
 
+    this.#backup_group = new BackupRestoreGroup(() =>
+      this.#secrets_group?.refreshRows(),
+    );
+    this.add(this.#backup_group);
+
     this.#options_group = new OptionsGroup(this.#settings);
     this.add(this.#options_group);
   }
@@ -1479,6 +1486,11 @@ class TOTPPreferencesPage extends Adw.PreferencesPage {
       this.remove(this.#options_group);
       this.#options_group?.destroy();
       this.#options_group = null;
+    }
+
+    if (this.#backup_group) {
+      this.remove(this.#backup_group);
+      this.#backup_group = null;
     }
 
     if (this.#secrets_group) {
