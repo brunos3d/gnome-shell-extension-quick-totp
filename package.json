@@ -3,12 +3,14 @@
   "version": "1.0.0",
   "description": "Quick TOTP — a GNOME Shell extension for TOTP/HOTP two-factor authentication codes.",
   "private": true,
+  "type": "module",
   "license": "GPL-3.0-or-later",
   "repository": {
     "type": "git",
     "url": "https://github.com/brunos3d/gnome-shell-extension-totp.git"
   },
   "scripts": {
+    "test": "node tests/run.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },

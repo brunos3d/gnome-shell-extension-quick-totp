@@ -1,0 +1,22 @@
+[
+  {
+    "issuer": "Deno",
+    "account": "Mason",
+    "secret": "4SJHB4GSD43FZBAI7C2HLRJGPQ",
+    "algorithm": "SHA1",
+    "digits": "6",
+    "kind": "totp",
+    "timer": "30",
+    "counter": "0"
+  },
+  {
+    "issuer": "Issuu",
+    "account": "James",
+    "secret": "YOOMIXWS5GN6RTBPUFFWKTW5M4",
+    "algorithm": "SHA1",
+    "digits": "6",
+    "kind": "hotp",
+    "timer": "0",
+    "counter": "1"
+  }
+]
