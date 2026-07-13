@@ -1,4 +1,4 @@
-/*  codeController.js
+/*  code-controller.js
  * Copyright (C) 2025  Daniel K. O.
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
@@ -16,7 +16,7 @@
 
 import GLib from "gi://GLib";
 
-import * as SecretUtils from "./secretUtils.js";
+import * as SecretUtils from "./secret-utils.js";
 
 function now() {
   return Date.now() / 1000;

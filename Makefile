@@ -17,18 +17,21 @@ ZIP_FILE := $(UUID).shell-extension.zip
 POT_FILE := po/$(GETTEXT_DOMAIN).pot
 PO_FILES := $(wildcard po/*.po)
 
+# extension.js and prefs.js must live at the extension root; everything else
+# lives under src/ and is bundled by packing the whole directory.
 SOURCES := extension.js prefs.js
-EXTRA_SOURCES := \
-	base32.js \
-	codeController.js \
-	indicator.js \
-	myAlertDialog.js \
-	myEntryRow.js \
-	mySpinRow.js \
-	secretUtils.js \
-	hotp.js \
-	otp.js \
-	totp.js
+SRC_SOURCES := \
+	src/otp/hotp.js \
+	src/otp/otp.js \
+	src/otp/totp.js \
+	src/services/code-controller.js \
+	src/services/secret-utils.js \
+	src/ui/indicator.js \
+	src/ui/widgets/my-alert-dialog.js \
+	src/ui/widgets/my-entry-row.js \
+	src/ui/widgets/my-spin-row.js \
+	src/utils/base32.js
+SRC_CSS := src/ui/prefs.css
 
 
 GRESOURCE_XML := icons.gresource.xml
@@ -42,7 +45,6 @@ EXTRA_DIST := \
 	COPYING \
 	DISCLAIMER.md \
 	SECURITY.md \
-	prefs.css \
 	README.md \
 	stylesheet.css
 
@@ -65,13 +67,14 @@ install: $(ZIP_FILE)
 
 
 $(ZIP_FILE):	$(EXTRA_DIST) \
-		$(EXTRA_SOURCES) \
+		$(SRC_SOURCES) \
+		$(SRC_CSS) \
 		$(GSCHEMA_XML_FILE) \
 		$(PO_FILES) \
 		$(SOURCES) \
 		Makefile
 	gnome-extensions pack --force \
-		$(patsubst %,--extra-source=%,$(EXTRA_SOURCES)) \
+		--extra-source=src \
 		$(patsubst %,--extra-source=%,$(EXTRA_DIST))
 
 
@@ -80,7 +83,7 @@ $(ZIP_FILE):	$(EXTRA_DIST) \
 	glib-compile-resources $< --target=$@
 
 
-$(POT_FILE): $(SOURCES) $(EXTRA_SOURCES)
+$(POT_FILE): $(SOURCES) $(SRC_SOURCES)
 	xgettext --from-code=UTF-8 \
 		--copyright-holder="Daniel K. O." \
 		--package-name="$(PACKAGE)" \

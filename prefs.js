@@ -17,14 +17,14 @@ import {
   gettext as _,
 } from "resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js";
 
-import * as Base32 from "./base32.js";
-import CodeController from "./codeController.js";
-import HOTP from "./hotp.js";
-import MyAlertDialog from "./myAlertDialog.js";
-import MyEntryRow from "./myEntryRow.js";
-import MySpinRow from "./mySpinRow.js";
-import * as SecretUtils from "./secretUtils.js";
-import TOTP from "./totp.js";
+import * as Base32 from "./src/utils/base32.js";
+import CodeController from "./src/services/code-controller.js";
+import HOTP from "./src/otp/hotp.js";
+import MyAlertDialog from "./src/ui/widgets/my-alert-dialog.js";
+import MyEntryRow from "./src/ui/widgets/my-entry-row.js";
+import MySpinRow from "./src/ui/widgets/my-spin-row.js";
+import * as SecretUtils from "./src/services/secret-utils.js";
+import TOTP from "./src/otp/totp.js";
 
 Gio._promisify(
   Gio.Subprocess.prototype,
@@ -552,7 +552,7 @@ class CopyCodeButton extends Gtk.Button {
     }
 
     // The countdown/refresh logic is shared with the panel indicator; see
-    // codeController.js.
+    // code-controller.js.
     this.#controller = new CodeController(this.#otp, this.render.bind(this));
     this.#controller.start();
   }
@@ -1456,7 +1456,7 @@ class TOTPPreferencesPage extends Adw.PreferencesPage {
       theme.add_resource_path(res_path);
 
     this.#provider = new Gtk.CssProvider();
-    this.#provider.load_from_path(`${path}/prefs.css`);
+    this.#provider.load_from_path(`${path}/src/ui/prefs.css`);
     Gtk.StyleContext.add_provider_for_display(
       Gdk.Display.get_default(),
       this.#provider,

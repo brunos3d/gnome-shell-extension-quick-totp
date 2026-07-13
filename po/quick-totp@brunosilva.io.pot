@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: Quick TOTP\n"
 "Report-Msgid-Bugs-To: https://github.com/brunos3d/gnome-shell-extension-"
 "totp\n"
-"POT-Creation-Date: 2026-07-13 02:13-0300\n"
+"POT-Creation-Date: 2026-07-13 02:30-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: prefs.js:65 indicator.js:225
+#: prefs.js:65 src/ui/indicator.js:225
 msgid "Error"
 msgstr ""
 
@@ -121,7 +121,7 @@ msgstr ""
 msgid "Unlock"
 msgstr ""
 
-#: prefs.js:590 indicator.js:33
+#: prefs.js:590 src/ui/indicator.js:33
 msgid "OTP code copied to clipboard."
 msgstr ""
 
@@ -129,7 +129,7 @@ msgstr ""
 msgid "QR code"
 msgstr ""
 
-#: prefs.js:630 myAlertDialog.js:51
+#: prefs.js:630 src/ui/widgets/my-alert-dialog.js:51
 msgid "_Close"
 msgstr ""
 
@@ -172,11 +172,11 @@ msgstr ""
 msgid "_Import"
 msgstr ""
 
-#: prefs.js:869 indicator.js:346
+#: prefs.js:869 src/ui/indicator.js:346
 msgid "Unlock OTP secrets..."
 msgstr ""
 
-#: prefs.js:872 indicator.js:340
+#: prefs.js:872 src/ui/indicator.js:340
 msgid "Lock OTP secrets"
 msgstr ""
 
@@ -305,122 +305,123 @@ msgid ""
 "cleared."
 msgstr ""
 
-#: base32.js:23
-msgid "Invalid base32 input; missing padding."
-msgstr ""
-
-#: base32.js:39
-msgid "Invalid base32 character at position:"
-msgstr ""
-
-#: base32.js:46
-msgid "Invalid padding."
-msgstr ""
-
-#: indicator.js:233
-msgid "Locked"
-msgstr ""
-
-#: indicator.js:297
-msgid "Type to search…"
-msgstr ""
-
-#: indicator.js:353
-msgid "Settings..."
-msgstr ""
-
-#: indicator.js:359
-msgid "OTP Secrets"
-msgstr ""
-
-#: indicator.js:394 indicator.js:586
-msgid "No OTP secrets."
-msgstr ""
-
-#: indicator.js:473
-msgid "Show OTP codes"
-msgstr ""
-
-#: indicator.js:474
-msgid "Hide OTP codes"
-msgstr ""
-
-#: indicator.js:484
-msgid "Failed to lock OTP secrets."
-msgstr ""
-
-#: indicator.js:487
-msgid "Error locking OTP secrets."
-msgstr ""
-
-#: indicator.js:497
-msgid "Failed to unlock OTP secrets."
-msgstr ""
-
-#: indicator.js:500
-msgid "Error unlocking OTP secrets."
-msgstr ""
-
-#: indicator.js:553
-msgid "Error retrieving OTP items."
-msgstr ""
-
-#: indicator.js:589
-msgid "No matching OTP secrets."
-msgstr ""
-
-#: indicator.js:691
-msgid "Error copying the OTP authentication code."
-msgstr ""
-
-#: secretUtils.js:171
-msgid "Failed to lookup secret."
-msgstr ""
-
-#: secretUtils.js:203
-msgid "Failed to retrieve secret."
-msgstr ""
-
-#: secretUtils.js:232 secretUtils.js:269 secretUtils.js:291
-msgid "Failed to lookup item."
-msgstr ""
-
-#: secretUtils.js:239 secretUtils.js:275
-msgid "Failed to set label."
-msgstr ""
-
-#: secretUtils.js:246
-msgid "Failed to set attributes."
-msgstr ""
-
-#: secretUtils.js:252
-msgid "Failed to set secret."
-msgstr ""
-
-#: secretUtils.js:298
-msgid "Failed to set counter."
-msgstr ""
-
-#: hotp.js:67
+#: src/otp/hotp.js:67
 msgid "URI host should be \"hotp\""
 msgstr ""
 
-#: otp.js:35
+#: src/otp/otp.js:35
 msgid "Invalid algorithm."
 msgstr ""
 
-#: otp.js:103
+#: src/otp/otp.js:103
 msgid "Failed to parse URI."
 msgstr ""
 
-#: otp.js:105
+#: src/otp/otp.js:105
 msgid "URI scheme should be \"otpauth://...\""
 msgstr ""
 
-#: otp.js:106
+#: src/otp/otp.js:106
 msgid "Unexpected port number in URI."
 msgstr ""
 
-#: totp.js:43
+#: src/otp/totp.js:43
 msgid "URI host should be \"totp\""
+msgstr ""
+
+#: src/services/secret-utils.js:171
+msgid "Failed to lookup secret."
+msgstr ""
+
+#: src/services/secret-utils.js:203
+msgid "Failed to retrieve secret."
+msgstr ""
+
+#: src/services/secret-utils.js:232 src/services/secret-utils.js:269
+#: src/services/secret-utils.js:291
+msgid "Failed to lookup item."
+msgstr ""
+
+#: src/services/secret-utils.js:239 src/services/secret-utils.js:275
+msgid "Failed to set label."
+msgstr ""
+
+#: src/services/secret-utils.js:246
+msgid "Failed to set attributes."
+msgstr ""
+
+#: src/services/secret-utils.js:252
+msgid "Failed to set secret."
+msgstr ""
+
+#: src/services/secret-utils.js:298
+msgid "Failed to set counter."
+msgstr ""
+
+#: src/ui/indicator.js:233
+msgid "Locked"
+msgstr ""
+
+#: src/ui/indicator.js:297
+msgid "Type to search…"
+msgstr ""
+
+#: src/ui/indicator.js:353
+msgid "Settings..."
+msgstr ""
+
+#: src/ui/indicator.js:359
+msgid "OTP Secrets"
+msgstr ""
+
+#: src/ui/indicator.js:394 src/ui/indicator.js:586
+msgid "No OTP secrets."
+msgstr ""
+
+#: src/ui/indicator.js:473
+msgid "Show OTP codes"
+msgstr ""
+
+#: src/ui/indicator.js:474
+msgid "Hide OTP codes"
+msgstr ""
+
+#: src/ui/indicator.js:484
+msgid "Failed to lock OTP secrets."
+msgstr ""
+
+#: src/ui/indicator.js:487
+msgid "Error locking OTP secrets."
+msgstr ""
+
+#: src/ui/indicator.js:497
+msgid "Failed to unlock OTP secrets."
+msgstr ""
+
+#: src/ui/indicator.js:500
+msgid "Error unlocking OTP secrets."
+msgstr ""
+
+#: src/ui/indicator.js:553
+msgid "Error retrieving OTP items."
+msgstr ""
+
+#: src/ui/indicator.js:589
+msgid "No matching OTP secrets."
+msgstr ""
+
+#: src/ui/indicator.js:691
+msgid "Error copying the OTP authentication code."
+msgstr ""
+
+#: src/utils/base32.js:23
+msgid "Invalid base32 input; missing padding."
+msgstr ""
+
+#: src/utils/base32.js:39
+msgid "Invalid base32 character at position:"
+msgstr ""
+
+#: src/utils/base32.js:46
+msgid "Invalid padding."
 msgstr ""
