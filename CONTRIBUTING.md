@@ -17,20 +17,38 @@ welcome — bug reports, feature requests, translations, documentation, and code
 
 ## Repository structure
 
-| Path                                                | Purpose                                                    |
-| --------------------------------------------------- | ---------------------------------------------------------- |
-| `extension.js`                                      | Extension entry point (enable/disable).                    |
-| `indicator.js`                                      | Panel button and the OTP menu (St/Clutter UI).             |
-| `prefs.js`                                          | Preferences window (GTK/Adw).                              |
-| `codeController.js`                                 | Toolkit-agnostic controller for the live code + countdown. |
-| `secretUtils.js`                                    | GNOME Keyring / libsecret access (storage of secrets).     |
-| `otp.js`, `totp.js`, `hotp.js`                      | OTP model and RFC 4226 / 6238 code generation.             |
-| `base32.js`                                         | Base32 encode/decode (RFC 4648).                           |
-| `myAlertDialog.js`, `myEntryRow.js`, `mySpinRow.js` | Fallbacks for older GTK/Adw.                               |
-| `schemas/`                                          | GSettings schema.                                          |
-| `po/`                                               | Translations (gettext).                                    |
-| `icons/`, `icons.gresource.xml`                     | Bundled symbolic icons.                                    |
-| `stylesheet.css`, `prefs.css`                       | Styles for the menu and preferences.                       |
+GNOME Shell requires `extension.js`, `prefs.js`, `metadata.json`, and
+`stylesheet.css` to live at the extension root; all other source lives under
+`src/`.
+
+```
+extension.js              Extension entry point (enable/disable).
+prefs.js                  Preferences window (GTK/Adw).
+metadata.json             Extension manifest.
+stylesheet.css            Panel menu styles (auto-loaded by the shell).
+icons.gresource.xml       Symbolic-icon bundle manifest.
+icons/                    Bundled symbolic icons.
+schemas/                  GSettings schema.
+po/                       Translations (gettext).
+assets/                   Branding and screenshots (repo only, not packaged).
+src/
+  utils/
+    base32.js             Base32 encode/decode (RFC 4648).
+  otp/
+    otp.js                OTP model + shared code generation.
+    totp.js               Time-based OTP (RFC 6238).
+    hotp.js               Counter-based OTP (RFC 4226).
+  services/
+    secret-utils.js       GNOME Keyring / libsecret access.
+    code-controller.js    Toolkit-agnostic live code + countdown controller.
+  ui/
+    indicator.js          Panel button and the OTP menu (St/Clutter).
+    prefs.css             Preferences window styles.
+    widgets/
+      my-alert-dialog.js  Fallbacks for older GTK/Adw.
+      my-entry-row.js
+      my-spin-row.js
+```
 
 ## Development setup
 
@@ -84,7 +102,9 @@ There is no automated test suite yet. Before opening a pull request, please:
 1. **Syntax-check** every JavaScript file you touched:
 
    ```sh
-   for f in *.js; do node --check "$f" || echo "FAIL $f"; done
+   for f in extension.js prefs.js $(find src -name "*.js"); do
+     node --check "$f" || echo "FAIL $f"
+   done
    ```
 
 2. **Build** the extension (`make`) and confirm it packs without errors.
