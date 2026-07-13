@@ -1,0 +1,13 @@
+node_modules/
+
+# Build artifacts
+*.gresource
+*.zip
+po/*.mo
+schemas/gschema.compiled
+
+# Tool-generated
+package-lock.json
+
+# License text (kept verbatim)
+COPYING
