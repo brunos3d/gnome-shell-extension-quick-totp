@@ -38,6 +38,22 @@ codes — invoke external command-line tools (for example `zbar` or `qrencode`)
 that must already be installed on your system. These run locally and are not part
 of any network communication.
 
+## Importing and exporting
+
+- **Imports are untrusted input.** Every account parsed from a file or QR code is
+  validated (type, algorithm, digits, period/counter, issuer/name length, and
+  Base32 secret) before it can be written to the keyring. Malformed entries are
+  reported to you and skipped — never silently accepted or executed. No content
+  from an imported file is evaluated as code.
+- **Exports are unencrypted.** An exported backup contains your OTP secrets in
+  clear text. Quick TOTP warns you before writing one and recommends storing it
+  securely and deleting it when no longer needed.
+- **Encrypted backup formats are intentionally not supported**, because the GNOME
+  Shell runtime lacks the required cryptographic primitives; this keeps the
+  security surface small and avoids bundling crypto into a shell extension. See
+  [`docs/import-export.md`](docs/import-export.md) and
+  [`src/io/crypto/README.md`](src/io/crypto/README.md).
+
 ## Priority
 
 Security issues that could expose or compromise user secrets are treated with

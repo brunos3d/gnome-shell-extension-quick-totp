@@ -43,12 +43,29 @@ src/
     code-controller.js    Toolkit-agnostic live code + countdown controller.
   ui/
     indicator.js          Panel button and the OTP menu (St/Clutter).
+    backup-restore.js     "Backup & Restore" preferences group (Adwaita).
     prefs.css             Preferences window styles.
     widgets/
       my-alert-dialog.js  Fallbacks for older GTK/Adw.
       my-entry-row.js
       my-spin-row.js
+  io/                     Toolkit-agnostic import/export engine (see below).
+    shared/               Canonical account model, validators, base64, protobuf.
+    parsers/              One module per format: bytes/text -> accounts.
+    serializers/          One module per format: accounts -> bytes/text.
+    formats/registry.js   Catalogue wiring parsers/serializers to UI metadata.
+    import-service.js     Validate, de-duplicate, and store into the keyring.
+    export-service.js     Gather accounts (with secrets) and serialize.
+    crypto/               Documents the (deliberately unsupported) encrypted formats.
+tests/                    Dependency-free test suite (node tests/run.mjs).
+docs/                     Longer-form documentation (e.g. import-export.md).
 ```
+
+The import/export engine under `src/io/` is pure JavaScript with no GNOME
+dependencies, so it can be unit-tested with plain `node`. Only the UI
+(`src/ui/backup-restore.js`) and the two services touch GTK/libsecret. Adding a
+new format is a self-contained change: add a parser and/or serializer, then one
+entry in `formats/registry.js`. See [`docs/import-export.md`](docs/import-export.md).
 
 ## Development setup
 
@@ -97,9 +114,17 @@ make update-po  # refresh translation catalogs from the sources
 
 ## Testing
 
-There is no automated test suite yet. Before opening a pull request, please:
+The import/export engine has an automated, dependency-free test suite. Before
+opening a pull request, please:
 
-1. **Syntax-check** every JavaScript file you touched:
+1. **Run the test suite** (parsers, serializers, round-trips, validation,
+   malformed input, and scaling):
+
+   ```sh
+   npm test
+   ```
+
+2. **Syntax-check** every JavaScript file you touched:
 
    ```sh
    for f in extension.js prefs.js $(find src -name "*.js"); do
@@ -107,11 +132,18 @@ There is no automated test suite yet. Before opening a pull request, please:
    done
    ```
 
-2. **Build** the extension (`make`) and confirm it packs without errors.
+3. **Build** the extension (`make`) and confirm it packs without errors.
 
-3. **Manually verify** the behavior you changed — panel menu, search, keyboard
-   navigation, show/hide, countdown, and (for secret-related changes) that
-   existing OTP secrets are still discovered and codes are still correct.
+4. **Manually verify** the behavior you changed — panel menu, search, keyboard
+   navigation, show/hide, countdown, import/export, and (for secret-related
+   changes) that existing OTP secrets are still discovered and codes are correct.
+
+When adding a format, add a parser/serializer test under `tests/` (reuse or add a
+fixture in `tests/fixtures/`).
+
+Some modules include self-contained reference vectors (see the RFC 4226 test
+cases in `otp/hotp.js` and the commented Base32 test in `utils/base32.js`) that
+are handy when changing code generation.
 
 Some modules include self-contained reference vectors (see the RFC 4226 test
 cases in `hotp.js` and the commented Base32 test in `base32.js`) that are handy
