@@ -32,11 +32,6 @@ Gio._promisify(Gtk.FileDialog.prototype, "open", "open_finish");
 Gio._promisify(Gtk.FileDialog.prototype, "save", "save_finish");
 Gio._promisify(Adw.MessageDialog.prototype, "choose", "choose_finish");
 
-// Import formats offered for the "from a file" flow (auto-detection tries these).
-const FILE_IMPORT_HINT = _(
-  "Aegis, andOTP, FreeOTP+, Bitwarden, GNOME Authenticator, Raivo OTP, Google Authenticator, Quick TOTP JSON, or a plain URI list.",
-);
-
 export const BackupRestoreGroup = GObject.registerClass(
   class BackupRestoreGroup extends Adw.PreferencesGroup {
     #onChanged;
@@ -62,7 +57,10 @@ export const BackupRestoreGroup = GObject.registerClass(
 
       const fromFile = new Adw.ActionRow({
         title: _("Import from a file…"),
-        subtitle: FILE_IMPORT_HINT,
+        // Note: gettext must be called at runtime (here), never at module scope.
+        subtitle: _(
+          "Aegis, andOTP, FreeOTP+, Bitwarden, GNOME Authenticator, Raivo OTP, Google Authenticator, Quick TOTP JSON, or a plain URI list.",
+        ),
         activatable: true,
       });
       fromFile.add_prefix(

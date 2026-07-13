@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: TOTP\n"
 "Report-Msgid-Bugs-To: https://github.com/brunos3d/gnome-shell-extension-"
 "totp\n"
-"POT-Creation-Date: 2026-07-13 10:06-0300\n"
+"POT-Creation-Date: 2026-07-13 10:24-0300\n"
 "PO-Revision-Date: 2025-12-25 09:47-0300\n"
 "Last-Translator: Daniel K. O.\n"
 "Language-Team: \n"
@@ -377,139 +377,139 @@ msgstr "Het geheim kan niet worden ingesteld."
 msgid "Failed to set counter."
 msgstr "Het instellen van de teller is mislukt."
 
-#: src/ui/backup-restore.js:37
+#: src/ui/backup-restore.js:43
+msgid "Backup & Restore"
+msgstr ""
+
+#: src/ui/backup-restore.js:44
+msgid "Import and export your OTP accounts in many formats."
+msgstr ""
+
+#: src/ui/backup-restore.js:54
+msgid "Restore / Import"
+msgstr ""
+
+#: src/ui/backup-restore.js:55
+msgid "Add accounts from another app or a backup file"
+msgstr ""
+
+#: src/ui/backup-restore.js:59
+msgid "Import from a file…"
+msgstr ""
+
+#: src/ui/backup-restore.js:62
 msgid ""
 "Aegis, andOTP, FreeOTP+, Bitwarden, GNOME Authenticator, Raivo OTP, Google "
 "Authenticator, Quick TOTP JSON, or a plain URI list."
 msgstr ""
 
-#: src/ui/backup-restore.js:48
-msgid "Backup & Restore"
-msgstr ""
-
-#: src/ui/backup-restore.js:49
-msgid "Import and export your OTP accounts in many formats."
-msgstr ""
-
-#: src/ui/backup-restore.js:59
-msgid "Restore / Import"
-msgstr ""
-
-#: src/ui/backup-restore.js:60
-msgid "Add accounts from another app or a backup file"
-msgstr ""
-
-#: src/ui/backup-restore.js:64
-msgid "Import from a file…"
-msgstr ""
-
-#: src/ui/backup-restore.js:80
+#: src/ui/backup-restore.js:78
 msgid "Backup / Export"
 msgstr ""
 
-#: src/ui/backup-restore.js:81
+#: src/ui/backup-restore.js:79
 msgid "Save your accounts to a file (unencrypted)"
 msgstr ""
 
-#: src/ui/backup-restore.js:104
+#: src/ui/backup-restore.js:102
 msgid "Import OTP accounts"
 msgstr ""
 
-#: src/ui/backup-restore.js:119
+#: src/ui/backup-restore.js:117
 msgid "Could not recognize this file as a supported OTP backup."
 msgstr ""
 
-#: src/ui/backup-restore.js:126
+#: src/ui/backup-restore.js:124
 msgid "No valid accounts were found in this file."
 msgstr ""
 
-#: src/ui/backup-restore.js:135
+#: src/ui/backup-restore.js:133
 #, fuzzy
 msgid "Imported accounts:"
 msgstr "Geïmporteerde geheimen:"
 
-#: src/ui/backup-restore.js:137
+#: src/ui/backup-restore.js:135
 msgid "skipped (already present):"
 msgstr ""
 
-#: src/ui/backup-restore.js:139
+#: src/ui/backup-restore.js:137
 msgid "failed:"
 msgstr ""
 
-#: src/ui/backup-restore.js:143
+#: src/ui/backup-restore.js:141
 msgid "Import failed:"
 msgstr ""
 
-#: src/ui/backup-restore.js:150
+#: src/ui/backup-restore.js:148
 msgid "Format:"
 msgstr ""
 
-#: src/ui/backup-restore.js:151
+#: src/ui/backup-restore.js:149
 msgid "Accounts to import:"
 msgstr ""
 
-#: src/ui/backup-restore.js:155
+#: src/ui/backup-restore.js:153
 msgid "Duplicates in file (merged):"
 msgstr ""
 
-#: src/ui/backup-restore.js:159
+#: src/ui/backup-restore.js:157
 msgid "Invalid entries (skipped):"
 msgstr ""
 
-#: src/ui/backup-restore.js:163
+#: src/ui/backup-restore.js:161
 msgid "Import OTP accounts?"
 msgstr ""
 
-#: src/ui/backup-restore.js:168 src/ui/backup-restore.js:242
+#: src/ui/backup-restore.js:166 src/ui/backup-restore.js:240
 #, fuzzy
 msgid "Cancel"
 msgstr "_Annuleren"
 
-#: src/ui/backup-restore.js:169
+#: src/ui/backup-restore.js:167
 #, fuzzy
 msgid "Import"
 msgstr "_Importeren"
 
-#: src/ui/backup-restore.js:184
+#: src/ui/backup-restore.js:182
 msgid "OTP backups (JSON, text, URIs)"
 msgstr ""
 
-#: src/ui/backup-restore.js:190
+#: src/ui/backup-restore.js:188
 msgid "All files"
 msgstr ""
 
-#: src/ui/backup-restore.js:203
+#: src/ui/backup-restore.js:201
 msgid "There are no accounts to export."
 msgstr ""
 
-#: src/ui/backup-restore.js:211
+#: src/ui/backup-restore.js:209
 msgid "Export OTP accounts"
 msgstr ""
 
-#: src/ui/backup-restore.js:223
+#: src/ui/backup-restore.js:221
 #, fuzzy
 msgid "Exported accounts:"
 msgstr "Geïmporteerde geheimen:"
 
-#: src/ui/backup-restore.js:226
+#: src/ui/backup-restore.js:224
 msgid "Export failed:"
 msgstr ""
 
-#: src/ui/backup-restore.js:233
+#: src/ui/backup-restore.js:231
 msgid "Export as unencrypted file?"
 msgstr ""
 
-#: src/ui/backup-restore.js:235
+#: src/ui/backup-restore.js:233
 msgid "account(s)"
 msgstr ""
 
-#: src/ui/backup-restore.js:237
+#: src/ui/backup-restore.js:235
 msgid ""
 "The exported file will contain your OTP secrets in clear text. Store it "
 "somewhere safe and delete it when you no longer need it."
 msgstr ""
 
-#: src/ui/backup-restore.js:243
+#: src/ui/backup-restore.js:241
 #, fuzzy
 msgid "Export"
 msgstr "_Importeren"
