@@ -1,6 +1,0 @@
-syntax: glob
-
-*.gresource
-*.mo
-*.zip
-*~

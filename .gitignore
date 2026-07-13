@@ -1,0 +1,12 @@
+# Build artifacts
+*.gresource
+*.zip
+
+# Compiled translations
+po/*.mo
+
+# Compiled GSettings schemas
+schemas/gschema.compiled
+
+# Editor backups
+*~
