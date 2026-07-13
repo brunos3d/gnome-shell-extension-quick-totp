@@ -6,97 +6,80 @@
 
 // See RFC 6238
 
-import * as OTP from './otp.js';
-
+import * as OTP from "./otp.js";
 
 // strings will be translated by gettext in the frontend
-const _ = x => x;
+const _ = (x) => x;
 
-
-function now()
-{
-    return new Date().getTime() / 1000;
+function now() {
+  return new Date().getTime() / 1000;
 }
 
+export default class TOTP extends OTP.OTP {
+  constructor({
+    issuer = "",
+    name = "",
+    secret = "",
+    digits = 6,
+    period = 30,
+    algorithm = "SHA-1",
+    uri = null,
+  } = {}) {
+    super();
 
-export default
-class TOTP extends OTP.OTP {
+    this.type = "TOTP";
 
-    constructor({
-        issuer = '',
-        name = '',
-        secret = '',
+    if (uri) {
+      let {
+        host = null,
+        issuer = "",
+        name = "",
+        secret = "",
         digits = 6,
         period = 30,
-        algorithm = 'SHA-1',
-        uri = null
-    } = {})
-    {
-        super();
-
-        this.type = 'TOTP';
-
-        if (uri) {
-            let {
-                host = null,
-                issuer = '',
-                name = '',
-                secret = '',
-                digits = 6,
-                period = 30,
-                algorithm = 'SHA-1'
-            } = OTP.parseURI(uri);
-            if (host.toLowerCase() != "totp")
-                throw new Error(_('URI host should be "totp"'));
-            this.issuer    = issuer;
-            this.name      = name;
-            this.secret    = secret;
-            this.digits    = parseInt(digits);
-            this.period    = parseInt(period);
-            this.algorithm = OTP.normalized_algorithm(algorithm);
-        } else {
-            this.issuer    = issuer;
-            this.name      = name;
-            this.secret    = secret;
-            this.digits    = parseInt(digits);
-            this.period    = parseInt(period);
-            this.algorithm = OTP.normalized_algorithm(algorithm);
-        }
+        algorithm = "SHA-1",
+      } = OTP.parseURI(uri);
+      if (host.toLowerCase() != "totp")
+        throw new Error(_('URI host should be "totp"'));
+      this.issuer = issuer;
+      this.name = name;
+      this.secret = secret;
+      this.digits = parseInt(digits);
+      this.period = parseInt(period);
+      this.algorithm = OTP.normalized_algorithm(algorithm);
+    } else {
+      this.issuer = issuer;
+      this.name = name;
+      this.secret = secret;
+      this.digits = parseInt(digits);
+      this.period = parseInt(period);
+      this.algorithm = OTP.normalized_algorithm(algorithm);
     }
+  }
 
+  code(time = now()) {
+    const counter = Math.trunc(time / this.period);
+    return super.code(counter);
+  }
 
-    code(time = now())
-    {
-        const counter = Math.trunc(time / this.period);
-        return super.code(counter);
-    }
+  // return code and expiry
+  code_and_expiry() {
+    const t = now();
+    const code = this.code(t);
+    const expiry = (Math.trunc(t / this.period) + 1) * this.period;
+    return [code, expiry];
+  }
 
+  uri() {
+    let args = {};
+    if (this.period != 30) args.period = this.period;
+    return super.uri(args);
+  }
 
-    // return code and expiry
-    code_and_expiry()
-    {
-        const t = now();
-        const code = this.code(t);
-        const expiry = (Math.trunc(t / this.period) + 1) * this.period;
-        return [code, expiry];
-    }
-
-
-    uri()
-    {
-        let args = {};
-        if (this.period != 30)
-            args.period = this.period;
-        return super.uri(args);
-    }
-
-
-    // return all members as strings, as required by libsecret
-    fields_non_destructive()
-    {
-        let result = super.fields_non_destructive();
-        result.period = this.period.toString();
-        return result;
-    }
-
-}; // class TOTP
+  // return all members as strings, as required by libsecret
+  fields_non_destructive() {
+    let result = super.fields_non_destructive();
+    result.period = this.period.toString();
+    return result;
+  }
+} // class TOTP

@@ -1,33 +1,32 @@
 button.otp-sort-button {
-    padding: 0px 4px 0px 4px;
-    min-height: 16px;
+  padding: 0px 4px 0px 4px;
+  min-height: 16px;
 }
 
 levelbar.totp-code-level > trough > block.filled.full {
-    background-color: @success_color;
+  background-color: @success_color;
 }
 
 levelbar.totp-code-level > trough > block.filled.high {
-    background-color: @warning_color;
+  background-color: @warning_color;
 }
 
 levelbar.totp-code-level > trough > block.filled.low {
-    background-color: @error_color;
+  background-color: @error_color;
 }
 
 window.qr-export-window {
-    padding: 0px;
+  padding: 0px;
 }
 
 window.import-uris-dialog {
-    padding: 6px;
+  padding: 6px;
 }
 
 box.import-uris-vbox {
-    padding: 6px;
+  padding: 6px;
 }
 
 .command-entry text {
-    font-family: monospace;
+  font-family: monospace;
 }
-

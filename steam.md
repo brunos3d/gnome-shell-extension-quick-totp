@@ -2,46 +2,43 @@
 
 The Steam Guard mobile app uses mostly standard TOTP:
 
- - The TOTP secret is named `shared_secret`, and will be stored in `Base64`
-   encoding. After you save, the extension will convert it to `Base32`.
+- The TOTP secret is named `shared_secret`, and will be stored in `Base64`
+  encoding. After you save, the extension will convert it to `Base32`.
 
- - Steam Guard parameters:
+- Steam Guard parameters:
 
-     - Type: TOTP
+  - Type: TOTP
 
-     - Digits: 5
+  - Digits: 5
 
-     - Period: 30 seconds
+  - Period: 30 seconds
 
-     - Algorithm: SHA-1
+  - Algorithm: SHA-1
 
- - Steam Guard uses decimal digits and letters to display authentication codes. To make
-   the TOTP extension show the codes in the same way, you **must** set the **Issuer** to
-   `Steam`.
-
+- Steam Guard uses decimal digits and letters to display authentication codes. To make
+  the TOTP extension show the codes in the same way, you **must** set the **Issuer** to
+  `Steam`.
 
 ## Importing TOTP secret from Steam Guard
 
 We need to extract the `shared_secret` from Steam Guard. There are a few different ways to
 obtain it, but here is one that's known to work:
 
-
 ### Prerequisites
 
- - Rooted Android device, with Steam Guard activated.
+- Rooted Android device, with Steam Guard activated.
 
- - [frida-server](https://github.com/frida/frida/releases): Download the
-   `frida-server-X.Y.Z-android-ARCH.xz` that matches your phone. If you don't know that
-   your phone is `arm64` or `x86`/`x86_64`, it's probably `arm`. There's no risk in
-   downloading the wrong architecture, it will simply not execute if you make a mistake.
+- [frida-server](https://github.com/frida/frida/releases): Download the
+  `frida-server-X.Y.Z-android-ARCH.xz` that matches your phone. If you don't know that
+  your phone is `arm64` or `x86`/`x86_64`, it's probably `arm`. There's no risk in
+  downloading the wrong architecture, it will simply not execute if you make a mistake.
 
-   > Note that the latest frida version might not work with your Android version. You might need
-   > to try older versions until you find one that works.
+  > Note that the latest frida version might not work with your Android version. You might need
+  > to try older versions until you find one that works.
 
- - `adb`: It's usually part of `android-tools` or `android-tools-adb` package.
+- `adb`: It's usually part of `android-tools` or `android-tools-adb` package.
 
- - USB cable to connect your phone to your PC.
-
+- USB cable to connect your phone to your PC.
 
 ### Preparation
 
@@ -49,7 +46,7 @@ obtain it, but here is one that's known to work:
 
        unxz frida-server-X.Y.Z-android-ARCH.xz
 
-    Example:
+   Example:
 
         unxz frida-server-16.5.9-android-arm.xz
 
@@ -116,10 +113,9 @@ obtain it, but here is one that's known to work:
 
    Make it executable by running `chmod +x dump.py`.
 
-4. On your phone's app settings, use "Force Stop" to completely stop the Steam app.
+3. On your phone's app settings, use "Force Stop" to completely stop the Steam app.
 
-5. Clear Steam's app cache. **DO NOT CLEAR THE STORAGE**.
-
+4. Clear Steam's app cache. **DO NOT CLEAR THE STORAGE**.
 
 ### Extracting the secrets
 
@@ -156,9 +152,9 @@ obtain it, but here is one that's known to work:
        chmod +x frida-server-X.Y.Z-android-ARCH
        ./frida-server-X.Y.Z-android-ARCH
 
-    If you see any error messages, this probably means this version of `frida-server` is
-    not compatible. Go download a different version and try again. You can press `Ctrl+C`
-    to stop `frida-server`.
+   If you see any error messages, this probably means this version of `frida-server` is
+   not compatible. Go download a different version and try again. You can press `Ctrl+C`
+   to stop `frida-server`.
 
 6. Run the `dump.py` script:
 
@@ -186,20 +182,20 @@ obtain it, but here is one that's known to work:
    }
    ```
 
-9. Use the `shared_secret` value as the TOTP secret, making sure to select `Base64`.
+8. Use the `shared_secret` value as the TOTP secret, making sure to select `Base64`.
 
-10. Close the Steam app.
+9. Close the Steam app.
 
-11. Stop the `dump.py` script by pressing `Ctrl+C`.
+10. Stop the `dump.py` script by pressing `Ctrl+C`.
 
-12. Stop the `frida-server` by pressing `Ctrl+C`.
+11. Stop the `frida-server` by pressing `Ctrl+C`.
 
-13. Open the Steam app again, and VERIFY that it generates the same authentication codes
+12. Open the Steam app again, and VERIFY that it generates the same authentication codes
     as the extension.
 
     > If the codes don't match, either you copied the `shared_secret` incorrectly, or you
     > didn't configure it correctly.
 
-14. Delete the `frida-server` executable form your phone:
+13. Delete the `frida-server` executable form your phone:
 
         rm frida-server-X.Y.Z-android-ARCH

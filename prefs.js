@@ -4,155 +4,142 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-
-import Adw       from 'gi://Adw';
-import Gdk       from 'gi://Gdk';
-import GdkPixbuf from 'gi://GdkPixbuf';
-import Gio       from 'gi://Gio';
-import GLib      from 'gi://GLib';
-import GObject   from 'gi://GObject';
-import Gtk       from 'gi://Gtk';
+import Adw from "gi://Adw";
+import Gdk from "gi://Gdk";
+import GdkPixbuf from "gi://GdkPixbuf";
+import Gio from "gi://Gio";
+import GLib from "gi://GLib";
+import GObject from "gi://GObject";
+import Gtk from "gi://Gtk";
 
 import {
-    ExtensionPreferences,
-    gettext as _
-} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
+  ExtensionPreferences,
+  gettext as _,
+} from "resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js";
 
-import * as Base32      from './base32.js';
-import CodeController   from './codeController.js';
-import HOTP             from './hotp.js';
-import MyAlertDialog    from './myAlertDialog.js';
-import MyEntryRow       from './myEntryRow.js';
-import MySpinRow        from './mySpinRow.js';
-import * as SecretUtils from './secretUtils.js';
-import TOTP             from './totp.js';
+import * as Base32 from "./base32.js";
+import CodeController from "./codeController.js";
+import HOTP from "./hotp.js";
+import MyAlertDialog from "./myAlertDialog.js";
+import MyEntryRow from "./myEntryRow.js";
+import MySpinRow from "./mySpinRow.js";
+import * as SecretUtils from "./secretUtils.js";
+import TOTP from "./totp.js";
 
-
-Gio._promisify(Gio.Subprocess.prototype, 'communicate_async', 'communicate_finish');
-Gio._promisify(Gio.Subprocess.prototype, 'communicate_utf8_async', 'communicate_utf8_finish');
-Gio._promisify(Gdk.Clipboard.prototype, 'read_text_async', 'read_text_finish');
-Gio._promisify(Gdk.Clipboard.prototype, 'read_texture_async', 'read_texture_finish');
+Gio._promisify(
+  Gio.Subprocess.prototype,
+  "communicate_async",
+  "communicate_finish",
+);
+Gio._promisify(
+  Gio.Subprocess.prototype,
+  "communicate_utf8_async",
+  "communicate_utf8_finish",
+);
+Gio._promisify(Gdk.Clipboard.prototype, "read_text_async", "read_text_finish");
+Gio._promisify(
+  Gdk.Clipboard.prototype,
+  "read_texture_async",
+  "read_texture_finish",
+);
 
 const AlertDialog = Gtk.AlertDialog ?? MyAlertDialog;
-Gio._promisify(AlertDialog.prototype, 'choose', 'choose_finish');
+Gio._promisify(AlertDialog.prototype, "choose", "choose_finish");
 
 const EntryRow = Adw.EntryRow ?? MyEntryRow;
 
 const SpinRow = Adw.SpinRow ?? MySpinRow;
 
-
-function makeLabel({issuer, name})
-{
-    const safe_issuer = GLib.markup_escape_text(issuer, -1);
-    const safe_name = GLib.markup_escape_text(name, -1);
-    return `${safe_issuer}: ${safe_name}`;
+function makeLabel({ issuer, name }) {
+  const safe_issuer = GLib.markup_escape_text(issuer, -1);
+  const safe_name = GLib.markup_escape_text(name, -1);
+  return `${safe_issuer}: ${safe_name}`;
 }
 
+function reportError(root, e) {
+  logError(e);
+  try {
+    const dialog = new AlertDialog({
+      modal: true,
+      detail: _(e.message),
+      message: _("Error"),
+    });
+    dialog.show(root);
+  } catch (ee) {
+    logError(ee);
+  }
+}
 
-function reportError(root, e)
-{
-    logError(e);
+function findListBoxChild(start) {
+  // Note: use BFS
+  const queue = [start];
+
+  while (queue.length > 0) {
+    const current = queue.shift();
+    if (current instanceof Gtk.ListBox) return current;
+
+    let child = current.get_first_child();
+    while (child) {
+      queue.push(child);
+      child = child.get_next_sibling();
+    }
+  }
+
+  return null;
+}
+
+function makeStringList(...strings) {
+  if (!Gtk.check_version(4, 10, 0))
+    return new Gtk.StringList({ strings: strings });
+
+  const list = new Gtk.StringList();
+  strings.forEach((s) => list.append(s));
+  return list;
+}
+
+function dict2OTP(dict) {
+  if (dict.type == "TOTP") return new TOTP(dict);
+  if (dict.type == "HOTP") return new HOTP(dict);
+  throw new Error(`dict is ${dict}`);
+}
+
+function OTP2variant(otp) {
+  if (otp.type == "TOTP")
+    return new GLib.Variant("a{sv}", {
+      type: GLib.Variant.new_string(otp.type),
+      issuer: GLib.Variant.new_string(otp.issuer),
+      name: GLib.Variant.new_string(otp.name),
+      digits: GLib.Variant.new_uint32(otp.digits),
+      period: GLib.Variant.new_uint32(otp.period),
+      algorithm: GLib.Variant.new_string(otp.algorithm),
+    });
+  if (otp.type == "HOTP")
+    return new GLib.Variant("a{sv}", {
+      type: GLib.Variant.new_string(otp.type),
+      issuer: GLib.Variant.new_string(otp.issuer),
+      name: GLib.Variant.new_string(otp.name),
+      digits: GLib.Variant.new_uint32(otp.digits),
+      counter: GLib.Variant.new_uint32(otp.counter),
+      algorithm: GLib.Variant.new_string(otp.algorithm),
+    });
+  throw new Error(`BUG: otp.type is ${otp.type}`);
+}
+
+function variant2OTP(args) {
+  return dict2OTP(args.recursiveUnpack());
+}
+
+function uri2OTP(uri) {
+  try {
+    return new TOTP({ uri: uri });
+  } catch (e1) {
     try {
-        const dialog = new AlertDialog({
-            modal: true,
-            detail: _(e.message),
-            message: _('Error')
-        });
-        dialog.show(root);
+      return new HOTP({ uri: uri });
+    } catch (e2) {
+      throw Error(`1: ${e1}\n2:${e2}`);
     }
-    catch (ee) {
-        logError(ee);
-    }
+  }
 }
-
-
-function findListBoxChild(start)
-{
-    // Note: use BFS
-    const queue = [start];
-
-    while (queue.length > 0) {
-        const current = queue.shift();
-        if (current instanceof Gtk.ListBox)
-            return current;
-
-        let child = current.get_first_child();
-        while (child) {
-            queue.push(child);
-            child = child.get_next_sibling();
-        }
-    }
-
-    return null;
-}
-
-
-function makeStringList(...strings)
-{
-    if (!Gtk.check_version(4, 10, 0))
-        return new Gtk.StringList({ strings: strings });
-
-    const list = new Gtk.StringList();
-    strings.forEach(s => list.append(s));
-    return list;
-}
-
-
-function dict2OTP(dict)
-{
-    if (dict.type == 'TOTP')
-        return new TOTP(dict);
-    if (dict.type == 'HOTP')
-        return new HOTP(dict);
-    throw new Error(`dict is ${dict}`);
-}
-
-
-function OTP2variant(otp)
-{
-    if (otp.type == 'TOTP')
-        return new GLib.Variant('a{sv}', {
-            type      : GLib.Variant.new_string(otp.type),
-            issuer    : GLib.Variant.new_string(otp.issuer),
-            name      : GLib.Variant.new_string(otp.name),
-            digits    : GLib.Variant.new_uint32(otp.digits),
-            period    : GLib.Variant.new_uint32(otp.period),
-            algorithm : GLib.Variant.new_string(otp.algorithm),
-        });
-    if (otp.type == 'HOTP')
-        return new GLib.Variant('a{sv}', {
-            type      : GLib.Variant.new_string(otp.type),
-            issuer    : GLib.Variant.new_string(otp.issuer),
-            name      : GLib.Variant.new_string(otp.name),
-            digits    : GLib.Variant.new_uint32(otp.digits),
-            counter   : GLib.Variant.new_uint32(otp.counter),
-            algorithm : GLib.Variant.new_string(otp.algorithm),
-        });
-    throw new Error(`BUG: otp.type is ${otp.type}`);
-}
-
-
-function variant2OTP(args)
-{
-    return dict2OTP(args.recursiveUnpack());
-}
-
-
-function uri2OTP(uri)
-{
-    try {
-        return new TOTP({ uri: uri });
-    }
-    catch (e1) {
-        try {
-            return new HOTP({ uri: uri });
-        }
-        catch (e2) {
-            throw Error(`1: ${e1}\n2:${e2}`);
-        }
-    }
-}
-
 
 /*
 function adwCheckVersion(req_major, req_minor)
@@ -166,1550 +153,1367 @@ function adwCheckVersion(req_major, req_minor)
 }
 */
 
-
 class ScanQRButton extends Gtk.Button {
+  static {
+    GObject.registerClass(this);
+  }
 
-    static {
-        GObject.registerClass(this);
+  #settings;
+
+  constructor(settings) {
+    super({
+      icon_name: "camera-photo-symbolic",
+      tooltip_text: _("Scan QR code."),
+      valign: Gtk.Align.CENTER,
+    });
+
+    this.#settings = settings;
+  }
+
+  async on_clicked() {
+    try {
+      const qrscan_cmd = this.#settings.get_string("qrscan-cmd");
+      const [parsed, args] = GLib.shell_parse_argv(qrscan_cmd);
+      if (!parsed) throw new Error(_('Failed to parse "qrscan-cmd" option.'));
+
+      const proc = Gio.Subprocess.new(args, Gio.SubprocessFlags.STDOUT_PIPE);
+
+      const [stdout] = await proc.communicate_utf8_async(null, null);
+      if (!stdout) return;
+
+      this.activate_action("import-uri", GLib.Variant.new_string(stdout));
+    } catch (e) {
+      reportError(this.root, e);
     }
-
-
-    #settings;
-
-
-    constructor(settings)
-    {
-        super({
-            icon_name: 'camera-photo-symbolic',
-            tooltip_text: _('Scan QR code.'),
-            valign: Gtk.Align.CENTER
-        });
-
-        this.#settings = settings;
-    }
-
-
-    async on_clicked()
-    {
-        try {
-            const qrscan_cmd = this.#settings.get_string('qrscan-cmd');
-            const [parsed, args] = GLib.shell_parse_argv(qrscan_cmd);
-            if (!parsed)
-                throw new Error(_('Failed to parse "qrscan-cmd" option.'));
-
-            const proc = Gio.Subprocess.new(args, Gio.SubprocessFlags.STDOUT_PIPE);
-
-            const [stdout] = await proc.communicate_utf8_async(null, null);
-            if (!stdout)
-                return;
-
-            this.activate_action('import-uri',
-                                 GLib.Variant.new_string(stdout));
-        }
-        catch (e) {
-            reportError(this.root, e);
-        }
-    }
-
-};
-
+  }
+}
 
 class PasteButton extends Gtk.Button {
+  static {
+    GObject.registerClass(this);
+  }
 
-    static {
-        GObject.registerClass(this);
+  #settings;
+
+  constructor(settings) {
+    super({
+      icon_name: "edit-paste-symbolic",
+      tooltip_text: _(
+        'Paste either the "otpauth://" URI, or the QR code image.',
+      ),
+      valign: Gtk.Align.CENTER,
+    });
+
+    this.#settings = settings;
+  }
+
+  async on_clicked() {
+    try {
+      const clipboard = this.get_clipboard();
+
+      let text = null;
+
+      if (clipboard.formats.contain_mime_type("text/plain;charset=utf-8"))
+        text = await clipboard.read_text_async(null);
+      else {
+        const texture = await clipboard.read_texture_async(null);
+        if (!texture) return;
+
+        const img_bytes = texture.save_to_png_bytes();
+
+        const qrimage_cmd = this.#settings.get_string("qrimage-cmd");
+        const [parsed, args] = GLib.shell_parse_argv(qrimage_cmd);
+        if (!parsed)
+          throw new Error(_('Failed to parse "qrimage-cmd" option.'));
+
+        const proc = Gio.Subprocess.new(
+          args,
+          Gio.SubprocessFlags.STDIN_PIPE | Gio.SubprocessFlags.STDOUT_PIPE,
+        );
+
+        const [stdout] = await proc.communicate_async(img_bytes, null);
+        if (!stdout) return;
+
+        const td = new TextDecoder();
+        text = td.decode(stdout.get_data());
+      }
+
+      if (text)
+        this.activate_action("import-uri", GLib.Variant.new_string(text));
+    } catch (e) {
+      reportError(this.root, e);
     }
-
-
-    #settings;
-
-
-    constructor(settings)
-    {
-        super({
-            icon_name: 'edit-paste-symbolic',
-            tooltip_text: _('Paste either the "otpauth://" URI, or the QR code image.'),
-            valign: Gtk.Align.CENTER
-        });
-
-        this.#settings = settings;
-    }
-
-
-    async on_clicked()
-    {
-        try {
-            const clipboard = this.get_clipboard();
-
-            let text = null;
-
-            if (clipboard.formats.contain_mime_type('text/plain;charset=utf-8'))
-                text = await clipboard.read_text_async(null);
-            else {
-                const texture = await clipboard.read_texture_async(null);
-                if (!texture)
-                    return;
-
-                const img_bytes = texture.save_to_png_bytes();
-
-                const qrimage_cmd = this.#settings.get_string('qrimage-cmd');
-                const [parsed, args] = GLib.shell_parse_argv(qrimage_cmd);
-                if (!parsed)
-                    throw new Error(_('Failed to parse "qrimage-cmd" option.'));
-
-                const proc = Gio.Subprocess.new(args,
-                                                Gio.SubprocessFlags.STDIN_PIPE
-                                                | Gio.SubprocessFlags.STDOUT_PIPE);
-
-                const [stdout] = await proc.communicate_async(img_bytes, null);
-                if (!stdout)
-                    return;
-
-                const td = new TextDecoder();
-                text = td.decode(stdout.get_data());
-            }
-
-            if (text)
-                this.activate_action('import-uri',
-                                     GLib.Variant.new_string(text));
-        }
-        catch (e) {
-            reportError(this.root, e);
-        }
-    }
-
-};
-
+  }
+}
 
 class SecretDialog extends Gtk.Dialog {
+  static {
+    GObject.registerClass(this);
 
-    static {
-        GObject.registerClass(this);
+    this.install_action("import-uri", "s", (obj, name, arg) =>
+      obj.importURI(arg.unpack()),
+    );
+  }
 
-        this.install_action('import-uri', 's',
-                            (obj, name, arg) => obj.importURI(arg.unpack()));
+  static type_list = ["TOTP", "HOTP"];
+  static secret_type_list = ["Base32", "Base64"];
+  static digits_list = ["5", "6", "7", "8"];
+  static period_list = ["15", "30", "45", "60"];
+  static algorithm_list = ["SHA-1", "SHA-256", "SHA-384", "SHA-512"];
+
+  #reject;
+  #resolve;
+  #ui = {};
+
+  constructor({ title, otp, settings }) {
+    const fields = otp.fields_non_destructive();
+
+    super({
+      title: title,
+      default_width: 500,
+      // WORKAROUND: need header bar, otherwise the dialog is not centered
+      use_header_bar: true,
+    });
+
+    const group = new Adw.PreferencesGroup({
+      title: title,
+      margin_bottom: 12,
+      margin_top: 12,
+      margin_start: 12,
+      margin_end: 12,
+    });
+    this.get_content_area().append(group);
+
+    const box = new Gtk.Box({
+      orientation: Gtk.Orientation.HORIZONTAL,
+      spacing: 6,
+    });
+    group.set_header_suffix(box);
+
+    box.append(new PasteButton(settings));
+    box.append(new ScanQRButton(settings));
+
+    // UI: type
+    this.#ui.type_drop = new Gtk.DropDown({
+      model: makeStringList(...SecretDialog.type_list),
+      selected: SecretDialog.type_list.indexOf(fields.type),
+    });
+
+    this.#ui.type_drop.connect("notify::selected-item", () =>
+      this.changedOTPtype(),
+    );
+    this.#ui.type = new Adw.ActionRow({
+      title: _("Type"),
+      subtitle: _("Select between time-based or counter-based OTP."),
+    });
+    this.#ui.type.add_suffix(this.#ui.type_drop);
+    group.add(this.#ui.type);
+
+    // UI: issuer
+    this.#ui.issuer = new EntryRow({
+      title: _("Issuer"),
+      text: fields.issuer,
+      tooltip_text: _(
+        "The name of the organization (Google, Facebook, etc) that issued the OTP.",
+      ),
+    });
+    group.add(this.#ui.issuer);
+
+    // UI: name
+    this.#ui.name = new EntryRow({
+      title: _("Name"),
+      text: fields.name,
+    });
+    group.add(this.#ui.name);
+
+    // UI: secret
+    this.#ui.secret = new EntryRow({
+      title: _("Secret"),
+      text: fields.secret,
+      tooltip_text: _("The shared secret key."),
+    });
+    this.#ui.secret_type = new Gtk.DropDown({
+      model: makeStringList(...SecretDialog.secret_type_list),
+      selected: 0,
+      tooltip_text: _("How the secret key is encoded."),
+    });
+    this.#ui.secret.add_suffix(this.#ui.secret_type);
+    group.add(this.#ui.secret);
+
+    // UI: digits
+    this.#ui.digits = new Adw.ComboRow({
+      title: _("Digits"),
+      title_lines: 1,
+      model: makeStringList(...SecretDialog.digits_list),
+      selected: SecretDialog.digits_list.indexOf(fields.digits),
+      tooltip_text: _("How many digits in the code."),
+    });
+    group.add(this.#ui.digits);
+
+    // UI: period
+    this.#ui.period = new Adw.ComboRow({
+      title: _("Period"),
+      title_lines: 1,
+      subtitle: _("Time between code updates, in seconds."),
+      subtitle_lines: 1,
+      model: makeStringList(...SecretDialog.period_list),
+      selected: SecretDialog.period_list.indexOf(fields.period || "30"),
+    });
+    group.add(this.#ui.period);
+
+    // UI: counter
+    const counter = parseInt(fields.counter || "0");
+    this.#ui.counter = new SpinRow({
+      title: _("Counter"),
+      tooltip_text: _(
+        "This counter must be synchronized with the server, and it increments every time a code is generated.",
+      ),
+      adjustment: new Gtk.Adjustment({
+        value: counter,
+        lower: 0,
+        upper: Number.MAX_SAFE_INTEGER,
+        step_increment: 1,
+        page_increment: 10,
+      }),
+      numeric: true,
+      width_chars: 5,
+      value: counter,
+    });
+    group.add(this.#ui.counter);
+
+    // UI: algorithm
+    this.#ui.algorithm = new Adw.ComboRow({
+      title: _("Algorithm"),
+      title_lines: 1,
+      model: makeStringList(...SecretDialog.algorithm_list),
+      selected: SecretDialog.algorithm_list.indexOf(fields.algorithm),
+      tooltip_text: _("The hash algorithm used to generate codes."),
+    });
+    group.add(this.#ui.algorithm);
+
+    // UI: confirm/cancel buttons
+    this.add_button(_("_Cancel"), Gtk.ResponseType.CANCEL);
+
+    const ok_button = this.add_button(_("_OK"), Gtk.ResponseType.OK);
+    ok_button.add_css_class("suggested-action");
+    this.set_default_widget(ok_button);
+
+    // make sure the Issuer is focused
+    this.#ui.issuer.grab_focus();
+
+    this.changedOTPtype();
+  }
+
+  on_close_request() {
+    this.#reject = null;
+    this.#resolve = null;
+    this.#ui = null;
+    return false;
+  }
+
+  on_response(response) {
+    this.#resolve(response == Gtk.ResponseType.OK ? this.getOTP() : null);
+    this.close();
+  }
+
+  getOTP() {
+    let secret = this.#ui.secret.text;
+    if (this.#ui.secret_type.selected_item.string == "Base64")
+      secret = Base32.encode(GLib.base64_decode(secret));
+
+    const type = this.#ui.type_drop.selected_item.string;
+    if (type == "TOTP")
+      return new TOTP({
+        issuer: this.#ui.issuer.text,
+        name: this.#ui.name.text,
+        secret: secret,
+        digits: parseInt(this.#ui.digits.selected_item.string),
+        period: parseInt(this.#ui.period.selected_item.string),
+        algorithm: this.#ui.algorithm.selected_item.string,
+      });
+    if (type == "HOTP")
+      return new HOTP({
+        issuer: this.#ui.issuer.text,
+        name: this.#ui.name.text,
+        secret: secret,
+        digits: parseInt(this.#ui.digits.selected_item.string),
+        counter: this.#ui.counter.value,
+        algorithm: this.#ui.algorithm.selected_item.string,
+      });
+    throw new Error(`BUG: type is ${type}`);
+  }
+
+  setOTP(otp) {
+    const fields = otp.fields();
+    this.#ui.type_drop.selected = SecretDialog.type_list.indexOf(fields.type);
+    this.#ui.issuer.text = fields.issuer;
+    this.#ui.name.text = fields.name;
+    this.#ui.secret.text = fields.secret;
+    this.#ui.secret_type.selected = 0;
+    this.#ui.digits.selected = SecretDialog.digits_list.indexOf(
+      fields.digits.toString(),
+    );
+    if ("period" in fields)
+      this.#ui.period.selected = SecretDialog.period_list.indexOf(
+        fields.period.toString(),
+      );
+    if ("counter" in fields) this.#ui.counter.value = fields.period;
+    this.#ui.algorithm.selected = SecretDialog.algorithm_list.indexOf(
+      fields.algorithm,
+    );
+  }
+
+  changedOTPtype() {
+    if (!this.#ui.type_drop.selected_item) return;
+    const type = this.#ui.type_drop.selected_item.string;
+    if (type == "TOTP") {
+      this.#ui.counter.visible = false;
+      this.#ui.period.visible = true;
+    } else if (type == "HOTP") {
+      this.#ui.period.visible = false;
+      this.#ui.counter.visible = true;
+    } else {
+      throw new Error(`BUG: type is ${type}`);
     }
+  }
 
-    static type_list = ['TOTP', 'HOTP'];
-    static secret_type_list = ['Base32', 'Base64'];
-    static digits_list = ['5', '6', '7', '8'];
-    static period_list = ['15', '30', '45', '60'];
-    static algorithm_list = ['SHA-1', 'SHA-256', 'SHA-384', 'SHA-512'];
+  choose(parent) {
+    this.transient_for = parent;
+    this.modal = !!parent;
+    this.visible = true;
 
+    return new Promise((resolve, reject) => {
+      this.#resolve = resolve;
+      this.#reject = reject;
+    });
+  }
 
-    #reject;
-    #resolve;
-    #ui = {};
-
-
-    constructor({ title, otp, settings })
-    {
-        const fields = otp.fields_non_destructive();
-
-        super({
-            title: title,
-            default_width: 500,
-            // WORKAROUND: need header bar, otherwise the dialog is not centered
-            use_header_bar: true
-        });
-
-        const group = new Adw.PreferencesGroup({
-            title: title,
-            margin_bottom: 12,
-            margin_top: 12,
-            margin_start: 12,
-            margin_end: 12
-        });
-        this.get_content_area().append(group);
-
-        const box = new Gtk.Box({
-            orientation: Gtk.Orientation.HORIZONTAL,
-            spacing: 6
-        });
-        group.set_header_suffix(box);
-
-        box.append(new PasteButton(settings));
-        box.append(new ScanQRButton(settings));
-
-        // UI: type
-        this.#ui.type_drop = new Gtk.DropDown({
-            model: makeStringList(...SecretDialog.type_list),
-            selected: SecretDialog.type_list.indexOf(fields.type),
-        });
-
-        this.#ui.type_drop.connect('notify::selected-item', () => this.changedOTPtype());
-        this.#ui.type = new Adw.ActionRow({
-            title: _('Type'),
-            subtitle: _('Select between time-based or counter-based OTP.')
-        });
-        this.#ui.type.add_suffix(this.#ui.type_drop);
-        group.add(this.#ui.type);
-
-        // UI: issuer
-        this.#ui.issuer = new EntryRow({
-            title: _('Issuer'),
-            text: fields.issuer,
-            tooltip_text: _('The name of the organization (Google, Facebook, etc) that issued the OTP.')
-        });
-        group.add(this.#ui.issuer);
-
-        // UI: name
-        this.#ui.name = new EntryRow({
-            title: _('Name'),
-            text: fields.name
-        });
-        group.add(this.#ui.name);
-
-        // UI: secret
-        this.#ui.secret = new EntryRow({
-            title: _('Secret'),
-            text: fields.secret,
-            tooltip_text: _('The shared secret key.')
-        });
-        this.#ui.secret_type = new Gtk.DropDown({
-            model: makeStringList(...SecretDialog.secret_type_list),
-            selected: 0,
-            tooltip_text: _('How the secret key is encoded.')
-        });
-        this.#ui.secret.add_suffix(this.#ui.secret_type);
-        group.add(this.#ui.secret);
-
-        // UI: digits
-        this.#ui.digits = new Adw.ComboRow({
-            title: _('Digits'),
-            title_lines: 1,
-            model: makeStringList(...SecretDialog.digits_list),
-            selected: SecretDialog.digits_list.indexOf(fields.digits),
-            tooltip_text: _('How many digits in the code.')
-        });
-        group.add(this.#ui.digits);
-
-        // UI: period
-        this.#ui.period = new Adw.ComboRow({
-            title: _('Period'),
-            title_lines: 1,
-            subtitle: _('Time between code updates, in seconds.'),
-            subtitle_lines: 1,
-            model: makeStringList(...SecretDialog.period_list),
-            selected: SecretDialog.period_list.indexOf(fields.period || '30')
-        });
-        group.add(this.#ui.period);
-
-        // UI: counter
-        const counter = parseInt(fields.counter || '0');
-        this.#ui.counter = new SpinRow({
-            title: _('Counter'),
-            tooltip_text: _('This counter must be synchronized with the server, and it increments every time a code is generated.'),
-            adjustment: new Gtk.Adjustment({
-                value: counter,
-                lower: 0,
-                upper: Number.MAX_SAFE_INTEGER,
-                step_increment: 1,
-                page_increment: 10,
-            }),
-            numeric: true,
-            width_chars: 5,
-            value: counter,
-        });
-        group.add(this.#ui.counter);
-
-        // UI: algorithm
-        this.#ui.algorithm = new Adw.ComboRow({
-            title: _('Algorithm'),
-            title_lines: 1,
-            model: makeStringList(...SecretDialog.algorithm_list),
-            selected: SecretDialog.algorithm_list.indexOf(fields.algorithm),
-            tooltip_text: _('The hash algorithm used to generate codes.')
-        });
-        group.add(this.#ui.algorithm);
-
-
-        // UI: confirm/cancel buttons
-        this.add_button(_('_Cancel'), Gtk.ResponseType.CANCEL);
-
-        const ok_button = this.add_button(_('_OK'), Gtk.ResponseType.OK);
-        ok_button.add_css_class('suggested-action');
-        this.set_default_widget(ok_button);
-
-
-        // make sure the Issuer is focused
-        this.#ui.issuer.grab_focus();
-
-        this.changedOTPtype();
+  importURI(uri) {
+    try {
+      const otp = uri2OTP(uri);
+      this.setOTP(otp);
+    } catch (e) {
+      reportError(this.root, e);
     }
-
-
-    on_close_request()
-    {
-        this.#reject   = null;
-        this.#resolve  = null;
-        this.#ui       = null;
-        return false;
-    }
-
-
-    on_response(response)
-    {
-        this.#resolve(response == Gtk.ResponseType.OK
-                      ? this.getOTP()
-                      : null);
-        this.close();
-    }
-
-
-    getOTP()
-    {
-        let secret = this.#ui.secret.text;
-        if (this.#ui.secret_type.selected_item.string == 'Base64')
-            secret = Base32.encode(GLib.base64_decode(secret));
-
-        const type = this.#ui.type_drop.selected_item.string;
-        if (type == 'TOTP')
-            return new TOTP({
-                issuer: this.#ui.issuer.text,
-                name: this.#ui.name.text,
-                secret: secret,
-                digits: parseInt(this.#ui.digits.selected_item.string),
-                period: parseInt(this.#ui.period.selected_item.string),
-                algorithm: this.#ui.algorithm.selected_item.string
-            });
-        if (type == 'HOTP')
-            return new HOTP({
-                issuer: this.#ui.issuer.text,
-                name: this.#ui.name.text,
-                secret: secret,
-                digits: parseInt(this.#ui.digits.selected_item.string),
-                counter: this.#ui.counter.value,
-                algorithm: this.#ui.algorithm.selected_item.string
-            });
-        throw new Error(`BUG: type is ${type}`);
-    }
-
-
-    setOTP(otp)
-    {
-        const fields = otp.fields();
-        this.#ui.type_drop.selected = SecretDialog.type_list.indexOf(fields.type);
-        this.#ui.issuer.text = fields.issuer;
-        this.#ui.name.text = fields.name;
-        this.#ui.secret.text = fields.secret;
-        this.#ui.secret_type.selected = 0;
-        this.#ui.digits.selected = SecretDialog.digits_list.indexOf(fields.digits.toString());
-        if ('period' in fields)
-            this.#ui.period.selected = SecretDialog.period_list.indexOf(fields.period.toString());
-        if ('counter' in fields)
-            this.#ui.counter.value = fields.period;
-        this.#ui.algorithm.selected = SecretDialog.algorithm_list.indexOf(fields.algorithm);
-    }
-
-
-    changedOTPtype()
-    {
-        if (!this.#ui.type_drop.selected_item)
-            return;
-        const type = this.#ui.type_drop.selected_item.string;
-        if (type == 'TOTP') {
-            this.#ui.counter.visible = false;
-            this.#ui.period.visible = true;
-        } else if (type == 'HOTP') {
-            this.#ui.period.visible = false;
-            this.#ui.counter.visible = true;
-        } else {
-            throw new Error(`BUG: type is ${type}`);
-        }
-    }
-
-
-    choose(parent)
-    {
-        this.transient_for = parent;
-        this.modal = !!parent;
-        this.visible = true;
-
-        return new Promise((resolve, reject) => {
-            this.#resolve = resolve;
-            this.#reject = reject;
-        });
-    }
-
-
-    importURI(uri)
-    {
-        try {
-            const otp = uri2OTP(uri);
-            this.setOTP(otp);
-        }
-        catch (e) {
-            reportError(this.root, e);
-        }
-    }
-
-};
-
+  }
+}
 
 class CopyCodeButton extends Gtk.Button {
+  static {
+    GObject.registerClass(this);
+  }
 
-    static {
-        GObject.registerClass(this);
+  #controller;
+  #label;
+  #level;
+  #otp;
+
+  constructor(otp) {
+    super({
+      tooltip_text: _("Copy code to clipboard."),
+      valign: Gtk.Align.CENTER,
+    });
+
+    this.#otp = otp;
+
+    const box = new Gtk.Box({
+      orientation: Gtk.Orientation.HORIZONTAL,
+      spacing: 6,
+    });
+    this.set_child(box);
+
+    box.append(
+      new Gtk.Image({
+        icon_name: "edit-copy-symbolic",
+      }),
+    );
+
+    this.#label = new Gtk.Label({
+      label: _("Unlock"),
+      use_markup: false,
+      width_chars: 10,
+    });
+    box.append(this.#label);
+
+    if (this.#otp.type == "TOTP") {
+      this.#level = new Gtk.LevelBar({
+        inverted: true,
+        max_value: this.#otp.period,
+        min_value: 0,
+        mode: Gtk.LevelBarMode.CONTINUOUS,
+        orientation: Gtk.Orientation.VERTICAL,
+      });
+      this.#level.add_css_class("totp-code-level");
+      this.#level.add_offset_value("full", this.#otp.period);
+      this.#level.add_offset_value("high", 10);
+      this.#level.add_offset_value("low", 5);
+
+      box.append(this.#level);
     }
 
+    // The countdown/refresh logic is shared with the panel indicator; see
+    // codeController.js.
+    this.#controller = new CodeController(this.#otp, this.render.bind(this));
+    this.#controller.start();
+  }
 
-    #controller;
-    #label;
-    #level;
-    #otp;
+  destroy() {
+    this.#controller.stop();
+  }
 
-
-    constructor(otp)
-    {
-        super({
-            tooltip_text: _('Copy code to clipboard.'),
-            valign: Gtk.Align.CENTER,
-        });
-
-        this.#otp = otp;
-
-        const box = new Gtk.Box({
-            orientation: Gtk.Orientation.HORIZONTAL,
-            spacing: 6
-        });
-        this.set_child(box);
-
-        box.append(new Gtk.Image({
-            icon_name: 'edit-copy-symbolic'
-        }));
-
-        this.#label = new Gtk.Label({
-            label: _('Unlock'),
-            use_markup: false,
-            width_chars: 10
-        });
-        box.append(this.#label);
-
-        if (this.#otp.type == 'TOTP') {
-            this.#level = new Gtk.LevelBar({
-                inverted: true,
-                max_value: this.#otp.period,
-                min_value: 0,
-                mode: Gtk.LevelBarMode.CONTINUOUS,
-                orientation: Gtk.Orientation.VERTICAL
-            });
-            this.#level.add_css_class('totp-code-level');
-            this.#level.add_offset_value('full', this.#otp.period);
-            this.#level.add_offset_value('high', 10);
-            this.#level.add_offset_value('low', 5);
-
-            box.append(this.#level);
-        }
-
-        // The countdown/refresh logic is shared with the panel indicator; see
-        // codeController.js.
-        this.#controller = new CodeController(this.#otp, this.render.bind(this));
-        this.#controller.start();
+  render({ locked, code, remaining, type, error }) {
+    if (error) {
+      this.sensitive = false;
+      return;
     }
 
-
-    destroy()
-    {
-        this.#controller.stop();
+    if (locked) {
+      if (type == "TOTP") this.#level.value = 0;
+      this.#label.label = _("Unlock");
+      this.#label.use_markup = false;
+      return;
     }
 
+    if (type == "TOTP") this.#level.value = remaining;
+    this.#label.label = `<tt>${code}</tt>`;
+    this.#label.use_markup = true;
+  }
 
-    render({locked, code, remaining, type, error})
-    {
-        if (error) {
-            this.sensitive = false;
-            return;
-        }
-
-        if (locked) {
-            if (type == 'TOTP')
-                this.#level.value = 0;
-            this.#label.label = _('Unlock');
-            this.#label.use_markup = false;
-            return;
-        }
-
-        if (type == 'TOTP')
-            this.#level.value = remaining;
-        this.#label.label = `<tt>${code}</tt>`;
-        this.#label.use_markup = true;
+  async on_clicked() {
+    try {
+      this.#otp.secret = await SecretUtils.getSecret(this.#otp);
+      const code = this.#otp.code();
+      if (this.#otp.type == "HOTP")
+        this.#otp.counter = await SecretUtils.incrementHOTP(this.#otp);
+      const arg = new GLib.Variant("(ssb)", [
+        code,
+        _("OTP code copied to clipboard."),
+        false,
+      ]);
+      this.activate_action("otp.copy-to-clipboard", arg);
+    } catch (e) {
+      reportError(this.root, e);
     }
-
-
-    async on_clicked()
-    {
-        try {
-            this.#otp.secret = await SecretUtils.getSecret(this.#otp);
-            const code = this.#otp.code();
-            if (this.#otp.type == 'HOTP')
-                this.#otp.counter = await SecretUtils.incrementHOTP(this.#otp);
-            const arg = new GLib.Variant('(ssb)',
-                                         [
-                                             code,
-                                             _('OTP code copied to clipboard.'),
-                                             false
-                                         ]);
-            this.activate_action('otp.copy-to-clipboard', arg);
-        }
-        catch (e) {
-            reportError(this.root, e);
-        }
-    }
-
-};
-
+  }
+}
 
 class ExportQRWindow extends Gtk.Window {
+  static {
+    GObject.registerClass(this);
+  }
 
-    static {
-        GObject.registerClass(this);
-    }
+  constructor(parent, img_stream) {
+    super({
+      transient_for: parent,
+      modal: true,
+      title: _("QR code"),
+    });
+    this.add_css_class("qr-export-window");
 
+    const box = new Gtk.Box({
+      orientation: Gtk.Orientation.VERTICAL,
+    });
+    this.set_child(box);
 
-    constructor(parent, img_stream)
-    {
-        super({
-            transient_for: parent,
-            modal: true,
-            title: _('QR code'),
-        });
-        this.add_css_class('qr-export-window');
+    const pbuf = GdkPixbuf.Pixbuf.new_from_stream(img_stream, null);
 
-        const box = new Gtk.Box({
-            orientation: Gtk.Orientation.VERTICAL
-        });
-        this.set_child(box);
+    const pic = new Gtk.Picture({
+      hexpand: true,
+      vexpand: true,
+      height_request: 400,
+      width_request: 400,
+    });
+    pic.set_pixbuf(pbuf);
+    box.append(pic);
 
-        const pbuf = GdkPixbuf.Pixbuf.new_from_stream(img_stream, null);
-
-        const pic = new Gtk.Picture({
-            hexpand: true,
-            vexpand: true,
-            height_request: 400,
-            width_request: 400,
-        });
-        pic.set_pixbuf(pbuf);
-        box.append(pic);
-
-        const button = new Gtk.Button({
-            label: _('_Close'),
-            use_underline: true
-        });
-        button.connect('clicked', () => this.close());
-        box.append(button);
-    }
-
-};
-
+    const button = new Gtk.Button({
+      label: _("_Close"),
+      use_underline: true,
+    });
+    button.connect("clicked", () => this.close());
+    box.append(button);
+  }
+}
 
 class MoveButton extends Gtk.Button {
+  static {
+    GObject.registerClass(this);
+  }
 
-    static {
-        GObject.registerClass(this);
-    }
+  #direction;
+  #group;
+  #row;
 
+  constructor(group, row, direction) {
+    super({
+      icon_name: direction < 0 ? "go-up-symbolic" : "go-down-symbolic",
+      tooltip_text:
+        direction < 0
+          ? _(
+              "Move this secret up; hold down the SHIFT key to move to the top of the list.",
+            )
+          : _(
+              "Move this secret down; hold down the SHIFT key to move to the bottom of the list.",
+            ),
+    });
+    this.add_css_class("flat");
+    this.add_css_class("otp-sort-button");
+    this.#group = group;
+    this.#row = row;
+    this.#direction = direction;
+  }
 
-    #direction;
-    #group;
-    #row;
+  destroy() {
+    this.#group = null;
+    this.#row = null;
+  }
 
-
-    constructor(group, row, direction)
-    {
-        super({
-            icon_name: (direction < 0 ? 'go-up-symbolic' : 'go-down-symbolic'),
-            tooltip_text: (direction < 0
-                           ? _('Move this secret up; hold down the SHIFT key to move to the top of the list.')
-                           : _('Move this secret down; hold down the SHIFT key to move to the bottom of the list.'))
-        });
-        this.add_css_class('flat');
-        this.add_css_class('otp-sort-button');
-        this.#group = group;
-        this.#row = row;
-        this.#direction = direction;
-    }
-
-
-    destroy()
-    {
-        this.#group = null;
-        this.#row = null;
-    }
-
-
-    on_clicked()
-    {
-        const display = Gdk.Display.get_default();
-        const seat = display.get_default_seat();
-        const kb = seat.get_keyboard();
-        const modifier = kb.modifier_state;
-        const shift_pressed = !!(modifier & Gdk.ModifierType.SHIFT_MASK);
-        let offset = this.#direction;
-        if (shift_pressed)
-            offset *= Infinity;
-        this.#group.moveBy(this.#row, offset);
-    }
-
-};
-
+  on_clicked() {
+    const display = Gdk.Display.get_default();
+    const seat = display.get_default_seat();
+    const kb = seat.get_keyboard();
+    const modifier = kb.modifier_state;
+    const shift_pressed = !!(modifier & Gdk.ModifierType.SHIFT_MASK);
+    let offset = this.#direction;
+    if (shift_pressed) offset *= Infinity;
+    this.#group.moveBy(this.#row, offset);
+  }
+}
 
 class SecretRow extends Adw.ActionRow {
+  static {
+    GObject.registerClass(this);
+  }
 
-    static {
-        GObject.registerClass(this);
-    }
+  #copy_code_button;
+  #down_button;
+  #up_button;
 
+  constructor(otp, group, settings) {
+    super({
+      title: otp.issuer,
+      title_lines: 1,
+      subtitle: otp.name,
+      subtitle_lines: 1,
+    });
 
-    #copy_code_button;
-    #down_button;
-    #up_button;
+    this._otp = otp; // used by storeAllRowsOrders()
 
+    const box = new Gtk.Box({
+      orientation: Gtk.Orientation.VERTICAL,
+      spacing: 0,
+      homogeneous: true,
+    });
+    this.add_prefix(box);
 
-    constructor(otp, group, settings)
-    {
-        super({
-            title: otp.issuer,
-            title_lines: 1,
-            subtitle: otp.name,
-            subtitle_lines: 1,
-        });
+    this.#up_button = new MoveButton(group, this, -1);
+    this.#down_button = new MoveButton(group, this, +1);
+    box.append(this.#up_button);
+    box.append(this.#down_button);
 
+    this.#copy_code_button = new CopyCodeButton(otp);
+    this.add_suffix(this.#copy_code_button);
 
-        this._otp = otp; // used by storeAllRowsOrders()
+    const menu = new Gio.Menu();
 
-        const box = new Gtk.Box({
-            orientation: Gtk.Orientation.VERTICAL,
-            spacing: 0,
-            homogeneous: true
-        });
-        this.add_prefix(box);
+    // helper function
+    const add_item = (label, action) => {
+      const item = new Gio.MenuItem();
+      item.set_label(label);
+      item.set_action_and_target_value(action, OTP2variant(otp));
+      menu.append_item(item);
+    };
 
-        this.#up_button = new MoveButton(group, this, -1);
-        this.#down_button = new MoveButton(group, this, +1);
-        box.append(this.#up_button);
-        box.append(this.#down_button);
+    add_item(_("_Edit..."), "otp.edit-secret");
 
-        this.#copy_code_button = new CopyCodeButton(otp);
-        this.add_suffix(this.#copy_code_button);
+    add_item(_("_Copy to clipboard"), "otp.export-secret-clipboard");
 
+    add_item(_("Export to _QR code..."), "otp.export-secret-qr");
 
-        const menu = new Gio.Menu();
+    add_item(_("_Remove"), "otp.remove-secret");
 
-        // helper function
-        const add_item = (label, action) => {
-            const item = new Gio.MenuItem();
-            item.set_label(label);
-            item.set_action_and_target_value(action, OTP2variant(otp));
-            menu.append_item(item);
-        };
+    this.add_suffix(
+      new Gtk.MenuButton({
+        icon_name: "open-menu-symbolic",
+        valign: Gtk.Align.CENTER,
+        menu_model: menu,
+      }),
+    );
+  }
 
-        add_item(_('_Edit...'),
-                 'otp.edit-secret');
+  destroy() {
+    this.#up_button = null;
+    this.#down_button = null;
 
-        add_item(_('_Copy to clipboard'),
-                 'otp.export-secret-clipboard');
+    this.#copy_code_button.destroy?.();
+    this.#copy_code_button = null;
+  }
 
-        add_item(_('Export to _QR code...'),
-                 'otp.export-secret-qr');
-
-        add_item(_('_Remove'),
-                 'otp.remove-secret');
-
-        this.add_suffix(new Gtk.MenuButton({
-            icon_name: 'open-menu-symbolic',
-            valign: Gtk.Align.CENTER,
-            menu_model: menu,
-        }));
-    }
-
-
-    destroy()
-    {
-        this.#up_button = null;
-        this.#down_button = null;
-
-        this.#copy_code_button.destroy?.();
-        this.#copy_code_button = null;
-    }
-
-
-    updateButtons()
-    {
-        this.#up_button.sensitive = !!this.get_prev_sibling();
-        this.#down_button.sensitive = !!this.get_next_sibling();
-    }
-
-};
-
+  updateButtons() {
+    this.#up_button.sensitive = !!this.get_prev_sibling();
+    this.#down_button.sensitive = !!this.get_next_sibling();
+  }
+}
 
 class ImportURIsDialog extends Gtk.Dialog {
+  static {
+    GObject.registerClass(this);
 
-    static {
-        GObject.registerClass(this);
+    this.install_action("import-uri", "s", (obj, name, arg) =>
+      obj.importURI(arg.unpack()),
+    );
+  }
 
-        this.install_action('import-uri', 's',
-                            (obj, name, arg) => obj.importURI(arg.unpack()));
-    }
+  #buffer;
+  #reject;
+  #resolve;
 
+  constructor(settings) {
+    super({
+      title: _('Importing "otpauth://" URIs'),
+      default_width: 600,
+      default_height: 400,
+      use_header_bar: true,
+    });
+    this.add_css_class("import-uris-dialog");
 
-    #buffer;
-    #reject;
-    #resolve;
+    const vbox = new Gtk.Box({
+      orientation: Gtk.Orientation.VERTICAL,
+      spacing: 6,
+    });
+    vbox.add_css_class("import-uris-vbox");
+    this.set_child(vbox);
 
+    const hbox = new Gtk.Box({
+      orientation: Gtk.Orientation.HORIZONTAL,
+      spacing: 6,
+    });
+    vbox.append(hbox);
 
-    constructor(settings)
-    {
-        super({
-            title: _('Importing "otpauth://" URIs'),
-            default_width: 600,
-            default_height: 400,
-            use_header_bar: true
-        });
-        this.add_css_class('import-uris-dialog');
+    const heading = new Gtk.Label({
+      label: _('Paste all "otpauth://" URIs you want to import, one per line.'),
+      hexpand: true,
+    });
+    hbox.append(heading);
 
-        const vbox = new Gtk.Box({
-            orientation: Gtk.Orientation.VERTICAL,
-            spacing: 6
-        });
-        vbox.add_css_class('import-uris-vbox');
-        this.set_child(vbox);
+    hbox.append(new PasteButton(settings));
+    hbox.append(new ScanQRButton(settings));
 
-        const hbox = new Gtk.Box({
-            orientation: Gtk.Orientation.HORIZONTAL,
-            spacing: 6
-        });
-        vbox.append(hbox);
+    this.#buffer = new Gtk.TextBuffer();
 
-        const heading = new Gtk.Label({
-            label: _('Paste all "otpauth://" URIs you want to import, one per line.'),
-            hexpand: true,
-        });
-        hbox.append(heading);
+    const scroll = new Gtk.ScrolledWindow({
+      vexpand: true,
+      hexpand: true,
+      child: new Gtk.TextView({
+        monospace: true,
+        buffer: this.#buffer,
+      }),
+    });
+    vbox.append(scroll);
 
-        hbox.append(new PasteButton(settings));
-        hbox.append(new ScanQRButton(settings));
+    // UI: import/cancel buttons
+    this.add_button(_("_Cancel"), Gtk.ResponseType.CANCEL);
 
+    const import_button = this.add_button(_("_Import"), Gtk.ResponseType.OK);
+    import_button.add_css_class("suggested-action");
+    this.set_default_widget(import_button);
+  }
 
-        this.#buffer = new Gtk.TextBuffer();
+  on_response(response) {
+    this.#resolve(response == Gtk.ResponseType.OK ? this.getText() : null);
+    this.close();
+  }
 
-        const scroll = new Gtk.ScrolledWindow({
-            vexpand: true,
-            hexpand: true,
-            child: new Gtk.TextView({
-                monospace: true,
-                buffer: this.#buffer
-            })
-        });
-        vbox.append(scroll);
+  getText() {
+    return this.#buffer.text;
+  }
 
+  choose(parent) {
+    this.transient_for = parent;
+    this.modal = !!parent;
+    this.visible = true;
 
-        // UI: import/cancel buttons
-        this.add_button(_('_Cancel'), Gtk.ResponseType.CANCEL);
+    return new Promise((resolve, reject) => {
+      this.#resolve = resolve;
+      this.#reject = reject;
+    });
+  }
 
-        const import_button = this.add_button(_('_Import'), Gtk.ResponseType.OK);
-        import_button.add_css_class('suggested-action');
-        this.set_default_widget(import_button);
-    }
-
-
-    on_response(response)
-    {
-        this.#resolve(response == Gtk.ResponseType.OK
-                      ? this.getText()
-                      : null);
-        this.close();
-    }
-
-
-    getText()
-    {
-        return this.#buffer.text;
-    }
-
-
-    choose(parent)
-    {
-        this.transient_for = parent;
-        this.modal = !!parent;
-        this.visible = true;
-
-        return new Promise((resolve, reject) => {
-            this.#resolve = resolve;
-            this.#reject = reject;
-        });
-    }
-
-
-    importURI(uri)
-    {
-        const iter = this.#buffer.get_end_iter();
-        this.#buffer.insert(iter, uri + '\n', -1);
-    }
-
-
-};
-
+  importURI(uri) {
+    const iter = this.#buffer.get_end_iter();
+    this.#buffer.insert(iter, uri + "\n", -1);
+  }
+}
 
 class LockButton extends Gtk.Button {
+  static {
+    GObject.registerClass(this);
+  }
 
-    static {
-        GObject.registerClass(this);
+  #locked = true;
+
+  constructor(args) {
+    super({
+      icon_name: "dialog-password-symbolic",
+      ...args,
+    });
+
+    this.updateState();
+  }
+
+  async updateState() {
+    try {
+      this.#locked = await SecretUtils.isOTPCollectionLocked();
+      if (this.#locked) {
+        this.icon_name = "changes-prevent-symbolic";
+        this.tooltip_text = _("Unlock OTP secrets...");
+      } else {
+        this.icon_name = "changes-allow-symbolic";
+        this.tooltip_text = _("Lock OTP secrets");
+      }
+    } catch (e) {
+      logError(e);
     }
+  }
 
-
-    #locked = true;
-
-
-    constructor(args)
-    {
-        super({
-            icon_name: 'dialog-password-symbolic',
-            ...args
-        });
-
-        this.updateState();
+  async on_clicked() {
+    try {
+      const success = this.#locked
+        ? await SecretUtils.unlockOTPCollection()
+        : await SecretUtils.lockOTPCollection();
+      await this.updateState();
+      this.activate_action("otp.refresh", null);
+    } catch (e) {
+      reportError(this.root, e);
     }
-
-
-    async updateState()
-    {
-        try {
-            this.#locked = await SecretUtils.isOTPCollectionLocked();
-            if (this.#locked) {
-                this.icon_name = 'changes-prevent-symbolic';
-                this.tooltip_text = _('Unlock OTP secrets...');
-            } else {
-                this.icon_name = 'changes-allow-symbolic';
-                this.tooltip_text = _('Lock OTP secrets');
-            }
-        }
-        catch (e) {
-            logError(e);
-        }
-    }
-
-
-    async on_clicked()
-    {
-        try {
-            const success = this.#locked
-                ? await SecretUtils.unlockOTPCollection()
-                : await SecretUtils.lockOTPCollection();
-            await this.updateState();
-            this.activate_action('otp.refresh', null);
-        }
-        catch (e) {
-            reportError(this.root, e);
-        }
-    }
-
-};
-
+  }
+}
 
 class SecretsGroup extends Adw.PreferencesGroup {
+  static {
+    GObject.registerClass(this);
 
-    static {
-        GObject.registerClass(this);
+    this.install_action("otp.create", null, (obj) => obj.createSecret());
 
-        this.install_action('otp.create', null,
-                            obj => obj.createSecret());
+    this.install_action("otp.refresh", null, (obj) => obj.refreshRows());
 
-        this.install_action('otp.refresh', null,
-                            obj => obj.refreshRows());
+    this.install_action("otp.import", null, (obj) => obj.importSecrets());
 
-        this.install_action('otp.import', null,
-                            obj => obj.importSecrets());
+    this.install_action("otp.export-all", null, (obj) =>
+      obj.exportAllSecrets(),
+    );
 
-        this.install_action('otp.export-all', null,
-                            obj => obj.exportAllSecrets());
+    this.install_action("otp.copy-to-clipboard", "(ssb)", (obj, name, args) =>
+      obj.copyToClipboard(...args.recursiveUnpack()),
+    );
 
-        this.install_action('otp.copy-to-clipboard', '(ssb)',
-                            (obj, name, args) =>
-                                obj.copyToClipboard(...args.recursiveUnpack()));
+    this.install_action("otp.edit-secret", "a{sv}", (obj, name, args) =>
+      obj.editSecret(variant2OTP(args)),
+    );
 
-        this.install_action('otp.edit-secret', 'a{sv}',
-                            (obj, name, args) =>
-                                obj.editSecret(variant2OTP(args)));
+    this.install_action(
+      "otp.export-secret-clipboard",
+      "a{sv}",
+      (obj, name, args) => obj.exportSecretClipboard(variant2OTP(args)),
+    );
 
-        this.install_action('otp.export-secret-clipboard', 'a{sv}',
-                            (obj, name, args) =>
-                                obj.exportSecretClipboard(variant2OTP(args)));
+    this.install_action("otp.export-secret-qr", "a{sv}", (obj, name, args) =>
+      obj.exportSecretQR(variant2OTP(args)),
+    );
 
-        this.install_action('otp.export-secret-qr', 'a{sv}',
-                            (obj, name, args) =>
-                                obj.exportSecretQR(variant2OTP(args)));
+    this.install_action("otp.remove-secret", "a{sv}", (obj, name, args) =>
+      obj.removeSecret(variant2OTP(args)),
+    );
+  }
 
-        this.install_action('otp.remove-secret', 'a{sv}',
-                            (obj, name, args) =>
-                                obj.removeSecret(variant2OTP(args)));
+  #clipboard_clear_source = 0;
+  #lock_button;
+  #rows = [];
+  #settings;
+
+  constructor(application_id, settings) {
+    super({
+      title: _("Secrets"),
+      description: _("A list of all OTP secrets from the keyring."),
+    });
+
+    const listbox = findListBoxChild(this);
+    listbox?.set_sort_func(this.rowSortFunc.bind(this));
+
+    this.#settings = settings;
+
+    const box = new Gtk.Box({
+      orientation: Gtk.Orientation.HORIZONTAL,
+      spacing: 6,
+    });
+    this.set_header_suffix(box);
+
+    this.#lock_button = new LockButton({ valign: Gtk.Align.CENTER });
+    box.append(this.#lock_button);
+
+    box.append(
+      new Gtk.Button({
+        icon_name: "document-new-symbolic",
+        tooltip_text: _("Add secret..."),
+        action_name: "otp.create",
+        valign: Gtk.Align.CENTER,
+      }),
+    );
+
+    box.append(
+      new Gtk.Button({
+        icon_name: "view-refresh-symbolic",
+        tooltip_text: _("Refresh secrets."),
+        action_name: "otp.refresh",
+        valign: Gtk.Align.CENTER,
+      }),
+    );
+
+    box.append(
+      new Gtk.Button({
+        icon_name: "document-import-symbolic",
+        action_name: "otp.import",
+        tooltip_text: _("Import secrets..."),
+        valign: Gtk.Align.CENTER,
+      }),
+    );
+
+    box.append(
+      new Gtk.Button({
+        icon_name: "document-export-symbolic",
+        action_name: "otp.export-all",
+        tooltip_text: _("Export all secrets to the clipboard."),
+        valign: Gtk.Align.CENTER,
+      }),
+    );
+
+    this.refreshRows();
+  }
+
+  destroy() {
+    this.cancelClipboardClear();
+    this.clearRows();
+    this.#lock_button = null;
+    this.#settings = null;
+  }
+
+  clearRows() {
+    this.#rows.forEach((row) => {
+      this.remove(row);
+      row.destroy();
+    });
+    this.#rows = [];
+  }
+
+  async refreshRows() {
+    this.clearRows();
+    try {
+      let locked = await SecretUtils.isOTPCollectionLocked();
+      if (locked) return;
+      const items = await SecretUtils.getOTPItems();
+      this.#lock_button.updateState();
+      items.forEach((item) => {
+        const attr = item.get_attributes();
+        const otp = dict2OTP(attr);
+        const row = new SecretRow(otp, this, this.#settings);
+        this.#rows.push(row);
+        this.add(row);
+      });
+      this.#rows.forEach((r) => r.updateButtons());
+    } catch (e) {
+      logError(e);
+    }
+  }
+
+  async createSecret() {
+    try {
+      const dialog = new SecretDialog({
+        title: _("Creating new OTP secret"),
+        otp: new TOTP(),
+        settings: this.#settings,
+      });
+
+      const otp = await dialog.choose(this.root);
+      if (!otp) return;
+
+      const n = this.#rows.length;
+      await SecretUtils.createOTPItem(otp, n);
+      this.root?.add_toast(new Adw.Toast({ title: _("Created new secret.") }));
+      await this.refreshRows();
+    } catch (e) {
+      reportError(this.root, e);
+    }
+  }
+
+  async importSecrets() {
+    try {
+      const dialog = new ImportURIsDialog(this.#settings);
+      const text = await dialog.choose(this.root);
+      if (!text) return; // canceled or empty text
+
+      const n = this.#rows.length;
+      const uris = GLib.Uri.list_extract_uris(text);
+
+      let successes = 0;
+      for (let i = 0; i < uris.length; ++i) {
+        try {
+          const otp = uri2OTP(uris[i]);
+          await SecretUtils.createOTPItem(otp, n + i);
+          ++successes;
+        } catch (e) {
+          logError(e);
+        }
+      }
+      this.root?.add_toast(
+        new Adw.Toast({
+          title: _("Imported secrets:") + ` ${successes}`,
+        }),
+      );
+
+      await this.refreshRows();
+    } catch (e) {
+      reportError(this.root, e);
+    }
+  }
+
+  async exportAllSecrets() {
+    try {
+      const uris = [];
+      const items = await SecretUtils.getOTPItems();
+      for (let i = 0; i < items.length; ++i) {
+        const attrs = items[i].get_attributes();
+        attrs.secret = await SecretUtils.getSecret(attrs);
+        const otp = dict2OTP(attrs);
+        uris.push(otp.uri());
+      }
+      this.copyToClipboard(
+        uris.join("\n"),
+        _("Copied all OTP secrets to clipboard."),
+        true,
+      );
+    } catch (e) {
+      reportError(this.root, e);
+    }
+  }
+
+  // Store the UI order in the keyring as their labels
+
+  async storeOneRowOrder(row) {
+    try {
+      const idx = this.#rows.indexOf(row);
+      const otp = row._otp;
+      await SecretUtils.updateOTPOrder(otp, idx);
+    } catch (e) {
+      logError(e);
+    }
+  }
+
+  async storeAllRowsOrders() {
+    try {
+      for (let i = 0; i < this.#rows.length; ++i) {
+        const otp = this.#rows[i]._otp;
+        await SecretUtils.updateOTPOrder(otp, i);
+      }
+    } catch (e) {
+      logError(e);
+    }
+  }
+
+  moveBy(row, offset) {
+    const i = this.#rows.indexOf(row);
+    if (i == -1) throw Error(`Trying to move a row that was not found: ${row}`);
+
+    if (isFinite(offset)) {
+      const j = i + offset;
+      if (j < 0 || j >= this.#rows.length) return;
+      // swap them
+      [this.#rows[i], this.#rows[j]] = [this.#rows[j], this.#rows[i]];
+      this.storeOneRowOrder(this.#rows[i]); // no await
+      this.storeOneRowOrder(this.#rows[j]); // no await
+    } else {
+      this.#rows.splice(i, 1);
+      if (offset < 0) {
+        // move all the way to the front
+        this.#rows.unshift(row);
+      } else {
+        // move all the way to the back
+        this.#rows.push(row);
+      }
+      this.storeAllRowsOrders(); // no await
     }
 
+    row.parent.invalidate_sort();
+    this.#rows.forEach((r) => r.updateButtons());
+  }
 
-    #clipboard_clear_source = 0;
-    #lock_button;
-    #rows = [];
-    #settings;
+  rowSortFunc(rowI, rowJ) {
+    const i = this.#rows.indexOf(rowI);
+    const j = this.#rows.indexOf(rowJ);
+    return i - j;
+  }
 
+  copyToClipboard(text, title, sensitive) {
+    // this runs outside gnome-shell, so we use GDK
+    const display = Gdk.Display.get_default();
+    const clipboard1 = display.get_primary_clipboard();
+    const clipboard2 = display.get_clipboard();
+    clipboard1.set(text);
+    clipboard2.set(text);
 
-    constructor(application_id, settings)
-    {
-        super({
-            title: _('Secrets'),
-            description: _('A list of all OTP secrets from the keyring.')
-        });
+    this.cancelClipboardClear();
 
-        const listbox = findListBoxChild(this);
-        listbox?.set_sort_func(this.rowSortFunc.bind(this));
+    if (sensitive) {
+      const delay = this.#settings.get_uint("clipboard-clear-delay");
+      this.#clipboard_clear_source = GLib.timeout_add(
+        GLib.PRIORITY_DEFAULT,
+        delay * 1000,
+        this.clipboardClear.bind(this),
+      );
+    }
 
-        this.#settings = settings;
+    if (!title) return;
 
-        const box = new Gtk.Box({
-            orientation: Gtk.Orientation.HORIZONTAL,
-            spacing: 6
-        });
-        this.set_header_suffix(box);
+    this.root?.add_toast(new Adw.Toast({ title: title }));
+  }
 
-        this.#lock_button = new LockButton({ valign: Gtk.Align.CENTER });
-        box.append(this.#lock_button);
+  clipboardClear() {
+    this.cancelClipboardClear();
+    try {
+      const display = Gdk.Display.get_default();
+      const clipboard1 = display.get_primary_clipboard();
+      const clipboard2 = display.get_clipboard();
+      if (clipboard1.local) clipboard1.set(null);
+      if (clipboard2.local) clipboard2.set(null);
+    } catch (e) {
+      logError(e);
+    }
+    return GLib.SOURCE_REMOVE;
+  }
 
-        box.append(
-            new Gtk.Button({
-                icon_name: 'document-new-symbolic',
-                tooltip_text: _('Add secret...'),
-                action_name: 'otp.create',
-                valign: Gtk.Align.CENTER,
-            })
+  cancelClipboardClear() {
+    if (!this.#clipboard_clear_source) return;
+    GLib.Source.remove(this.#clipboard_clear_source);
+    this.#clipboard_clear_source = 0;
+  }
+
+  async editSecret(otp) {
+    try {
+      otp.secret = await SecretUtils.getSecret(otp);
+      if (otp.type == "HOTP") {
+        const item = await SecretUtils.getOTPItem(otp);
+        const attr = item.get_attributes();
+        otp.counter = parseInt(attr.counter);
+      }
+      const dialog = new SecretDialog({
+        title: _("Editing OTP secret"),
+        otp: otp,
+        settings: this.#settings,
+      });
+
+      const new_otp = await dialog.choose(this.root);
+      if (!new_otp) return;
+
+      await SecretUtils.updateOTPItem(otp, new_otp);
+      otp.wipe_secret();
+      await this.refreshRows();
+    } catch (e) {
+      reportError(this.root, e);
+    }
+  }
+
+  async exportSecretClipboard(otp) {
+    try {
+      otp.secret = await SecretUtils.getSecret(otp);
+      const uri = otp.uri();
+      this.copyToClipboard(uri, _("Copied secret URI to clipboard."), true);
+    } catch (e) {
+      reportError(this.root, e);
+    }
+  }
+
+  async exportSecretQR(otp) {
+    try {
+      otp.secret = await SecretUtils.getSecret(otp);
+      const uri = otp.uri();
+
+      const te = new TextEncoder();
+      const uri_data = te.encode(uri);
+
+      const qrencode_cmd = this.#settings.get_string("qrencode-cmd");
+      const [parsed, args] = GLib.shell_parse_argv(qrencode_cmd);
+      if (!parsed) throw new Error(_('Failed to parse "qrencode-cmd" option.'));
+
+      const proc = Gio.Subprocess.new(
+        args,
+        Gio.SubprocessFlags.STDIN_PIPE |
+          Gio.SubprocessFlags.STDOUT_PIPE |
+          Gio.SubprocessFlags.STDERR_PIPE,
+      );
+
+      /*
+       * WORKAROUND: `.communicate_async()` will randomly fail with a broken pipe
+       * error, so we have to use the blocking API instead.
+       */
+      const [success, stdout, stderr] = proc.communicate(uri_data, null);
+
+      const status = proc.get_exit_status();
+      if (status) {
+        if (stderr) {
+          const td = new TextDecoder();
+          const stderr_text = td.decode(stderr.get_data());
+          throw new Error(stderr_text);
+        } else throw new Error(`Process exited with status: ${status}`);
+      }
+
+      if (!stdout) throw new Error("Empty stdout");
+
+      const img_stream = Gio.MemoryInputStream.new_from_bytes(stdout);
+      const export_window = new ExportQRWindow(this.root, img_stream);
+      export_window.show();
+    } catch (e) {
+      reportError(this.root, e);
+    }
+  }
+
+  async removeSecret(otp) {
+    try {
+      const cancel_response = 0;
+      const delete_response = 1;
+      const buttons = [_("_Cancel"), _("_Delete")];
+      const label = makeLabel(otp);
+      const dialog = new AlertDialog({
+        message: _("Deleting OTP secret"),
+        detail: _("Deleting secret:") + ` "${label}"`,
+        modal: true,
+        default_button: delete_response,
+        cancel_button: cancel_response,
+        buttons: buttons,
+      });
+
+      const response = await dialog.choose(this.root, null);
+      if (response == delete_response) {
+        const success = await SecretUtils.removeOTPItem(otp);
+        if (!success)
+          throw new Error(_("Failed to remove secret. Is it locked?"));
+        this.root?.add_toast(
+          new Adw.Toast({ title: _("Deleted secret:") + ` "${label}"` }),
         );
-
-        box.append(
-            new Gtk.Button({
-                icon_name: 'view-refresh-symbolic',
-                tooltip_text: _('Refresh secrets.'),
-                action_name: 'otp.refresh',
-                valign: Gtk.Align.CENTER,
-            })
-        );
-
-        box.append(
-            new Gtk.Button({
-                icon_name: 'document-import-symbolic',
-                action_name: 'otp.import',
-                tooltip_text: _('Import secrets...'),
-                valign: Gtk.Align.CENTER,
-            })
-        );
-
-        box.append(
-            new Gtk.Button({
-                icon_name: 'document-export-symbolic',
-                action_name: 'otp.export-all',
-                tooltip_text: _('Export all secrets to the clipboard.'),
-                valign: Gtk.Align.CENTER,
-            })
-        );
-
-        this.refreshRows();
+        await this.refreshRows();
+        await this.storeAllRowsOrders();
+      }
+    } catch (e) {
+      reportError(this.root, e);
     }
-
-
-    destroy()
-    {
-        this.cancelClipboardClear();
-        this.clearRows();
-        this.#lock_button = null;
-        this.#settings    = null;
-    }
-
-
-    clearRows()
-    {
-        this.#rows.forEach(row => {
-            this.remove(row);
-            row.destroy();
-        });
-        this.#rows = [];
-    }
-
-
-    async refreshRows()
-    {
-        this.clearRows();
-        try {
-            let locked = await SecretUtils.isOTPCollectionLocked();
-            if (locked)
-                return;
-            const items = await SecretUtils.getOTPItems();
-            this.#lock_button.updateState();
-            items.forEach(item =>
-                {
-                    const attr = item.get_attributes();
-                    const otp = dict2OTP(attr);
-                    const row = new SecretRow(otp, this, this.#settings);
-                    this.#rows.push(row);
-                    this.add(row);
-                });
-            this.#rows.forEach(r => r.updateButtons());
-        }
-        catch (e) {
-            logError(e);
-        }
-    }
-
-
-    async createSecret()
-    {
-        try {
-            const dialog = new SecretDialog({
-                title: _('Creating new OTP secret'),
-                otp: new TOTP(),
-                settings: this.#settings
-            });
-
-            const otp = await dialog.choose(this.root);
-            if (!otp)
-                return;
-
-            const n = this.#rows.length;
-            await SecretUtils.createOTPItem(otp, n);
-            this.root?.add_toast(new Adw.Toast({ title: _('Created new secret.') }));
-            await this.refreshRows();
-        }
-        catch (e) {
-            reportError(this.root, e);
-        }
-    }
-
-
-    async importSecrets()
-    {
-        try {
-            const dialog = new ImportURIsDialog(this.#settings);
-            const text = await dialog.choose(this.root);
-            if (!text)
-                return; // canceled or empty text
-
-            const n = this.#rows.length;
-            const uris = GLib.Uri.list_extract_uris(text);
-
-            let successes = 0;
-            for (let i = 0; i < uris.length; ++i) {
-                try {
-                    const otp = uri2OTP(uris[i]);
-                    await SecretUtils.createOTPItem(otp, n + i);
-                    ++successes;
-                }
-                catch (e) {
-                    logError(e);
-                }
-            }
-            this.root?.add_toast(new Adw.Toast({
-                title: _('Imported secrets:') + ` ${successes}`
-            }));
-
-            await this.refreshRows();
-
-        }
-        catch (e) {
-            reportError(this.root, e);
-        }
-    }
-
-
-    async exportAllSecrets()
-    {
-        try {
-            const uris = [];
-            const items = await SecretUtils.getOTPItems();
-            for (let i = 0; i < items.length; ++i) {
-                const attrs = items[i].get_attributes();
-                attrs.secret = await SecretUtils.getSecret(attrs);
-                const otp = dict2OTP(attrs);
-                uris.push(otp.uri());
-            }
-            this.copyToClipboard(uris.join('\n'),
-                                 _('Copied all OTP secrets to clipboard.'),
-                                 true);
-        }
-        catch (e) {
-            reportError(this.root, e);
-        }
-    }
-
-
-    // Store the UI order in the keyring as their labels
-
-    async storeOneRowOrder(row)
-    {
-        try {
-            const idx = this.#rows.indexOf(row);
-            const otp = row._otp;
-            await SecretUtils.updateOTPOrder(otp, idx);
-        }
-        catch (e) {
-            logError(e);
-        }
-    }
-
-    async storeAllRowsOrders()
-    {
-        try {
-            for (let i = 0; i < this.#rows.length; ++i) {
-                const otp = this.#rows[i]._otp;
-                await SecretUtils.updateOTPOrder(otp, i);
-            }
-        }
-        catch (e) {
-            logError(e);
-        }
-    }
-
-
-    moveBy(row, offset)
-    {
-        const i = this.#rows.indexOf(row);
-        if (i == -1)
-            throw Error(`Trying to move a row that was not found: ${row}`);
-
-        if (isFinite(offset)) {
-            const j = i + offset;
-            if (j < 0 || j >= this.#rows.length)
-                return;
-            // swap them
-            [this.#rows[i], this.#rows[j]] = [this.#rows[j], this.#rows[i]];
-            this.storeOneRowOrder(this.#rows[i]); // no await
-            this.storeOneRowOrder(this.#rows[j]); // no await
-        } else {
-            this.#rows.splice(i, 1);
-            if (offset < 0) {
-                // move all the way to the front
-                this.#rows.unshift(row);
-            } else {
-                // move all the way to the back
-                this.#rows.push(row);
-            }
-            this.storeAllRowsOrders(); // no await
-        }
-
-        row.parent.invalidate_sort();
-        this.#rows.forEach(r =>  r.updateButtons());
-    }
-
-
-    rowSortFunc(rowI, rowJ)
-    {
-        const i = this.#rows.indexOf(rowI);
-        const j = this.#rows.indexOf(rowJ);
-        return i - j;
-    }
-
-
-    copyToClipboard(text, title, sensitive)
-    {
-        // this runs outside gnome-shell, so we use GDK
-        const display = Gdk.Display.get_default();
-        const clipboard1 = display.get_primary_clipboard();
-        const clipboard2 = display.get_clipboard();
-        clipboard1.set(text);
-        clipboard2.set(text);
-
-        this.cancelClipboardClear();
-
-        if (sensitive) {
-            const delay = this.#settings.get_uint('clipboard-clear-delay');
-            this.#clipboard_clear_source =
-                GLib.timeout_add(GLib.PRIORITY_DEFAULT,
-                                 delay * 1000,
-                                 this.clipboardClear.bind(this));
-        }
-
-        if (!title)
-            return;
-
-        this.root?.add_toast(new Adw.Toast({ title: title }));
-    }
-
-
-    clipboardClear()
-    {
-        this.cancelClipboardClear();
-        try {
-            const display = Gdk.Display.get_default();
-            const clipboard1 = display.get_primary_clipboard();
-            const clipboard2 = display.get_clipboard();
-            if (clipboard1.local)
-                clipboard1.set(null);
-            if (clipboard2.local)
-                clipboard2.set(null);
-        }
-        catch (e) {
-            logError(e);
-        }
-        return GLib.SOURCE_REMOVE;
-    }
-
-
-    cancelClipboardClear()
-    {
-        if (!this.#clipboard_clear_source)
-            return;
-        GLib.Source.remove(this.#clipboard_clear_source);
-        this.#clipboard_clear_source = 0;
-    }
-
-
-    async editSecret(otp)
-    {
-        try {
-            otp.secret = await SecretUtils.getSecret(otp);
-            if (otp.type == 'HOTP') {
-                const item = await SecretUtils.getOTPItem(otp);
-                const attr = item.get_attributes();
-                otp.counter = parseInt(attr.counter);
-            }
-            const dialog = new SecretDialog({
-                title: _('Editing OTP secret'),
-                otp: otp,
-                settings: this.#settings
-            });
-
-            const new_otp = await dialog.choose(this.root);
-            if (!new_otp)
-                return;
-
-            await SecretUtils.updateOTPItem(otp, new_otp);
-            otp.wipe_secret();
-            await this.refreshRows();
-        }
-        catch (e) {
-            reportError(this.root, e);
-        }
-    }
-
-
-    async exportSecretClipboard(otp)
-    {
-        try {
-            otp.secret = await SecretUtils.getSecret(otp);
-            const uri = otp.uri();
-            this.copyToClipboard(uri,
-                                 _('Copied secret URI to clipboard.'),
-                                 true);
-        }
-        catch (e) {
-            reportError(this.root, e);
-        }
-    }
-
-
-    async exportSecretQR(otp)
-    {
-        try {
-            otp.secret = await SecretUtils.getSecret(otp);
-            const uri = otp.uri();
-
-            const te = new TextEncoder();
-            const uri_data = te.encode(uri);
-
-            const qrencode_cmd = this.#settings.get_string('qrencode-cmd');
-            const [parsed, args] = GLib.shell_parse_argv(qrencode_cmd);
-            if (!parsed)
-                throw new Error(_('Failed to parse "qrencode-cmd" option.'));
-
-            const proc = Gio.Subprocess.new(args,
-                                            Gio.SubprocessFlags.STDIN_PIPE
-                                            | Gio.SubprocessFlags.STDOUT_PIPE
-                                            | Gio.SubprocessFlags.STDERR_PIPE);
-
-            /*
-             * WORKAROUND: `.communicate_async()` will randomly fail with a broken pipe
-             * error, so we have to use the blocking API instead.
-             */
-            const [success, stdout, stderr] = proc.communicate(uri_data, null);
-
-            const status = proc.get_exit_status();
-            if (status) {
-                if (stderr) {
-                    const td = new TextDecoder();
-                    const stderr_text = td.decode(stderr.get_data());
-                    throw new Error(stderr_text);
-                } else
-                    throw new Error(`Process exited with status: ${status}`);
-            }
-
-            if (!stdout)
-                throw new Error('Empty stdout');
-
-            const img_stream = Gio.MemoryInputStream.new_from_bytes(stdout);
-            const export_window = new ExportQRWindow(this.root, img_stream);
-            export_window.show();
-        }
-        catch (e) {
-            reportError(this.root, e);
-        }
-    }
-
-
-    async removeSecret(otp)
-    {
-        try {
-            const cancel_response = 0;
-            const delete_response = 1;
-            const buttons = [_('_Cancel'), _('_Delete')];
-            const label = makeLabel(otp);
-            const dialog = new AlertDialog({
-                message: _('Deleting OTP secret'),
-                detail: _('Deleting secret:') + ` "${label}"`,
-                modal: true,
-                default_button: delete_response,
-                cancel_button: cancel_response,
-                buttons: buttons
-            });
-
-            const response = await dialog.choose(this.root, null);
-            if (response == delete_response) {
-                const success = await SecretUtils.removeOTPItem(otp);
-                if (!success)
-                    throw new Error(_('Failed to remove secret. Is it locked?'));
-                this.root?.add_toast(
-                    new Adw.Toast({ title: _('Deleted secret:') + ` "${label}"` })
-                );
-                await this.refreshRows();
-                await this.storeAllRowsOrders();
-            }
-        }
-        catch (e) {
-            reportError(this.root, e);
-        }
-    }
-
-};
-
+  }
+}
 
 class CmdSettingRow extends EntryRow {
+  static {
+    GObject.registerClass(this);
 
-    static {
-        GObject.registerClass(this);
+    this.install_action("reset-setting", null, (obj) => obj.resetSetting());
+  }
 
-        this.install_action('reset-setting', null,
-                            obj => obj.resetSetting());
-    }
+  #key;
+  #settings;
 
+  constructor({ settings, key, ...args }) {
+    super(args);
+    this.add_css_class("command-entry");
 
-    #key;
-    #settings;
+    this.#key = key;
+    this.#settings = settings;
 
+    this.#settings.bind(key, this, "text", Gio.SettingsBindFlags.DEFAULT);
 
-    constructor({settings, key, ...args})
-    {
-        super(args);
-        this.add_css_class('command-entry');
+    this.add_suffix(
+      new Gtk.Button({
+        icon_name: "edit-clear-symbolic",
+        tooltip_text: _("Revert option back to the default value."),
+        action_name: "reset-setting",
+        valign: Gtk.Align.CENTER,
+      }),
+    );
+  }
 
-        this.#key = key;
-        this.#settings = settings;
+  destroy() {
+    this.#settings = null;
+  }
 
-        this.#settings.bind(key,
-                            this, 'text',
-                            Gio.SettingsBindFlags.DEFAULT);
-
-        this.add_suffix(new Gtk.Button({
-            icon_name: 'edit-clear-symbolic',
-            tooltip_text: _('Revert option back to the default value.'),
-            action_name: 'reset-setting',
-            valign: Gtk.Align.CENTER,
-        }));
-    }
-
-
-    destroy()
-    {
-        this.#settings = null;
-    }
-
-
-    resetSetting()
-    {
-        this.#settings.reset(this.#key);
-    }
-
-};
-
+  resetSetting() {
+    this.#settings.reset(this.#key);
+  }
+}
 
 class OptionsGroup extends Adw.PreferencesGroup {
+  static {
+    GObject.registerClass(this);
+  }
 
-    static {
-        GObject.registerClass(this);
-    }
+  #qrencode;
+  #qrimage;
+  #qrscan;
 
+  constructor(settings) {
+    super({
+      title: _("Options"),
+    });
 
-    #qrencode;
-    #qrimage;
-    #qrscan;
+    this.#qrencode = new CmdSettingRow({
+      settings: settings,
+      key: "qrencode-cmd",
+      title: _("QR generator"),
+      tooltip_text: _(
+        "This command must read text from standard input, and write an image to the standard output.",
+      ),
+    });
+    this.add(this.#qrencode);
 
+    this.#qrimage = new CmdSettingRow({
+      settings: settings,
+      key: "qrimage-cmd",
+      title: _("QR reader"),
+      tooltip_text: _(
+        "This command must read an image from the standard input, and print the decoded URI to the standard output.",
+      ),
+    });
+    this.add(this.#qrimage);
 
-    constructor(settings)
-    {
-        super({
-            title: _('Options')
-        });
+    this.#qrscan = new CmdSettingRow({
+      settings: settings,
+      key: "qrscan-cmd",
+      title: _("QR scanner"),
+      tooltip_text: _(
+        "This command must capture an image from a camera, and print the decoded URI to the standard output.",
+      ),
+    });
+    this.add(this.#qrscan);
 
-        this.#qrencode = new CmdSettingRow({
-            settings: settings,
-            key: 'qrencode-cmd',
-            title: _('QR generator'),
-            tooltip_text: _('This command must read text from standard input, and write an image to the standard output.')
-        });
-        this.add(this.#qrencode);
+    const cb_clear_delay = new SpinRow({
+      title: _("Clipboard clear delay"),
+      subtitle: _(
+        "Sensitive data is cleared from the clipboard after this many seconds.",
+      ),
+      tooltip_text: _(
+        'When exporting sensitive data ("otpauth://" URIs) they will be cleared from the clipboard after this time has passed. Authentication codes are not cleared.',
+      ),
+      adjustment: new Gtk.Adjustment({
+        value: 30,
+        lower: 1,
+        upper: Number.MAX_SAFE_INTEGER,
+        step_increment: 1,
+        page_increment: 10,
+      }),
+      numeric: true,
+      width_chars: 5,
+      value: 30,
+    });
+    settings.bind(
+      "clipboard-clear-delay",
+      cb_clear_delay,
+      "value",
+      Gio.SettingsBindFlags.DEFAULT,
+    );
 
-        this.#qrimage = new CmdSettingRow({
-            settings: settings,
-            key: 'qrimage-cmd',
-            title: _('QR reader'),
-            tooltip_text: _('This command must read an image from the standard input, and print the decoded URI to the standard output.')
-        });
-        this.add(this.#qrimage);
+    this.add(cb_clear_delay);
+  }
 
-        this.#qrscan = new CmdSettingRow({
-            settings: settings,
-            key: 'qrscan-cmd',
-            title: _('QR scanner'),
-            tooltip_text: _('This command must capture an image from a camera, and print the decoded URI to the standard output.')
-        });
-        this.add(this.#qrscan);
+  destroy() {
+    this.#qrencode?.destroy();
+    this.#qrencode = null;
 
-        const cb_clear_delay = new SpinRow({
-            title: _('Clipboard clear delay'),
-            subtitle: _('Sensitive data is cleared from the clipboard after this many seconds.'),
-            tooltip_text: _('When exporting sensitive data ("otpauth://" URIs) they will be cleared from the clipboard after this time has passed. Authentication codes are not cleared.'),
-            adjustment: new Gtk.Adjustment({
-                value: 30,
-                lower: 1,
-                upper: Number.MAX_SAFE_INTEGER,
-                step_increment: 1,
-                page_increment: 10,
-            }),
-            numeric: true,
-            width_chars: 5,
-            value: 30,
-        });
-        settings.bind('clipboard-clear-delay',
-                      cb_clear_delay, 'value',
-                      Gio.SettingsBindFlags.DEFAULT);
+    this.#qrimage?.destroy();
+    this.#qrimage = null;
 
-        this.add(cb_clear_delay);
-    }
-
-
-    destroy()
-    {
-        this.#qrencode?.destroy();
-        this.#qrencode = null;
-
-        this.#qrimage?.destroy();
-        this.#qrimage = null;
-
-        this.#qrscan?.destroy();
-        this.#qrscan = null;
-    }
-
-};
-
+    this.#qrscan?.destroy();
+    this.#qrscan = null;
+  }
+}
 
 class TOTPPreferencesPage extends Adw.PreferencesPage {
+  static {
+    GObject.registerClass(this);
+  }
 
-    static {
-        GObject.registerClass(this);
+  #options_group;
+  #provider;
+  #resource;
+  #secrets_group;
+  #settings;
+
+  constructor(path, application_id, settings) {
+    super();
+
+    /*
+     * Note: icons need to be loaded from gresource, not from filesystem, in order
+     * to be theme-recolored.
+     */
+    this.#resource = Gio.Resource.load(`${path}/icons.gresource`);
+    Gio.resources_register(this.#resource);
+    const theme = Gtk.IconTheme.get_for_display(Gdk.Display.get_default());
+    const res_path = "/io/brunosilva/quicktotp/icons";
+    if (!theme.get_resource_path().includes(res_path))
+      theme.add_resource_path(res_path);
+
+    this.#provider = new Gtk.CssProvider();
+    this.#provider.load_from_path(`${path}/prefs.css`);
+    Gtk.StyleContext.add_provider_for_display(
+      Gdk.Display.get_default(),
+      this.#provider,
+      Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION,
+    );
+
+    this.#settings = settings;
+
+    this.#secrets_group = new SecretsGroup(application_id, this.#settings);
+    this.add(this.#secrets_group);
+
+    this.#options_group = new OptionsGroup(this.#settings);
+    this.add(this.#options_group);
+  }
+
+  destroy() {
+    this.#settings = null;
+
+    if (this.#options_group) {
+      this.remove(this.#options_group);
+      this.#options_group?.destroy();
+      this.#options_group = null;
     }
 
-
-    #options_group;
-    #provider;
-    #resource;
-    #secrets_group;
-    #settings;
-
-
-    constructor(path, application_id, settings)
-    {
-        super();
-
-        /*
-         * Note: icons need to be loaded from gresource, not from filesystem, in order
-         * to be theme-recolored.
-         */
-        this.#resource = Gio.Resource.load(`${path}/icons.gresource`);
-        Gio.resources_register(this.#resource);
-        const theme = Gtk.IconTheme.get_for_display(Gdk.Display.get_default());
-        const res_path = '/io/brunosilva/quicktotp/icons';
-        if (!theme.get_resource_path().includes(res_path))
-            theme.add_resource_path(res_path);
-
-        this.#provider = new Gtk.CssProvider();
-        this.#provider.load_from_path(`${path}/prefs.css`);
-        Gtk.StyleContext.add_provider_for_display(Gdk.Display.get_default(),
-                                                  this.#provider,
-                                                  Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
-
-        this.#settings = settings;
-
-        this.#secrets_group = new SecretsGroup(application_id, this.#settings);
-        this.add(this.#secrets_group);
-
-        this.#options_group = new OptionsGroup(this.#settings);
-        this.add(this.#options_group);
+    if (this.#secrets_group) {
+      this.remove(this.#secrets_group);
+      this.#secrets_group?.destroy();
+      this.#secrets_group = null;
     }
 
-
-    destroy()
-    {
-        this.#settings = null;
-
-        if (this.#options_group) {
-            this.remove(this.#options_group);
-            this.#options_group?.destroy();
-            this.#options_group = null;
-        }
-
-        if (this.#secrets_group) {
-            this.remove(this.#secrets_group);
-            this.#secrets_group?.destroy();
-            this.#secrets_group = null;
-        }
-
-        if (this.#provider) {
-            Gtk.StyleContext.remove_provider_for_display(Gdk.Display.get_default(),
-                                                         this.#provider);
-            this.#provider = null;
-        }
-
-        if (this.#resource) {
-            Gio.resources_unregister(this.#resource);
-            this.#resource = null;
-        }
+    if (this.#provider) {
+      Gtk.StyleContext.remove_provider_for_display(
+        Gdk.Display.get_default(),
+        this.#provider,
+      );
+      this.#provider = null;
     }
 
-};
-
-
-export default
-class TOTPPreferences extends ExtensionPreferences {
-
-    fillPreferencesWindow(window)
-    {
-        const app = window.get_application();
-        const app_id = app?.application_id ?? 'org.gnome.Extensions';
-
-        const page = new TOTPPreferencesPage(this.path,
-                                           app_id,
-                                           this.getSettings());
-
-        window.add(page);
-        window.connect('close-request',
-                       () => {
-                           window.remove(page);
-                           page.destroy();
-                           return false;
-                       });
+    if (this.#resource) {
+      Gio.resources_unregister(this.#resource);
+      this.#resource = null;
     }
+  }
+}
 
-};
+export default class TOTPPreferences extends ExtensionPreferences {
+  fillPreferencesWindow(window) {
+    const app = window.get_application();
+    const app_id = app?.application_id ?? "org.gnome.Extensions";
+
+    const page = new TOTPPreferencesPage(this.path, app_id, this.getSettings());
+
+    window.add(page);
+    window.connect("close-request", () => {
+      window.remove(page);
+      page.destroy();
+      return false;
+    });
+  }
+}

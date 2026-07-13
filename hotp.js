@@ -34,79 +34,66 @@
  *      9     520489
  */
 
-import * as OTP from './otp.js';
-
+import * as OTP from "./otp.js";
 
 // strings will be translated by gettext in the frontend
-const _ = x => x;
+const _ = (x) => x;
 
+export default class HOTP extends OTP.OTP {
+  constructor({
+    issuer = "",
+    name = "",
+    secret = "",
+    digits = 6,
+    counter = 0,
+    algorithm = "SHA-1",
+    uri = null,
+  } = {}) {
+    super();
 
-export default
-class HOTP extends OTP.OTP {
+    this.type = "HOTP";
 
-    constructor({
-        issuer = '',
-        name = '',
-        secret = '',
+    if (uri) {
+      let {
+        host = null,
+        issuer = "",
+        name = "",
+        secret = "",
         digits = 6,
         counter = 0,
-        algorithm = 'SHA-1',
-        uri = null
-    } = {})
-    {
-        super();
-
-        this.type = 'HOTP';
-
-        if (uri) {
-            let {
-                host = null,
-                issuer = '',
-                name = '',
-                secret = '',
-                digits = 6,
-                counter = 0,
-                algorithm = 'SHA-1'
-            } = OTP.parseURI(uri);
-            if (host.toLowerCase() != 'hotp')
-                throw new Error(_('URI host should be "hotp"'));
-            this.issuer    = issuer;
-            this.name      = name;
-            this.secret    = secret;
-            this.digits    = parseInt(digits);
-            this.counter   = parseInt(counter);
-            this.algorithm = OTP.normalized_algorithm(algorithm);
-        } else {
-            this.issuer    = issuer;
-            this.name      = name;
-            this.secret    = secret;
-            this.digits    = parseInt(digits);
-            this.counter   = parseInt(counter);
-            this.algorithm = OTP.normalized_algorithm(algorithm);
-        }
+        algorithm = "SHA-1",
+      } = OTP.parseURI(uri);
+      if (host.toLowerCase() != "hotp")
+        throw new Error(_('URI host should be "hotp"'));
+      this.issuer = issuer;
+      this.name = name;
+      this.secret = secret;
+      this.digits = parseInt(digits);
+      this.counter = parseInt(counter);
+      this.algorithm = OTP.normalized_algorithm(algorithm);
+    } else {
+      this.issuer = issuer;
+      this.name = name;
+      this.secret = secret;
+      this.digits = parseInt(digits);
+      this.counter = parseInt(counter);
+      this.algorithm = OTP.normalized_algorithm(algorithm);
     }
+  }
 
+  code(counter = this.counter) {
+    return super.code(counter);
+  }
 
-    code(counter = this.counter)
-    {
-        return super.code(counter);
-    }
+  uri() {
+    let args = {};
+    if (this.counter != 0) args.counter = this.counter;
+    return super.uri(args);
+  }
 
-
-    uri()
-    {
-        let args = {};
-        if (this.counter != 0)
-            args.counter = this.counter;
-        return super.uri(args);
-    }
-
-
-    fields_non_destructive()
-    {
-        let result = super.fields_non_destructive();
-        result.counter = this.counter.toString();
-        return result;
-    }
-
-}; // class HOTP
+  fields_non_destructive() {
+    let result = super.fields_non_destructive();
+    result.counter = this.counter.toString();
+    return result;
+  }
+} // class HOTP
