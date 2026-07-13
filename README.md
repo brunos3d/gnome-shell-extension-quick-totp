@@ -21,7 +21,7 @@ Authentication (2FA).
 <details>
   <summary>A quick demonstration video</summary>
   <p align="center">
-    <video src="assets/screencast.mp4" controls></video>
+    <video src="https://github.com/user-attachments/assets/185e363c-b169-42cc-a144-b4dafb7f3745" controls></video>
   </p>
 </details>
 
