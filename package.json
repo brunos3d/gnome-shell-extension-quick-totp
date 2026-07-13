@@ -10,6 +10,14 @@
     "url": "https://github.com/brunos3d/gnome-shell-extension-totp.git"
   },
   "scripts": {
+    "build": "make",
+    "pack": "make",
+    "install:extension": "make install",
+    "uninstall:extension": "gnome-extensions uninstall quick-totp@brunosilva.io",
+    "prefs": "gnome-extensions prefs quick-totp@brunosilva.io",
+    "clean": "make clean",
+    "update-po": "make update-po",
+    "check": "for f in extension.js prefs.js $(find src -name '*.js'); do node --check \"$f\" || exit 1; done",
     "test": "node tests/run.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
