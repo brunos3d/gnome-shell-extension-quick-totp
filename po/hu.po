@@ -5,9 +5,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: TOTP\n"
-"Report-Msgid-Bugs-To: https://github.com/dkosmari/gnome-shell-extension-"
+"Report-Msgid-Bugs-To: https://github.com/brunos3d/gnome-shell-extension-"
 "totp\n"
-"POT-Creation-Date: 2025-12-25 10:14-0300\n"
+"POT-Creation-Date: 2026-07-13 01:53-0300\n"
 "PO-Revision-Date: 2025-12-25 09:42-0300\n"
 "Last-Translator: Daniel K. O.\n"
 "Language-Team: \n"
@@ -18,80 +18,80 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Poedit 3.5\n"
 
-#: prefs.js:58
+#: prefs.js:59 indicator.js:253
 msgid "Error"
 msgstr "Hiba"
 
-#: prefs.js:189
+#: prefs.js:184
 msgid "Scan QR code."
 msgstr "QR-kód beolvasása."
 
-#: prefs.js:203
+#: prefs.js:198
 msgid "Failed to parse \"qrscan-cmd\" option."
 msgstr "Nem sikerült feldolgozni a „qrscan-cmd” beállítást."
 
-#: prefs.js:236
+#: prefs.js:231
 msgid "Paste either the \"otpauth://\" URI, or the QR code image."
 msgstr "Illessze be az „otpauth://” URI-t vagy a QR-kód képét."
 
-#: prefs.js:263
+#: prefs.js:258
 msgid "Failed to parse \"qrimage-cmd\" option."
 msgstr "Nem sikerült feldolgozni a „qrimage-cmd” beállítást."
 
-#: prefs.js:347
+#: prefs.js:342
 msgid "Type"
 msgstr "Típus"
 
-#: prefs.js:348
+#: prefs.js:343
 msgid "Select between time-based or counter-based OTP."
 msgstr "Válasszon az időalapú vagy a számlálóalapú OTP között."
 
-#: prefs.js:355
+#: prefs.js:350
 msgid "Issuer"
 msgstr "Kibocsátó"
 
-#: prefs.js:357
+#: prefs.js:352
 msgid ""
 "The name of the organization (Google, Facebook, etc) that issued the OTP."
 msgstr "Az OTP-t kibocsátó szervezet (Google, Facebook stb.) neve."
 
-#: prefs.js:363
+#: prefs.js:358
 msgid "Name"
 msgstr "Név"
 
-#: prefs.js:370
+#: prefs.js:365
 msgid "Secret"
 msgstr "Titok"
 
-#: prefs.js:372
+#: prefs.js:367
 msgid "The shared secret key."
 msgstr "A megosztott titkos kulcs."
 
-#: prefs.js:377
+#: prefs.js:372
 msgid "How the secret key is encoded."
 msgstr "A titkos kulcs kódolásának módja."
 
-#: prefs.js:384
+#: prefs.js:379
 msgid "Digits"
 msgstr "Számjegyek"
 
-#: prefs.js:388
+#: prefs.js:383
 msgid "How many digits in the code."
 msgstr "Hány számjegyes a kód."
 
-#: prefs.js:394
+#: prefs.js:389
 msgid "Period"
 msgstr "Időtartam"
 
-#: prefs.js:396
+#: prefs.js:391
 msgid "Time between code updates, in seconds."
 msgstr "A kódfrissítések közötti idő másodpercben."
 
-#: prefs.js:406
+#: prefs.js:401
 msgid "Counter"
 msgstr "Zseton"
 
-#: prefs.js:407
+#: prefs.js:402
 msgid ""
 "This counter must be synchronized with the server, and it increments every "
 "time a code is generated."
@@ -99,50 +99,50 @@ msgstr ""
 "Ezt a számlálót szinkronizálni kell a szerverrel, és minden kódgeneráláskor "
 "növekszik."
 
-#: prefs.js:423
+#: prefs.js:418
 msgid "Algorithm"
 msgstr "Algoritmus"
 
-#: prefs.js:427
+#: prefs.js:422
 msgid "The hash algorithm used to generate codes."
 msgstr "A kódok generálásához használt hash-algoritmus."
 
-#: prefs.js:433 prefs.js:965 prefs.js:1515
+#: prefs.js:428 prefs.js:908 prefs.js:1458
 msgid "_Cancel"
 msgstr "_Mégse"
 
-#: prefs.js:435
+#: prefs.js:430
 msgid "_OK"
 msgstr "_OK"
 
-#: prefs.js:573
+#: prefs.js:566
 msgid "Copy code to clipboard."
 msgstr "Kód másolása a vágólapra."
 
-#: prefs.js:590 prefs.js:642
+#: prefs.js:583 prefs.js:628
 msgid "Unlock"
 msgstr "Feloldás"
 
-#: prefs.js:707 indicator.js:29
+#: prefs.js:650 indicator.js:37
 msgid "OTP code copied to clipboard."
 msgstr "Az OTP-kód a vágólapra másolva."
 
-#: prefs.js:732
+#: prefs.js:675
 msgid "QR code"
 msgstr "QR-kód"
 
-#: prefs.js:753 myAlertDialog.js:62
+#: prefs.js:696 myAlertDialog.js:62
 msgid "_Close"
 msgstr "_Bezárás"
 
-#: prefs.js:780
+#: prefs.js:723
 msgid ""
 "Move this secret up; hold down the SHIFT key to move to the top of the list."
 msgstr ""
 "Mozgassa ezt a titkot felfelé; tartsa lenyomva a SHIFT billentyűt, hogy a "
 "lista tetejére lépjen."
 
-#: prefs.js:781
+#: prefs.js:724
 msgid ""
 "Move this secret down; hold down the SHIFT key to move to the bottom of the "
 "list."
@@ -150,128 +150,128 @@ msgstr ""
 "Mozgassa ezt a titkot lefelé; tartsa lenyomva a SHIFT billentyűt, hogy a "
 "lista aljára lépjen."
 
-#: prefs.js:864
+#: prefs.js:807
 msgid "_Edit..."
 msgstr "_Szerkesztés…"
 
-#: prefs.js:867
+#: prefs.js:810
 msgid "_Copy to clipboard"
 msgstr "_Másolás a vágólapra"
 
-#: prefs.js:870
+#: prefs.js:813
 msgid "Export to _QR code..."
 msgstr "Exportálás QR-kódba…"
 
-#: prefs.js:873
+#: prefs.js:816
 msgid "_Remove"
 msgstr "_Eltávolítás"
 
-#: prefs.js:921
+#: prefs.js:864
 msgid "Importing \"otpauth://\" URIs"
 msgstr "„otpauth://” URI-k importálása"
 
-#: prefs.js:942
+#: prefs.js:885
 msgid "Paste all \"otpauth://\" URIs you want to import, one per line."
 msgstr ""
 "Illessze be az összes importálandó „otpauth://” URI-t, soronként egyet."
 
-#: prefs.js:967
+#: prefs.js:910
 msgid "_Import"
 msgstr "_Importálás"
 
-#: prefs.js:1038 indicator.js:70
+#: prefs.js:981 indicator.js:371
 msgid "Unlock OTP secrets..."
 msgstr "OTP-titkok feloldása…"
 
-#: prefs.js:1041 indicator.js:66
+#: prefs.js:984 indicator.js:367
 msgid "Lock OTP secrets"
 msgstr "OTP-titkok zárolása"
 
-#: prefs.js:1115
+#: prefs.js:1058
 msgid "Secrets"
 msgstr "Titkok"
 
-#: prefs.js:1116
+#: prefs.js:1059
 msgid "A list of all OTP secrets from the keyring."
 msgstr "A kulcstartóból származó összes OTP-titok listája."
 
-#: prefs.js:1136
+#: prefs.js:1079
 msgid "Add secret..."
 msgstr "Titok hozzáadása…"
 
-#: prefs.js:1145
+#: prefs.js:1088
 msgid "Refresh secrets."
 msgstr "Titkok frissítése."
 
-#: prefs.js:1155
+#: prefs.js:1098
 msgid "Import secrets..."
 msgstr "Titkok importálása…"
 
-#: prefs.js:1164
+#: prefs.js:1107
 msgid "Export all secrets to the clipboard."
 msgstr "Összes titok exportálása a vágólapra."
 
-#: prefs.js:1221
+#: prefs.js:1164
 msgid "Creating new OTP secret"
 msgstr "Új OTP-titok létrehozása"
 
-#: prefs.js:1232
+#: prefs.js:1175
 msgid "Created new secret."
 msgstr "Új titok létrehozva."
 
-#: prefs.js:1264
+#: prefs.js:1207
 msgid "Imported secrets:"
 msgstr "Titkok importálása:"
 
-#: prefs.js:1288
+#: prefs.js:1231
 msgid "Copied all OTP secrets to clipboard."
 msgstr "Összes titok a vágólapra másolva."
 
-#: prefs.js:1428
+#: prefs.js:1371
 msgid "Editing OTP secret"
 msgstr "OTP-titok szerkesztése"
 
-#: prefs.js:1453
+#: prefs.js:1396
 msgid "Copied secret URI to clipboard."
 msgstr "Titok-URI a vágólapra másolva."
 
-#: prefs.js:1474
+#: prefs.js:1417
 msgid "Failed to parse \"qrencode-cmd\" option."
 msgstr "Nem sikerült feldolgozni a „qrencode-cmd” beállítást."
 
-#: prefs.js:1515
+#: prefs.js:1458
 msgid "_Delete"
 msgstr "_Törlés"
 
-#: prefs.js:1518
+#: prefs.js:1461
 msgid "Deleting OTP secret"
 msgstr "OTP-titok törlése"
 
-#: prefs.js:1519
+#: prefs.js:1462
 msgid "Deleting secret:"
 msgstr "Titok törlése:"
 
-#: prefs.js:1530
+#: prefs.js:1473
 msgid "Failed to remove secret. Is it locked?"
 msgstr "Nem sikerült eltávolítani a titkot. Zárolva van?"
 
-#: prefs.js:1532
+#: prefs.js:1475
 msgid "Deleted secret:"
 msgstr "Titok törölve:"
 
-#: prefs.js:1574
+#: prefs.js:1517
 msgid "Revert option back to the default value."
 msgstr "A beállítás visszaállítása az alapértelmezett értékre."
 
-#: prefs.js:1610
+#: prefs.js:1553
 msgid "Options"
 msgstr "Beállítások"
 
-#: prefs.js:1616
+#: prefs.js:1559
 msgid "QR generator"
 msgstr "QR-kód-előállító"
 
-#: prefs.js:1617
+#: prefs.js:1560
 msgid ""
 "This command must read text from standard input, and write an image to the "
 "standard output."
@@ -279,11 +279,11 @@ msgstr ""
 "Ennek a parancsnak szöveget kell olvasnia a szabványos bemenetről, és képet "
 "kell írnia a szabványos kimenetre."
 
-#: prefs.js:1624
+#: prefs.js:1567
 msgid "QR reader"
 msgstr "QR-kód-olvasó"
 
-#: prefs.js:1625
+#: prefs.js:1568
 msgid ""
 "This command must read an image from the standard input, and print the "
 "decoded URI to the standard output."
@@ -291,11 +291,11 @@ msgstr ""
 "Ennek a parancsnak be kell olvasnia egy képet a szabványos bemenetről, és a "
 "dekódolt URI-t ki kell írnia a szabványos kimenetre."
 
-#: prefs.js:1632
+#: prefs.js:1575
 msgid "QR scanner"
 msgstr "QR-kód-beolvasó"
 
-#: prefs.js:1633
+#: prefs.js:1576
 msgid ""
 "This command must capture an image from a camera, and print the decoded URI "
 "to the standard output."
@@ -303,15 +303,15 @@ msgstr ""
 "Ennek a parancsnak egy képet kell rögzítenie egy kamerárával, és a dekódolt "
 "URI-t ki kell írnia a szabványos kimenetre."
 
-#: prefs.js:1638
+#: prefs.js:1581
 msgid "Clipboard clear delay"
 msgstr "Vágólap törlésének késleltetése"
 
-#: prefs.js:1639
+#: prefs.js:1582
 msgid "Sensitive data is cleared from the clipboard after this many seconds."
 msgstr "Az érzékeny adatok ennyi másodperc után törlődnek a vágólapról."
 
-#: prefs.js:1640
+#: prefs.js:1583
 msgid ""
 "When exporting sensitive data (\"otpauth://\" URIs) they will be cleared "
 "from the clipboard after this time has passed. Authentication codes are not "
@@ -332,63 +332,90 @@ msgstr "Érvénytelen base32 karakter a következő pozícióban:"
 msgid "Invalid padding."
 msgstr "Érvénytelen kitöltés."
 
-#: indicator.js:75
+#: indicator.js:261
+msgid "Locked"
+msgstr ""
+
+#: indicator.js:333
+msgid "Type to search…"
+msgstr ""
+
+#: indicator.js:376
 msgid "Settings..."
 msgstr "Beállítások…"
 
-#: indicator.js:79
+#: indicator.js:380
 msgid "OTP Secrets"
 msgstr "OTP-titkok"
 
-#: indicator.js:133
+#: indicator.js:416 indicator.js:641
+#, fuzzy
+msgid "No OTP secrets."
+msgstr "OTP-titkok zárolása"
+
+#: indicator.js:507
+#, fuzzy
+msgid "Show OTP codes"
+msgstr "OTP-titkok zárolása"
+
+#: indicator.js:507
+msgid "Hide OTP codes"
+msgstr ""
+
+#: indicator.js:519
 msgid "Failed to lock OTP secrets."
 msgstr "Nem sikerült zárolni az OTP-titkokat."
 
-#: indicator.js:137
+#: indicator.js:523
 msgid "Error locking OTP secrets."
 msgstr "Hiba az OTP-titkok zárolásakor."
 
-#: indicator.js:149
+#: indicator.js:535
 msgid "Failed to unlock OTP secrets."
 msgstr "Nem sikerült feloldani az OTP-titkokat."
 
-#: indicator.js:153
+#: indicator.js:539
 msgid "Error unlocking OTP secrets."
 msgstr "Hiba az OTP-titkok feloldásakor."
 
-#: indicator.js:187
+#: indicator.js:598
 msgid "Error retrieving OTP items."
 msgstr "Hiba az OTP-elemek lekérdezésekor."
 
-#: indicator.js:210
+#: indicator.js:644
+#, fuzzy
+msgid "No matching OTP secrets."
+msgstr "Hiba az OTP-titkok zárolásakor."
+
+#: indicator.js:765
 msgid "Error copying the OTP authentication code."
 msgstr "Hiba az OTP hitelesítési kód másolásakor."
 
-#: secretUtils.js:190
+#: secretUtils.js:206
 msgid "Failed to lookup secret."
 msgstr "A titok keresése sikertelen."
 
-#: secretUtils.js:230
+#: secretUtils.js:246
 msgid "Failed to retrieve secret."
 msgstr "A titok lekérdezése sikertelen."
 
-#: secretUtils.js:267 secretUtils.js:306 secretUtils.js:330
+#: secretUtils.js:283 secretUtils.js:322 secretUtils.js:346
 msgid "Failed to lookup item."
 msgstr "Az elem keresése sikertelen."
 
-#: secretUtils.js:274 secretUtils.js:313
+#: secretUtils.js:290 secretUtils.js:329
 msgid "Failed to set label."
 msgstr "A címke beállítása sikertelen."
 
-#: secretUtils.js:281
+#: secretUtils.js:297
 msgid "Failed to set attributes."
 msgstr "Az attribútumok beállítása sikertelen."
 
-#: secretUtils.js:287
+#: secretUtils.js:303
 msgid "Failed to set secret."
 msgstr "Nem sikerült beállítani a titkot."
 
-#: secretUtils.js:339
+#: secretUtils.js:355
 msgid "Failed to set counter."
 msgstr "Nem sikerült beállítani a számlálót."
 
