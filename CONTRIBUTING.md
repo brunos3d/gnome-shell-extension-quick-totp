@@ -17,20 +17,20 @@ welcome — bug reports, feature requests, translations, documentation, and code
 
 ## Repository structure
 
-| Path | Purpose |
-|------|---------|
-| `extension.js` | Extension entry point (enable/disable). |
-| `indicator.js` | Panel button and the OTP menu (St/Clutter UI). |
-| `prefs.js` | Preferences window (GTK/Adw). |
-| `codeController.js` | Toolkit-agnostic controller for the live code + countdown. |
-| `secretUtils.js` | GNOME Keyring / libsecret access (storage of secrets). |
-| `otp.js`, `totp.js`, `hotp.js` | OTP model and RFC 4226 / 6238 code generation. |
-| `base32.js` | Base32 encode/decode (RFC 4648). |
-| `myAlertDialog.js`, `myEntryRow.js`, `mySpinRow.js` | Fallbacks for older GTK/Adw. |
-| `schemas/` | GSettings schema. |
-| `po/` | Translations (gettext). |
-| `icons/`, `icons.gresource.xml` | Bundled symbolic icons. |
-| `stylesheet.css`, `prefs.css` | Styles for the menu and preferences. |
+| Path                                                | Purpose                                                    |
+| --------------------------------------------------- | ---------------------------------------------------------- |
+| `extension.js`                                      | Extension entry point (enable/disable).                    |
+| `indicator.js`                                      | Panel button and the OTP menu (St/Clutter UI).             |
+| `prefs.js`                                          | Preferences window (GTK/Adw).                              |
+| `codeController.js`                                 | Toolkit-agnostic controller for the live code + countdown. |
+| `secretUtils.js`                                    | GNOME Keyring / libsecret access (storage of secrets).     |
+| `otp.js`, `totp.js`, `hotp.js`                      | OTP model and RFC 4226 / 6238 code generation.             |
+| `base32.js`                                         | Base32 encode/decode (RFC 4648).                           |
+| `myAlertDialog.js`, `myEntryRow.js`, `mySpinRow.js` | Fallbacks for older GTK/Adw.                               |
+| `schemas/`                                          | GSettings schema.                                          |
+| `po/`                                               | Translations (gettext).                                    |
+| `icons/`, `icons.gresource.xml`                     | Bundled symbolic icons.                                    |
+| `stylesheet.css`, `prefs.css`                       | Styles for the menu and preferences.                       |
 
 ## Development setup
 
@@ -99,19 +99,23 @@ when changing code generation.
 
 ## Code style
 
-The codebase follows a consistent, GJS-friendly style. Please match it:
+Formatting is handled by [Prettier](https://prettier.io/) using the settings in
+`.prettierrc`, so you don't have to format by hand. Before committing, run:
 
-- Four-space indentation; no tabs.
-- Opening braces for functions, methods, and classes go on their **own line**.
+```sh
+npm install     # once, to get the pinned Prettier version
+npm run format  # format everything (or: npm run format:check)
+```
+
+A few conventions Prettier does not enforce, but that we still follow:
+
 - Prefer `const`, then `let`; never `var`.
-- Single-quoted strings.
-- Semicolons at statement ends.
 - Private class members use `#` fields.
 - GObject classes are created with `GObject.registerClass`.
 - Wrap all user-facing strings in `gettext` (`_()`); backend modules that must
   avoid a hard dependency use the `const _ = x => x;` passthrough so strings are
   still extractable.
-- Write comments that explain *why*, not *what*.
+- Write comments that explain _why_, not _what_.
 
 ## Pull request guidelines
 
