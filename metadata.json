@@ -1,17 +1,10 @@
 {
-    "name": "Quick TOTP",
-    "description": "Quick TOTP is an actively maintained fork of the original TOTP extension. Generate One-Time Passwords (aka OTP, both TOTP and HOTP) for websites that use Two-Factor Authentication (2FA) like Google, Facebook, Discord, Amazon, Steam, etc.\n\nThe panel menu offers a scrollable list, instant search/filter, a show/hide toggle for codes, a live countdown for each entry, and full keyboard navigation.\n\nNOTE: This extension uses the clipboard:\n - clicking on an OTP entry in the indicator will copy the generated code to the clipboard;\n - the preferences window will copy a generated code to the clipboard when clicked on the corresponding button;\n - the preferences window will copy the OTP secret to the clipboard when selecting the \"Copy to clipboard\" menu option;\n - after copying an OTP secret into the clipboard the clipboard will be cleared after a configurable amount of time (default is 30 seconds);\n - when creating or editing an OTP secret, the paste button (on the top right) will paste the OTP secret (as text or QR image) from the clipboard.",
-    "uuid": "quick-totp@brunosilva.io",
-    "url": "https://github.com/brunos3d/gnome-shell-extension-totp",
-    "gettext-domain": "quick-totp@brunosilva.io",
-    "settings-schema": "org.gnome.shell.extensions.quick-totp",
-    "version-name": "1.0.0",
-    "shell-version": [
-        "45",
-        "46",
-        "47",
-        "48",
-        "49",
-        "50"
-    ]
+  "name": "Quick TOTP",
+  "description": "Quick TOTP is an actively maintained fork of the original TOTP extension. Generate One-Time Passwords (aka OTP, both TOTP and HOTP) for websites that use Two-Factor Authentication (2FA) like Google, Facebook, Discord, Amazon, Steam, etc.\n\nThe panel menu offers a scrollable list, instant search/filter, a show/hide toggle for codes, a live countdown for each entry, and full keyboard navigation.\n\nNOTE: This extension uses the clipboard:\n - clicking on an OTP entry in the indicator will copy the generated code to the clipboard;\n - the preferences window will copy a generated code to the clipboard when clicked on the corresponding button;\n - the preferences window will copy the OTP secret to the clipboard when selecting the \"Copy to clipboard\" menu option;\n - after copying an OTP secret into the clipboard the clipboard will be cleared after a configurable amount of time (default is 30 seconds);\n - when creating or editing an OTP secret, the paste button (on the top right) will paste the OTP secret (as text or QR image) from the clipboard.",
+  "uuid": "quick-totp@brunosilva.io",
+  "url": "https://github.com/brunos3d/gnome-shell-extension-totp",
+  "gettext-domain": "quick-totp@brunosilva.io",
+  "settings-schema": "org.gnome.shell.extensions.quick-totp",
+  "version-name": "1.0.0",
+  "shell-version": ["45", "46", "47", "48", "49", "50"]
 }

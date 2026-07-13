@@ -18,7 +18,6 @@ Authentication (2FA).
 
 ![screenshot](screenshot.png)
 
-
 ## Project Status
 
 Quick TOTP is the actively maintained continuation of the original
@@ -28,7 +27,6 @@ repository, and contributions are welcome.
 
 For details on how this fork relates to the original project and where to report
 issues, please see [DISCLAIMER.md](DISCLAIMER.md).
-
 
 ## Why this fork exists
 
@@ -40,17 +38,16 @@ issues, please see [DISCLAIMER.md](DISCLAIMER.md).
 - Community contributions — issues, translations, and pull requests — are
   welcome.
 
-
 ## Compatibility
 
-| GNOME Shell Version | Status |
-|---------------------|--------|
-| 45 | ✅ Supported |
-| 46 | ✅ Supported |
-| 47 | ✅ Supported |
-| 48 | ✅ Supported |
-| 49 | ✅ Supported |
-| 50 | ✅ Supported (verified) |
+| GNOME Shell Version | Status                  |
+| ------------------- | ----------------------- |
+| 45                  | ✅ Supported            |
+| 46                  | ✅ Supported            |
+| 47                  | ✅ Supported            |
+| 48                  | ✅ Supported            |
+| 49                  | ✅ Supported            |
+| 50                  | ✅ Supported (verified) |
 
 **✅ Supported** — declared in `metadata.json` and covered by the extension's
 version-specific code paths (for example, the `St.ScrollView` API differences
@@ -60,7 +57,6 @@ Packaging and installation were verified locally on **GNOME Shell 50.3**. The
 other releases are targeted but not individually re-tested for this fork —
 if you run into a problem on any version, please
 [open an issue](https://github.com/brunos3d/gnome-shell-extension-totp/issues).
-
 
 ## Features
 
@@ -78,7 +74,6 @@ if you run into a problem on any version, please
 - **Secure by design** — secrets are stored in the GNOME Keyring and wiped from
   memory immediately after use (see [Security](#security)).
 
-
 ## Security
 
 The OTP secret is stored in the [GNOME
@@ -93,7 +88,6 @@ immediately wipe the OTP secret from memory.
 In the preferences window, sensitive data (the `otpauth://` URIs) are
 automatically erased from the clipboard after a few seconds (30 by default).
 
-
 ## Installing from GNOME Shell Extensions website
 
 Quick TOTP has its own extension identity, so it will be published as a separate
@@ -101,18 +95,17 @@ listing on the [GNOME Shell Extensions website](https://extensions.gnome.org/).
 Until that listing is available, please install from source using the
 instructions below.
 
-
 ## Installing from sources
 
 Prerequisites:
 
-  - [make](https://www.gnu.org/software/make/)
+- [make](https://www.gnu.org/software/make/)
 
-  - [jq](https://stedolan.github.io/jq/)
+- [jq](https://stedolan.github.io/jq/)
 
-  - glib2-devel (Fedora) or glib2.0-common (Mageia) or libgio-2.0-dev-bin
-    (Ubuntu): whatever is the package that provides the
-    `glib-compile-resources` tool.
+- glib2-devel (Fedora) or glib2.0-common (Mageia) or libgio-2.0-dev-bin
+  (Ubuntu): whatever is the package that provides the
+  `glib-compile-resources` tool.
 
 Run:
 
@@ -122,7 +115,6 @@ Run:
 
 Then log out and back in (or restart GNOME Shell) and enable **Quick TOTP** with
 your preferred extensions manager.
-
 
 ## Migrating from the original TOTP extension
 
@@ -136,7 +128,6 @@ their defaults; adjust them in the preferences window if you had customized them
 You may keep both extensions installed side by side, but to avoid duplicate panel
 indicators it is recommended to disable the original once Quick TOTP is enabled.
 
-
 ## Importing and exporting URIs
 
 It's possible to import and export OTP secrets that conform to [Google's Key URI
@@ -144,20 +135,17 @@ Format](https://github.com/google/google-authenticator/wiki/Key-Uri-Format).
 This format is compatible with applications like Google Authenticator, FreeOTP,
 Authy, etc.
 
-
 ## Scanning QR codes
 
 It's possible to scan QR codes from a camera and from the clipboard, if you have
 the [ZBar](https://zbar.sourceforge.net/) package installed. In some distros
 (like Debian and Ubuntu) the package is named `zbar-tools`.
 
-
 ## Exporting QR code
 
 It's possible to export the OTP secret as a QR code to be scanned into other
 devices, if you have the [qrencode](https://fukuchi.org/works/qrencode/) package
 installed.
-
 
 ## Importing Steam Guard secret
 
@@ -166,7 +154,6 @@ You can generate Steam Guard Mobile Authenticator codes, by importing the
 
 See the [Steam Guard](steam.md) document for more details.
 
-
 ## Related extensions
 
 When using this extension on a laptop, it's a good idea to also install [Keyring
@@ -174,12 +161,10 @@ Autolock](https://extensions.gnome.org/extension/6846/keyring-autolock/). It wil
 ensure your Keyring gets locked after a period of time, so you never forget to
 keep your OTP secrets protected.
 
-
 ## Contributing
 
 Bug reports, feature requests, translations, and pull requests are welcome. Open
 an issue or pull request in this repository.
-
 
 ## Credits
 
@@ -187,7 +172,6 @@ Quick TOTP is a fork of the original
 [gnome-shell-extension-totp](https://github.com/dkosmari/gnome-shell-extension-totp)
 by Daniel Kosmari, whose work made this project possible. See
 [AUTHORS](AUTHORS) for authorship details.
-
 
 ## License
 
