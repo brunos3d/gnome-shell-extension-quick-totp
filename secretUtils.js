@@ -30,9 +30,25 @@ Gio._promisify(Secret.Service.prototype, 'unlock', 'unlock_finish');
 const OTP_COLLECTION_DBUS_PATH = '/org/freedesktop/secrets/collection/OTP';
 
 
+/*
+ * COMPATIBILITY CONTRACT — DO NOT CHANGE THIS STRING.
+ *
+ * This is the libsecret schema name, which libsecret stores on every item as
+ * the "xdg:schema" attribute and matches against on lookup (because the
+ * schemas below use SchemaFlags.NONE). It intentionally keeps the original
+ * "totp@dkosmari.github.com" identifier so that OTP secrets created by the
+ * upstream extension remain discoverable after migrating to Quick TOTP.
+ *
+ * It is unrelated to — and must NOT be conflated with — the extension UUID or
+ * the GSettings settings-schema, both of which were renamed for the fork.
+ * Changing this value would orphan every existing user's stored secrets.
+ */
+const KEYRING_SCHEMA_ID = 'org.gnome.shell.extensions.totp';
+
+
 function makeSchemaTOTP()
 {
-    return new Secret.Schema('org.gnome.shell.extensions.totp',
+    return new Secret.Schema(KEYRING_SCHEMA_ID,
                              Secret.SchemaFlags.NONE,
                              {
                                  type      : Secret.SchemaAttributeType.STRING,
@@ -47,7 +63,7 @@ function makeSchemaTOTP()
 
 function makeSchemaHOTP()
 {
-    return new Secret.Schema('org.gnome.shell.extensions.totp',
+    return new Secret.Schema(KEYRING_SCHEMA_ID,
                              Secret.SchemaFlags.NONE,
                              {
                                  type      : Secret.SchemaAttributeType.STRING,
