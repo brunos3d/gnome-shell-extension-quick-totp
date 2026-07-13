@@ -1,4 +1,4 @@
-/*  secretUtils.js
+/*  secret-utils.js
  * Copyright (C) 2025  Daniel K. O.
  *
  * SPDX-License-Identifier: GPL-3.0-or-later

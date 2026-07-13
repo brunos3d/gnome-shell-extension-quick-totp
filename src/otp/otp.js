@@ -8,7 +8,7 @@
 
 import GLib from "gi://GLib";
 
-import * as Base32 from "./base32.js";
+import * as Base32 from "../utils/base32.js";
 
 // strings will be translated by gettext in the frontend
 const _ = (x) => x;

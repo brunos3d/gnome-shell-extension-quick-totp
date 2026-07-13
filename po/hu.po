@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: TOTP\n"
 "Report-Msgid-Bugs-To: https://github.com/brunos3d/gnome-shell-extension-"
 "totp\n"
-"POT-Creation-Date: 2026-07-13 02:13-0300\n"
+"POT-Creation-Date: 2026-07-13 02:27-0300\n"
 "PO-Revision-Date: 2025-12-25 09:42-0300\n"
 "Last-Translator: Daniel K. O.\n"
 "Language-Team: \n"
@@ -18,7 +18,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Poedit 3.5\n"
 
-#: prefs.js:65 indicator.js:225
+#: prefs.js:65 src/ui/indicator.js:225
 msgid "Error"
 msgstr "Hiba"
 
@@ -123,7 +123,7 @@ msgstr "Kód másolása a vágólapra."
 msgid "Unlock"
 msgstr "Feloldás"
 
-#: prefs.js:590 indicator.js:33
+#: prefs.js:590 src/ui/indicator.js:33
 msgid "OTP code copied to clipboard."
 msgstr "Az OTP-kód a vágólapra másolva."
 
@@ -131,7 +131,7 @@ msgstr "Az OTP-kód a vágólapra másolva."
 msgid "QR code"
 msgstr "QR-kód"
 
-#: prefs.js:630 myAlertDialog.js:51
+#: prefs.js:630 src/ui/widgets/my-alert-dialog.js:51
 msgid "_Close"
 msgstr "_Bezárás"
 
@@ -179,11 +179,11 @@ msgstr ""
 msgid "_Import"
 msgstr "_Importálás"
 
-#: prefs.js:869 indicator.js:346
+#: prefs.js:869 src/ui/indicator.js:346
 msgid "Unlock OTP secrets..."
 msgstr "OTP-titkok feloldása…"
 
-#: prefs.js:872 indicator.js:340
+#: prefs.js:872 src/ui/indicator.js:340
 msgid "Lock OTP secrets"
 msgstr "OTP-titkok zárolása"
 
@@ -320,125 +320,126 @@ msgstr ""
 "Érzékeny adatok („otpauth://” URI-k) exportálásakor ezek az adatok az idő "
 "letelte után törlődnek a vágólapról. A hitelesítési kódok nem törlődnek."
 
-#: base32.js:23
-msgid "Invalid base32 input; missing padding."
-msgstr "Érvénytelen base32 bemenet; hiányzó kitöltés."
+#: src/otp/hotp.js:67
+msgid "URI host should be \"hotp\""
+msgstr "Az URI-kiszolgálónak a következőnek kell lennie: „hotp”"
 
-#: base32.js:39
-msgid "Invalid base32 character at position:"
-msgstr "Érvénytelen base32 karakter a következő pozícióban:"
+#: src/otp/otp.js:35
+msgid "Invalid algorithm."
+msgstr "Érvénytelen algoritmus."
 
-#: base32.js:46
-msgid "Invalid padding."
-msgstr "Érvénytelen kitöltés."
+#: src/otp/otp.js:103
+msgid "Failed to parse URI."
+msgstr "Nem sikerült elemezni az URI-t."
 
-#: indicator.js:233
+#: src/otp/otp.js:105
+msgid "URI scheme should be \"otpauth://...\""
+msgstr "Az URI-sémának a következőnek kell lennie: „otpauth://...”"
+
+#: src/otp/otp.js:106
+msgid "Unexpected port number in URI."
+msgstr "Váratlan portszám az URI-ban."
+
+#: src/otp/totp.js:43
+msgid "URI host should be \"totp\""
+msgstr "Az URI-kiszolgálónak a következőnek kell lennie: „totp”"
+
+#: src/services/secret-utils.js:171
+msgid "Failed to lookup secret."
+msgstr "A titok keresése sikertelen."
+
+#: src/services/secret-utils.js:203
+msgid "Failed to retrieve secret."
+msgstr "A titok lekérdezése sikertelen."
+
+#: src/services/secret-utils.js:232 src/services/secret-utils.js:269
+#: src/services/secret-utils.js:291
+msgid "Failed to lookup item."
+msgstr "Az elem keresése sikertelen."
+
+#: src/services/secret-utils.js:239 src/services/secret-utils.js:275
+msgid "Failed to set label."
+msgstr "A címke beállítása sikertelen."
+
+#: src/services/secret-utils.js:246
+msgid "Failed to set attributes."
+msgstr "Az attribútumok beállítása sikertelen."
+
+#: src/services/secret-utils.js:252
+msgid "Failed to set secret."
+msgstr "Nem sikerült beállítani a titkot."
+
+#: src/services/secret-utils.js:298
+msgid "Failed to set counter."
+msgstr "Nem sikerült beállítani a számlálót."
+
+#: src/ui/indicator.js:233
 msgid "Locked"
 msgstr ""
 
-#: indicator.js:297
+#: src/ui/indicator.js:297
 msgid "Type to search…"
 msgstr ""
 
-#: indicator.js:353
+#: src/ui/indicator.js:353
 msgid "Settings..."
 msgstr "Beállítások…"
 
-#: indicator.js:359
+#: src/ui/indicator.js:359
 msgid "OTP Secrets"
 msgstr "OTP-titkok"
 
-#: indicator.js:394 indicator.js:586
+#: src/ui/indicator.js:394 src/ui/indicator.js:586
 #, fuzzy
 msgid "No OTP secrets."
 msgstr "OTP-titkok zárolása"
 
-#: indicator.js:473
+#: src/ui/indicator.js:473
 #, fuzzy
 msgid "Show OTP codes"
 msgstr "OTP-titkok zárolása"
 
-#: indicator.js:474
+#: src/ui/indicator.js:474
 msgid "Hide OTP codes"
 msgstr ""
 
-#: indicator.js:484
+#: src/ui/indicator.js:484
 msgid "Failed to lock OTP secrets."
 msgstr "Nem sikerült zárolni az OTP-titkokat."
 
-#: indicator.js:487
+#: src/ui/indicator.js:487
 msgid "Error locking OTP secrets."
 msgstr "Hiba az OTP-titkok zárolásakor."
 
-#: indicator.js:497
+#: src/ui/indicator.js:497
 msgid "Failed to unlock OTP secrets."
 msgstr "Nem sikerült feloldani az OTP-titkokat."
 
-#: indicator.js:500
+#: src/ui/indicator.js:500
 msgid "Error unlocking OTP secrets."
 msgstr "Hiba az OTP-titkok feloldásakor."
 
-#: indicator.js:553
+#: src/ui/indicator.js:553
 msgid "Error retrieving OTP items."
 msgstr "Hiba az OTP-elemek lekérdezésekor."
 
-#: indicator.js:589
+#: src/ui/indicator.js:589
 #, fuzzy
 msgid "No matching OTP secrets."
 msgstr "Hiba az OTP-titkok zárolásakor."
 
-#: indicator.js:691
+#: src/ui/indicator.js:691
 msgid "Error copying the OTP authentication code."
 msgstr "Hiba az OTP hitelesítési kód másolásakor."
 
-#: secretUtils.js:171
-msgid "Failed to lookup secret."
-msgstr "A titok keresése sikertelen."
+#: src/utils/base32.js:23
+msgid "Invalid base32 input; missing padding."
+msgstr "Érvénytelen base32 bemenet; hiányzó kitöltés."
 
-#: secretUtils.js:203
-msgid "Failed to retrieve secret."
-msgstr "A titok lekérdezése sikertelen."
+#: src/utils/base32.js:39
+msgid "Invalid base32 character at position:"
+msgstr "Érvénytelen base32 karakter a következő pozícióban:"
 
-#: secretUtils.js:232 secretUtils.js:269 secretUtils.js:291
-msgid "Failed to lookup item."
-msgstr "Az elem keresése sikertelen."
-
-#: secretUtils.js:239 secretUtils.js:275
-msgid "Failed to set label."
-msgstr "A címke beállítása sikertelen."
-
-#: secretUtils.js:246
-msgid "Failed to set attributes."
-msgstr "Az attribútumok beállítása sikertelen."
-
-#: secretUtils.js:252
-msgid "Failed to set secret."
-msgstr "Nem sikerült beállítani a titkot."
-
-#: secretUtils.js:298
-msgid "Failed to set counter."
-msgstr "Nem sikerült beállítani a számlálót."
-
-#: hotp.js:67
-msgid "URI host should be \"hotp\""
-msgstr "Az URI-kiszolgálónak a következőnek kell lennie: „hotp”"
-
-#: otp.js:35
-msgid "Invalid algorithm."
-msgstr "Érvénytelen algoritmus."
-
-#: otp.js:103
-msgid "Failed to parse URI."
-msgstr "Nem sikerült elemezni az URI-t."
-
-#: otp.js:105
-msgid "URI scheme should be \"otpauth://...\""
-msgstr "Az URI-sémának a következőnek kell lennie: „otpauth://...”"
-
-#: otp.js:106
-msgid "Unexpected port number in URI."
-msgstr "Váratlan portszám az URI-ban."
-
-#: totp.js:43
-msgid "URI host should be \"totp\""
-msgstr "Az URI-kiszolgálónak a következőnek kell lennie: „totp”"
+#: src/utils/base32.js:46
+msgid "Invalid padding."
+msgstr "Érvénytelen kitöltés."
