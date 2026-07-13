@@ -16,28 +16,14 @@ It generates the time-based (TOTP) and counter-based (HOTP) one-time codes used
 by services like Google, GitHub, Steam, and many others that support Two-Factor
 Authentication (2FA).
 
-<p align="center">
-  <video
-    src="https://github.com/brunos3d/gnome-shell-extension-quick-totp/raw/main/assets/screencast.mp4"
-    poster="https://github.com/brunos3d/gnome-shell-extension-quick-totp/raw/main/assets/screenshot.png"
-    width="720"
-    controls
-    muted
-    loop
-    playsinline
-  >
-    <a href="assets/screencast.mp4">▶ Watch the demo screencast</a>
-  </video>
-</p>
+![screenshot](assets/screenshot.png)
 
-<p align="center">
-  <sub>
-    ▶ A quick tour — panel menu, instant search, live countdown, and Backup
-    &amp; Restore.
-    <a href="assets/screencast.mp4">Open the video</a> if it doesn't play
-    inline, or see the <a href="assets/screenshot.png">screenshot</a>.
-  </sub>
-</p>
+<details>
+  <summary>A quick demonstration video</summary>
+  <p align="center">
+    <video src="assets/screencast.mp4" controls></video>
+  </p>
+</details>
 
 ## Project Status
 
