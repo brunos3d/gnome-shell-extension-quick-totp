@@ -51,6 +51,26 @@ const EntryRow = Adw.EntryRow ?? MyEntryRow;
 
 const SpinRow = Adw.SpinRow ?? MySpinRow;
 
+/*
+ * Class initialization must only register the GType (see the EGO review
+ * guidelines on initialization), so widget actions are installed per instance
+ * with a Gio.SimpleActionGroup instead of Gtk's install_action().
+ */
+function insertActionGroup(widget, prefix, actions) {
+  const group = new Gio.SimpleActionGroup();
+  for (const { name, parameter_type = null, activate } of actions) {
+    const action = new Gio.SimpleAction({
+      name: name,
+      parameter_type: parameter_type
+        ? new GLib.VariantType(parameter_type)
+        : null,
+    });
+    action.connect("activate", activate);
+    group.add_action(action);
+  }
+  widget.insert_action_group(prefix, group);
+}
+
 function makeLabel({ issuer, name }) {
   const safe_issuer = GLib.markup_escape_text(issuer, -1);
   const safe_name = GLib.markup_escape_text(name, -1);
@@ -182,7 +202,7 @@ class ScanQRButton extends Gtk.Button {
       const [stdout] = await proc.communicate_utf8_async(null, null);
       if (!stdout) return;
 
-      this.activate_action("import-uri", GLib.Variant.new_string(stdout));
+      this.activate_action("import.uri", GLib.Variant.new_string(stdout));
     } catch (e) {
       reportError(this.root, e);
     }
@@ -240,27 +260,23 @@ class PasteButton extends Gtk.Button {
       }
 
       if (text)
-        this.activate_action("import-uri", GLib.Variant.new_string(text));
+        this.activate_action("import.uri", GLib.Variant.new_string(text));
     } catch (e) {
       reportError(this.root, e);
     }
   }
 }
 
+const TYPE_LIST = ["TOTP", "HOTP"];
+const SECRET_TYPE_LIST = ["Base32", "Base64"];
+const DIGITS_LIST = ["5", "6", "7", "8"];
+const PERIOD_LIST = ["15", "30", "45", "60"];
+const ALGORITHM_LIST = ["SHA-1", "SHA-256", "SHA-384", "SHA-512"];
+
 class SecretDialog extends Gtk.Dialog {
   static {
     GObject.registerClass(this);
-
-    this.install_action("import-uri", "s", (obj, name, arg) =>
-      obj.importURI(arg.unpack()),
-    );
   }
-
-  static type_list = ["TOTP", "HOTP"];
-  static secret_type_list = ["Base32", "Base64"];
-  static digits_list = ["5", "6", "7", "8"];
-  static period_list = ["15", "30", "45", "60"];
-  static algorithm_list = ["SHA-1", "SHA-256", "SHA-384", "SHA-512"];
 
   #reject;
   #resolve;
@@ -275,6 +291,14 @@ class SecretDialog extends Gtk.Dialog {
       // WORKAROUND: need header bar, otherwise the dialog is not centered
       use_header_bar: true,
     });
+
+    insertActionGroup(this, "import", [
+      {
+        name: "uri",
+        parameter_type: "s",
+        activate: (action, arg) => this.importURI(arg.unpack()),
+      },
+    ]);
 
     const group = new Adw.PreferencesGroup({
       title: title,
@@ -296,8 +320,8 @@ class SecretDialog extends Gtk.Dialog {
 
     // UI: type
     this.#ui.type_drop = new Gtk.DropDown({
-      model: makeStringList(...SecretDialog.type_list),
-      selected: SecretDialog.type_list.indexOf(fields.type),
+      model: makeStringList(...TYPE_LIST),
+      selected: TYPE_LIST.indexOf(fields.type),
     });
 
     this.#ui.type_drop.connect("notify::selected-item", () =>
@@ -334,7 +358,7 @@ class SecretDialog extends Gtk.Dialog {
       tooltip_text: _("The shared secret key."),
     });
     this.#ui.secret_type = new Gtk.DropDown({
-      model: makeStringList(...SecretDialog.secret_type_list),
+      model: makeStringList(...SECRET_TYPE_LIST),
       selected: 0,
       tooltip_text: _("How the secret key is encoded."),
     });
@@ -345,8 +369,8 @@ class SecretDialog extends Gtk.Dialog {
     this.#ui.digits = new Adw.ComboRow({
       title: _("Digits"),
       title_lines: 1,
-      model: makeStringList(...SecretDialog.digits_list),
-      selected: SecretDialog.digits_list.indexOf(fields.digits),
+      model: makeStringList(...DIGITS_LIST),
+      selected: DIGITS_LIST.indexOf(fields.digits),
       tooltip_text: _("How many digits in the code."),
     });
     group.add(this.#ui.digits);
@@ -357,8 +381,8 @@ class SecretDialog extends Gtk.Dialog {
       title_lines: 1,
       subtitle: _("Time between code updates, in seconds."),
       subtitle_lines: 1,
-      model: makeStringList(...SecretDialog.period_list),
-      selected: SecretDialog.period_list.indexOf(fields.period || "30"),
+      model: makeStringList(...PERIOD_LIST),
+      selected: PERIOD_LIST.indexOf(fields.period || "30"),
     });
     group.add(this.#ui.period);
 
@@ -386,8 +410,8 @@ class SecretDialog extends Gtk.Dialog {
     this.#ui.algorithm = new Adw.ComboRow({
       title: _("Algorithm"),
       title_lines: 1,
-      model: makeStringList(...SecretDialog.algorithm_list),
-      selected: SecretDialog.algorithm_list.indexOf(fields.algorithm),
+      model: makeStringList(...ALGORITHM_LIST),
+      selected: ALGORITHM_LIST.indexOf(fields.algorithm),
       tooltip_text: _("The hash algorithm used to generate codes."),
     });
     group.add(this.#ui.algorithm);
@@ -446,22 +470,16 @@ class SecretDialog extends Gtk.Dialog {
 
   setOTP(otp) {
     const fields = otp.fields();
-    this.#ui.type_drop.selected = SecretDialog.type_list.indexOf(fields.type);
+    this.#ui.type_drop.selected = TYPE_LIST.indexOf(fields.type);
     this.#ui.issuer.text = fields.issuer;
     this.#ui.name.text = fields.name;
     this.#ui.secret.text = fields.secret;
     this.#ui.secret_type.selected = 0;
-    this.#ui.digits.selected = SecretDialog.digits_list.indexOf(
-      fields.digits.toString(),
-    );
+    this.#ui.digits.selected = DIGITS_LIST.indexOf(fields.digits.toString());
     if ("period" in fields)
-      this.#ui.period.selected = SecretDialog.period_list.indexOf(
-        fields.period.toString(),
-      );
+      this.#ui.period.selected = PERIOD_LIST.indexOf(fields.period.toString());
     if ("counter" in fields) this.#ui.counter.value = fields.period;
-    this.#ui.algorithm.selected = SecretDialog.algorithm_list.indexOf(
-      fields.algorithm,
-    );
+    this.#ui.algorithm.selected = ALGORITHM_LIST.indexOf(fields.algorithm);
   }
 
   changedOTPtype() {
@@ -759,10 +777,6 @@ class SecretRow extends Adw.ActionRow {
 class ImportURIsDialog extends Gtk.Dialog {
   static {
     GObject.registerClass(this);
-
-    this.install_action("import-uri", "s", (obj, name, arg) =>
-      obj.importURI(arg.unpack()),
-    );
   }
 
   #buffer;
@@ -777,6 +791,14 @@ class ImportURIsDialog extends Gtk.Dialog {
       use_header_bar: true,
     });
     this.add_css_class("import-uris-dialog");
+
+    insertActionGroup(this, "import", [
+      {
+        name: "uri",
+        parameter_type: "s",
+        activate: (action, arg) => this.importURI(arg.unpack()),
+      },
+    ]);
 
     const vbox = new Gtk.Box({
       orientation: Gtk.Orientation.VERTICAL,
@@ -893,32 +915,6 @@ class LockButton extends Gtk.Button {
 class SecretsGroup extends Adw.PreferencesGroup {
   static {
     GObject.registerClass(this);
-
-    this.install_action("otp.create", null, (obj) => obj.createSecret());
-
-    this.install_action("otp.refresh", null, (obj) => obj.refreshRows());
-
-    this.install_action("otp.copy-to-clipboard", "(ssb)", (obj, name, args) =>
-      obj.copyToClipboard(...args.recursiveUnpack()),
-    );
-
-    this.install_action("otp.edit-secret", "a{sv}", (obj, name, args) =>
-      obj.editSecret(variant2OTP(args)),
-    );
-
-    this.install_action(
-      "otp.export-secret-clipboard",
-      "a{sv}",
-      (obj, name, args) => obj.exportSecretClipboard(variant2OTP(args)),
-    );
-
-    this.install_action("otp.export-secret-qr", "a{sv}", (obj, name, args) =>
-      obj.exportSecretQR(variant2OTP(args)),
-    );
-
-    this.install_action("otp.remove-secret", "a{sv}", (obj, name, args) =>
-      obj.removeSecret(variant2OTP(args)),
-    );
   }
 
   #clipboard_clear_source = 0;
@@ -931,6 +927,44 @@ class SecretsGroup extends Adw.PreferencesGroup {
       title: _("Secrets"),
       description: _("A list of all OTP secrets from the keyring."),
     });
+
+    insertActionGroup(this, "otp", [
+      {
+        name: "create",
+        activate: () => this.createSecret(),
+      },
+      {
+        name: "refresh",
+        activate: () => this.refreshRows(),
+      },
+      {
+        name: "copy-to-clipboard",
+        parameter_type: "(ssb)",
+        activate: (action, args) =>
+          this.copyToClipboard(...args.recursiveUnpack()),
+      },
+      {
+        name: "edit-secret",
+        parameter_type: "a{sv}",
+        activate: (action, args) => this.editSecret(variant2OTP(args)),
+      },
+      {
+        name: "export-secret-clipboard",
+        parameter_type: "a{sv}",
+        activate: (action, args) =>
+          this.exportSecretClipboard(variant2OTP(args)),
+      },
+      {
+        name: "export-secret-qr",
+        parameter_type: "a{sv}",
+        activate: (action, args) => this.exportSecretQR(variant2OTP(args)),
+      },
+      {
+        name: "remove-secret",
+        parameter_type: "a{sv}",
+        activate: (action, args) => this.removeSecret(variant2OTP(args)),
+      },
+    ]);
 
     const listbox = findListBoxChild(this);
     listbox?.set_sort_func(this.rowSortFunc.bind(this));
@@ -1313,8 +1347,6 @@ class SecretsGroup extends Adw.PreferencesGroup {
 class CmdSettingRow extends EntryRow {
   static {
     GObject.registerClass(this);
-
-    this.install_action("reset-setting", null, (obj) => obj.resetSetting());
   }
 
   #key;
@@ -1329,11 +1361,18 @@ class CmdSettingRow extends EntryRow {
 
     this.#settings.bind(key, this, "text", Gio.SettingsBindFlags.DEFAULT);
 
+    insertActionGroup(this, "cmd", [
+      {
+        name: "reset",
+        activate: () => this.resetSetting(),
+      },
+    ]);
+
     this.add_suffix(
       new Gtk.Button({
         icon_name: "edit-clear-symbolic",
         tooltip_text: _("Revert option back to the default value."),
-        action_name: "reset-setting",
+        action_name: "cmd.reset",
         valign: Gtk.Align.CENTER,
       }),
     );
