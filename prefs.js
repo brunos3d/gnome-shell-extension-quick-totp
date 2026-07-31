@@ -1599,7 +1599,6 @@ export default class TOTPPreferences extends ExtensionPreferences {
 
     window.add(page);
     window.connect("close-request", () => {
-      window.remove(page);
       page.destroy();
       return false;
     });
