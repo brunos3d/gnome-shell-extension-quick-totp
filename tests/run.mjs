@@ -6,11 +6,11 @@
  * runs them and exits non-zero on failure.
  */
 
-import { run } from "./lib/harness.js";
+import { run } from './lib/harness.js';
 
-await import("./parsers.test.mjs");
-await import("./validators.test.mjs");
-await import("./roundtrip.test.mjs");
+await import('./parsers.test.mjs');
+await import('./validators.test.mjs');
+await import('./roundtrip.test.mjs');
 
 const ok = await run();
 process.exit(ok ? 0 : 1);

@@ -9,10 +9,10 @@
  * clear text.
  */
 
-import * as SecretUtils from "../services/secret-utils.js";
+import * as SecretUtils from '../services/secret-utils.js';
 
-import { makeAccount } from "./shared/otp-account.js";
-import { findExportFormat } from "./formats/registry.js";
+import { makeAccount } from './shared/otp-account.js';
+import { findExportFormat } from './formats/registry.js';
 
 /**
  * Read every stored OTP account, including its secret, as normalized
@@ -20,25 +20,25 @@ import { findExportFormat } from "./formats/registry.js";
  * @returns {Promise<OtpAccount[]>}
  */
 export async function gatherAccounts() {
-  const items = await SecretUtils.getOTPItems();
-  const accounts = [];
+    const items = await SecretUtils.getOTPItems();
+    const accounts = [];
 
-  for (const item of items) {
-    const attrs = item.get_attributes();
-    const otpLike = {
-      type: attrs.type,
-      issuer: attrs.issuer ?? "",
-      name: attrs.name ?? "",
-      digits: attrs.digits,
-      period: attrs.period,
-      counter: attrs.counter,
-      algorithm: attrs.algorithm,
-    };
-    const secret = await SecretUtils.getSecret(otpLike);
-    accounts.push(makeAccount({ ...otpLike, secret }));
-  }
+    for (const item of items) {
+        const attrs = item.get_attributes();
+        const otpLike = {
+            type: attrs.type,
+            issuer: attrs.issuer ?? '',
+            name: attrs.name ?? '',
+            digits: attrs.digits,
+            period: attrs.period,
+            counter: attrs.counter,
+            algorithm: attrs.algorithm,
+        };
+        const secret = await SecretUtils.getSecret(otpLike);
+        accounts.push(makeAccount({ ...otpLike, secret }));
+    }
 
-  return accounts;
+    return accounts;
 }
 
 /**
@@ -48,9 +48,9 @@ export async function gatherAccounts() {
  * @returns {string}
  */
 export function serializeAccounts(formatId, accounts) {
-  const format = findExportFormat(formatId);
-  if (!format) throw new Error(`Unknown export format "${formatId}".`);
-  if (accounts.length === 0)
-    throw new Error("There are no accounts to export.");
-  return format.serialize(accounts);
+    const format = findExportFormat(formatId);
+    if (!format) throw new Error(`Unknown export format "${formatId}".`);
+    if (accounts.length === 0)
+        throw new Error('There are no accounts to export.');
+    return format.serialize(accounts);
 }

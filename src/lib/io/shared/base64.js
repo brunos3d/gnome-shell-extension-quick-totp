@@ -10,14 +10,14 @@
  */
 
 const ALPHABET =
-  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 const LOOKUP = (() => {
-  const t = new Int16Array(256).fill(-1);
-  for (let i = 0; i < ALPHABET.length; i++) t[ALPHABET.charCodeAt(i)] = i;
-  // URL-safe aliases
-  t["-".charCodeAt(0)] = 62;
-  t["_".charCodeAt(0)] = 63;
-  return t;
+    const t = new Int16Array(256).fill(-1);
+    for (let i = 0; i < ALPHABET.length; i++) t[ALPHABET.charCodeAt(i)] = i;
+    // URL-safe aliases
+    t['-'.charCodeAt(0)] = 62;
+    t['_'.charCodeAt(0)] = 63;
+    return t;
 })();
 
 /**
@@ -26,25 +26,25 @@ const LOOKUP = (() => {
  * @returns {Uint8Array}
  */
 export function decode(input) {
-  const s = String(input ?? "").replace(/\s+/g, "");
-  const clean = s.replace(/=+$/, "");
-  const out = new Uint8Array(Math.floor((clean.length * 3) / 4));
-  let bits = 0;
-  let acc = 0;
-  let outIndex = 0;
+    const s = String(input ?? '').replace(/\s+/g, '');
+    const clean = s.replace(/=+$/, '');
+    const out = new Uint8Array(Math.floor((clean.length * 3) / 4));
+    let bits = 0;
+    let acc = 0;
+    let outIndex = 0;
 
-  for (let i = 0; i < clean.length; i++) {
-    const value = LOOKUP[clean.charCodeAt(i)];
-    if (value < 0)
-      throw new Error(`Invalid Base64 character at position ${i}.`);
-    acc = (acc << 6) | value;
-    bits += 6;
-    if (bits >= 8) {
-      bits -= 8;
-      out[outIndex++] = (acc >> bits) & 0xff;
+    for (let i = 0; i < clean.length; i++) {
+        const value = LOOKUP[clean.charCodeAt(i)];
+        if (value < 0)
+            throw new Error(`Invalid Base64 character at position ${i}.`);
+        acc = (acc << 6) | value;
+        bits += 6;
+        if (bits >= 8) {
+            bits -= 8;
+            out[outIndex++] = (acc >> bits) & 0xff;
+        }
     }
-  }
-  return out.subarray(0, outIndex);
+    return out.subarray(0, outIndex);
 }
 
 /**
@@ -53,16 +53,17 @@ export function decode(input) {
  * @returns {string}
  */
 export function encode(bytes) {
-  const b = bytes instanceof Uint8Array ? bytes : Uint8Array.from(bytes);
-  let out = "";
-  for (let i = 0; i < b.length; i += 3) {
-    const b0 = b[i];
-    const b1 = i + 1 < b.length ? b[i + 1] : 0;
-    const b2 = i + 2 < b.length ? b[i + 2] : 0;
-    out += ALPHABET[b0 >> 2];
-    out += ALPHABET[((b0 & 0x03) << 4) | (b1 >> 4)];
-    out += i + 1 < b.length ? ALPHABET[((b1 & 0x0f) << 2) | (b2 >> 6)] : "=";
-    out += i + 2 < b.length ? ALPHABET[b2 & 0x3f] : "=";
-  }
-  return out;
+    const b = bytes instanceof Uint8Array ? bytes : Uint8Array.from(bytes);
+    let out = '';
+    for (let i = 0; i < b.length; i += 3) {
+        const b0 = b[i];
+        const b1 = i + 1 < b.length ? b[i + 1] : 0;
+        const b2 = i + 2 < b.length ? b[i + 2] : 0;
+        out += ALPHABET[b0 >> 2];
+        out += ALPHABET[((b0 & 0x03) << 4) | (b1 >> 4)];
+        out +=
+            i + 1 < b.length ? ALPHABET[((b1 & 0x0f) << 2) | (b2 >> 6)] : '=';
+        out += i + 2 < b.length ? ALPHABET[b2 & 0x3f] : '=';
+    }
+    return out;
 }

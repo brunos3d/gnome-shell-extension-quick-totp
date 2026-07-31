@@ -120,17 +120,17 @@ opening a pull request, please:
 1. **Run the test suite** (parsers, serializers, round-trips, validation,
    malformed input, and scaling):
 
-   ```sh
-   npm test
-   ```
+    ```sh
+    npm test
+    ```
 
 2. **Syntax-check** every JavaScript file you touched:
 
-   ```sh
-   for f in extension.js prefs.js $(find src -name "*.js"); do
-     node --check "$f" || echo "FAIL $f"
-   done
-   ```
+    ```sh
+    for f in extension.js prefs.js $(find src -name "*.js"); do
+      node --check "$f" || echo "FAIL $f"
+    done
+    ```
 
 3. **Build** the extension (`make`) and confirm it packs without errors.
 

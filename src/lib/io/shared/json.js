@@ -10,19 +10,19 @@
  */
 
 export function parseJson(data) {
-  let text =
-    typeof data === "string"
-      ? data
-      : new TextDecoder("utf-8", { fatal: false }).decode(data);
-  // Strip a leading BOM if present.
-  if (text.charCodeAt(0) === 0xfeff) text = text.slice(1);
-  try {
-    return JSON.parse(text);
-  } catch (e) {
-    throw new Error(`File is not valid JSON: ${e.message}`);
-  }
+    let text =
+        typeof data === 'string'
+            ? data
+            : new TextDecoder('utf-8', { fatal: false }).decode(data);
+    // Strip a leading BOM if present.
+    if (text.charCodeAt(0) === 0xfeff) text = text.slice(1);
+    try {
+        return JSON.parse(text);
+    } catch (e) {
+        throw new Error(`File is not valid JSON: ${e.message}`);
+    }
 }
 
 export function asArray(value) {
-  return Array.isArray(value) ? value : [];
+    return Array.isArray(value) ? value : [];
 }

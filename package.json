@@ -1,28 +1,28 @@
 {
-  "name": "quick-totp",
-  "version": "1.0.0",
-  "description": "Quick TOTP — a GNOME Shell extension for TOTP/HOTP two-factor authentication codes.",
-  "private": true,
-  "type": "module",
-  "license": "GPL-3.0-or-later",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/brunos3d/gnome-shell-extension-quick-totp.git"
-  },
-  "scripts": {
-    "build": "make",
-    "pack": "make",
-    "install:extension": "make install",
-    "uninstall:extension": "gnome-extensions uninstall quick-totp@brunosilva.io",
-    "prefs": "gnome-extensions prefs quick-totp@brunosilva.io",
-    "clean": "make clean",
-    "update-po": "make update-po",
-    "check": "for f in extension.js prefs.js $(find src -name '*.js'); do node --check \"$f\" || exit 1; done",
-    "test": "node tests/run.mjs",
-    "format": "prettier --write .",
-    "format:check": "prettier --check ."
-  },
-  "devDependencies": {
-    "prettier": "^3.9.5"
-  }
+    "name": "quick-totp",
+    "version": "1.0.0",
+    "description": "Quick TOTP — a GNOME Shell extension for TOTP/HOTP two-factor authentication codes.",
+    "private": true,
+    "type": "module",
+    "license": "GPL-3.0-or-later",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/brunos3d/gnome-shell-extension-quick-totp.git"
+    },
+    "scripts": {
+        "build": "make",
+        "pack": "make",
+        "install:extension": "make install",
+        "uninstall:extension": "gnome-extensions uninstall quick-totp@brunosilva.io",
+        "prefs": "gnome-extensions prefs quick-totp@brunosilva.io",
+        "clean": "make clean",
+        "update-po": "make update-po",
+        "check": "for f in extension.js prefs.js $(find src -name '*.js'); do node --check \"$f\" || exit 1; done",
+        "test": "node tests/run.mjs",
+        "format": "prettier --write .",
+        "format:check": "prettier --check ."
+    },
+    "devDependencies": {
+        "prettier": "^3.9.5"
+    }
 }

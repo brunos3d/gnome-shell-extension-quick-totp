@@ -7,7 +7,7 @@
  * parsers/otpauth-uri.js.
  */
 
-import { isSteam } from "../shared/otp-account.js";
+import { isSteam } from '../shared/otp-account.js';
 
 /**
  * Build a single otpauth:// URI from an account.
@@ -15,25 +15,25 @@ import { isSteam } from "../shared/otp-account.js";
  * @returns {string}
  */
 export function buildUri(account) {
-  const steam = isSteam(account);
-  const host = steam ? "steam" : account.type.toLowerCase();
+    const steam = isSteam(account);
+    const host = steam ? 'steam' : account.type.toLowerCase();
 
-  const label = account.issuer
-    ? `${encodeURIComponent(account.issuer)}:${encodeURIComponent(account.name)}`
-    : encodeURIComponent(account.name);
+    const label = account.issuer
+        ? `${encodeURIComponent(account.issuer)}:${encodeURIComponent(account.name)}`
+        : encodeURIComponent(account.name);
 
-  const params = [`secret=${account.secret}`];
-  if (account.issuer)
-    params.push(`issuer=${encodeURIComponent(account.issuer)}`);
-  params.push(`algorithm=${account.algorithm.replace("-", "")}`);
-  params.push(`digits=${account.digits}`);
-  if (account.type === "HOTP") {
-    params.push(`counter=${account.counter ?? 0}`);
-  } else {
-    params.push(`period=${account.period ?? 30}`);
-  }
+    const params = [`secret=${account.secret}`];
+    if (account.issuer)
+        params.push(`issuer=${encodeURIComponent(account.issuer)}`);
+    params.push(`algorithm=${account.algorithm.replace('-', '')}`);
+    params.push(`digits=${account.digits}`);
+    if (account.type === 'HOTP') {
+        params.push(`counter=${account.counter ?? 0}`);
+    } else {
+        params.push(`period=${account.period ?? 30}`);
+    }
 
-  return `otpauth://${host}/${label}?${params.join("&")}`;
+    return `otpauth://${host}/${label}?${params.join('&')}`;
 }
 
 /**
@@ -42,5 +42,5 @@ export function buildUri(account) {
  * @returns {string}
  */
 export function buildUriList(accounts) {
-  return accounts.map(buildUri).join("\n") + "\n";
+    return accounts.map(buildUri).join('\n') + '\n';
 }
