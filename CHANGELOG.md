@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-07-30
+
+Addresses the extensions.gnome.org review feedback and adopts the
+[GJS style guide](https://gjs.guide/guides/gjs/style-guide.html).
+
+### Changed
+
+- **The QR commands no longer have default values.** The QR generator, reader
+  and scanner commands in the preferences are empty until you configure them.
+  Using a QR feature without a configured command shows an error pointing to
+  the Options section, and the tooltips and schema descriptions suggest the
+  previously bundled commands (`qrencode`, `zbarimg`, `zbarcam`) as examples.
+  Existing installs that customized these settings keep their values.
+- Reorganized the source tree by process: `src/shell/` runs only in
+  gnome-shell, `src/prefs/` only in the preferences dialog, and `src/lib/` is
+  shared, following the review guidelines on process isolation.
+- Class initialization now only registers the GType; widget actions are set up
+  per instance.
+- Adopted the GJS style guide tooling: `.editorconfig`, Prettier with 4-space
+  indentation and single quotes, and the guide's ESLint configuration
+  (`npm run lint`). The code passes with zero errors.
+- Logging uses `console.error()` instead of the deprecated `logError()`.
+
+### Fixed
+
+- Removed unnecessary optional call checks and unused code flagged by the
+  review, and a redundant page removal when closing the preferences window.
+- A version bump now rebuilds the extension pack (`metadata.json` was missing
+  from the Makefile dependencies).
+
 ## [1.0.0] - 2026-07-13
 
 First release of **Quick TOTP**, an independently maintained fork of the original
@@ -97,5 +127,6 @@ lightweight experience of the original.
 - Import/export concepts and some test fixtures are derived from GNOME
   Authenticator (GPL-3.0-or-later); see `docs/import-export.md`.
 
-[Unreleased]: https://github.com/brunos3d/gnome-shell-extension-quick-totp/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/brunos3d/gnome-shell-extension-quick-totp/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/brunos3d/gnome-shell-extension-quick-totp/releases/tag/v1.1.0
 [1.0.0]: https://github.com/brunos3d/gnome-shell-extension-quick-totp/releases/tag/v1.0.0
