@@ -7,8 +7,6 @@
 // Implements most of Adw.EntryRow the extension needs.
 
 import Adw from 'gi://Adw';
-import Gio from 'gi://Gio';
-import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 import Gtk from 'gi://Gtk';
 
@@ -17,7 +15,7 @@ function findByBuildableID(start, id) {
     const queue = [start];
     while (queue.length > 0) {
         const current = queue.shift();
-        if (current.get_buildable_id() == id) return current;
+        if (current.get_buildable_id() === id) return current;
 
         let child = current.get_first_child();
         while (child) {

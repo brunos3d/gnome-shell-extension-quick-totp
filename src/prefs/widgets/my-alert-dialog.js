@@ -73,7 +73,7 @@ export default class AlertDialog extends Gtk.MessageDialog {
         return result.propagate_int();
     }
 
-    _cancelled_cb(cancellable) {
+    _cancelled_cb(_cancellable) {
         this.on_response(Gtk.ResponseType.CLOSE);
     }
 
@@ -84,7 +84,7 @@ export default class AlertDialog extends Gtk.MessageDialog {
             this.#cancellable_signal = 0;
         }
 
-        if (response == Gtk.ResponseType.CLOSE) {
+        if (response === Gtk.ResponseType.CLOSE) {
             this.#task.return_error(
                 new GLib.Error(
                     GLib.quark_from_string(DIALOG_ERROR_QUARK),

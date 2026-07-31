@@ -21,15 +21,17 @@ function get_algorithm(name) {
         case 'SHA-256':
             return GLib.ChecksumType.SHA256;
 
-        case 'SHA-384':
+        case 'SHA-384': {
             const v2_51_error = GLib.check_version(2, 51, 0);
             if (v2_51_error) throw new Error(v2_51_error);
             return GLib.ChecksumType.SHA384;
+        }
 
-        case 'SHA-512':
+        case 'SHA-512': {
             const v2_36_error = GLib.check_version(2, 36, 0);
             if (v2_36_error) throw new Error(v2_36_error);
             return GLib.ChecksumType.SHA512;
+        }
 
         default:
             throw new Error(_('Invalid algorithm.'));
@@ -58,12 +60,6 @@ function hex_to_bytes(hex) {
     for (let i = 0; i < hex.length; i += 2)
         blob.push(parseInt(hex.substring(i, i + 2), 16));
     return new Uint8Array(blob);
-}
-
-function bytes_to_hex(blob) {
-    let hex = '';
-    blob.forEach((x) => (hex += x.toString(16).padStart(2, '0')));
-    return hex;
 }
 
 function splitQuery(query) {
@@ -98,12 +94,12 @@ function toSteam(value, digits) {
 }
 
 export function parseURI(uri) {
-    let [success, scheme, userinfo, host, port, path, query, fragment] =
+    let [success, scheme, _userinfo, host, port, path, query, _fragment] =
         GLib.Uri.split(uri, GLib.UriFlags.NON_DNS);
     if (!success) throw new Error(_('Failed to parse URI.'));
-    if (scheme != 'otpauth')
+    if (scheme !== 'otpauth')
         throw new Error(_('URI scheme should be "otpauth://..."'));
-    if (port != -1) throw new Error(_('Unexpected port number in URI.'));
+    if (port !== -1) throw new Error(_('Unexpected port number in URI.'));
 
     let result = splitQuery(query);
 
@@ -136,7 +132,7 @@ export class OTP {
         let value = dynamicTruncation(hmac);
         let value_str = '';
 
-        if (this.issuer.toUpperCase() == 'STEAM')
+        if (this.issuer.toUpperCase() === 'STEAM')
             value_str = toSteam(value, this.digits);
         else
             // regular OTP uses decimal output
@@ -154,14 +150,14 @@ export class OTP {
         let query = `secret=${this.secret}`;
         this.wipe_secret();
 
-        if (this.issuer != '') query += `&issuer=${this.issuer}`;
+        if (this.issuer !== '') query += `&issuer=${this.issuer}`;
 
-        if (this.digits != 6) query += `&digits=${this.digits}`;
+        if (this.digits !== 6) query += `&digits=${this.digits}`;
 
         for (const [key, val] of Object.entries(args))
             query += `&${key}=${val}`;
 
-        if (this.algorithm != 'SHA-1') {
+        if (this.algorithm !== 'SHA-1') {
             // remove the '-' from the algorithm name
             const algorithm = this.algorithm.replaceAll(/-/g, '');
             query += `&algorithm=${algorithm}`;

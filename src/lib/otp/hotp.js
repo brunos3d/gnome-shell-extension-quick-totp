@@ -54,31 +54,26 @@ export default class HOTP extends OTP.OTP {
         this.type = 'HOTP';
 
         if (uri) {
-            let {
-                host = null,
+            const fields = OTP.parseURI(uri);
+            const { host = null } = fields;
+            if (host.toLowerCase() !== 'hotp')
+                throw new Error(_('URI host should be "hotp"'));
+            ({
                 issuer = '',
                 name = '',
                 secret = '',
                 digits = 6,
                 counter = 0,
                 algorithm = 'SHA-1',
-            } = OTP.parseURI(uri);
-            if (host.toLowerCase() != 'hotp')
-                throw new Error(_('URI host should be "hotp"'));
-            this.issuer = issuer;
-            this.name = name;
-            this.secret = secret;
-            this.digits = parseInt(digits);
-            this.counter = parseInt(counter);
-            this.algorithm = OTP.normalized_algorithm(algorithm);
-        } else {
-            this.issuer = issuer;
-            this.name = name;
-            this.secret = secret;
-            this.digits = parseInt(digits);
-            this.counter = parseInt(counter);
-            this.algorithm = OTP.normalized_algorithm(algorithm);
+            } = fields);
         }
+
+        this.issuer = issuer;
+        this.name = name;
+        this.secret = secret;
+        this.digits = parseInt(digits);
+        this.counter = parseInt(counter);
+        this.algorithm = OTP.normalized_algorithm(algorithm);
     }
 
     code(counter = this.counter) {
@@ -87,7 +82,7 @@ export default class HOTP extends OTP.OTP {
 
     uri() {
         let args = {};
-        if (this.counter != 0) args.counter = this.counter;
+        if (this.counter !== 0) args.counter = this.counter;
         return super.uri(args);
     }
 

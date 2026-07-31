@@ -91,7 +91,7 @@ function makeLabel({ issuer, name }) {
 }
 
 function reportError(root, e) {
-    logError(e);
+    console.error(e);
     try {
         const dialog = new AlertDialog({
             modal: true,
@@ -100,7 +100,7 @@ function reportError(root, e) {
         });
         dialog.show(root);
     } catch (ee) {
-        logError(ee);
+        console.error(ee);
     }
 }
 
@@ -132,13 +132,13 @@ function makeStringList(...strings) {
 }
 
 function dict2OTP(dict) {
-    if (dict.type == 'TOTP') return new TOTP(dict);
-    if (dict.type == 'HOTP') return new HOTP(dict);
+    if (dict.type === 'TOTP') return new TOTP(dict);
+    if (dict.type === 'HOTP') return new HOTP(dict);
     throw new Error(`dict is ${dict}`);
 }
 
 function OTP2variant(otp) {
-    if (otp.type == 'TOTP')
+    if (otp.type === 'TOTP')
         return new GLib.Variant('a{sv}', {
             type: GLib.Variant.new_string(otp.type),
             issuer: GLib.Variant.new_string(otp.issuer),
@@ -147,7 +147,7 @@ function OTP2variant(otp) {
             period: GLib.Variant.new_uint32(otp.period),
             algorithm: GLib.Variant.new_string(otp.algorithm),
         });
-    if (otp.type == 'HOTP')
+    if (otp.type === 'HOTP')
         return new GLib.Variant('a{sv}', {
             type: GLib.Variant.new_string(otp.type),
             issuer: GLib.Variant.new_string(otp.issuer),
@@ -293,7 +293,6 @@ class SecretDialog extends Gtk.Dialog {
         GObject.registerClass(this);
     }
 
-    #reject;
     #resolve;
     #ui = {};
 
@@ -445,24 +444,23 @@ class SecretDialog extends Gtk.Dialog {
     }
 
     on_close_request() {
-        this.#reject = null;
         this.#resolve = null;
         this.#ui = null;
         return false;
     }
 
     on_response(response) {
-        this.#resolve(response == Gtk.ResponseType.OK ? this.getOTP() : null);
+        this.#resolve(response === Gtk.ResponseType.OK ? this.getOTP() : null);
         this.close();
     }
 
     getOTP() {
         let secret = this.#ui.secret.text;
-        if (this.#ui.secret_type.selected_item.string == 'Base64')
+        if (this.#ui.secret_type.selected_item.string === 'Base64')
             secret = Base32.encode(GLib.base64_decode(secret));
 
         const type = this.#ui.type_drop.selected_item.string;
-        if (type == 'TOTP')
+        if (type === 'TOTP')
             return new TOTP({
                 issuer: this.#ui.issuer.text,
                 name: this.#ui.name.text,
@@ -471,7 +469,7 @@ class SecretDialog extends Gtk.Dialog {
                 period: parseInt(this.#ui.period.selected_item.string),
                 algorithm: this.#ui.algorithm.selected_item.string,
             });
-        if (type == 'HOTP')
+        if (type === 'HOTP')
             return new HOTP({
                 issuer: this.#ui.issuer.text,
                 name: this.#ui.name.text,
@@ -504,10 +502,10 @@ class SecretDialog extends Gtk.Dialog {
     changedOTPtype() {
         if (!this.#ui.type_drop.selected_item) return;
         const type = this.#ui.type_drop.selected_item.string;
-        if (type == 'TOTP') {
+        if (type === 'TOTP') {
             this.#ui.counter.visible = false;
             this.#ui.period.visible = true;
-        } else if (type == 'HOTP') {
+        } else if (type === 'HOTP') {
             this.#ui.period.visible = false;
             this.#ui.counter.visible = true;
         } else {
@@ -520,9 +518,8 @@ class SecretDialog extends Gtk.Dialog {
         this.modal = !!parent;
         this.visible = true;
 
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             this.#resolve = resolve;
-            this.#reject = reject;
         });
     }
 
@@ -573,7 +570,7 @@ class CopyCodeButton extends Gtk.Button {
         });
         box.append(this.#label);
 
-        if (this.#otp.type == 'TOTP') {
+        if (this.#otp.type === 'TOTP') {
             this.#level = new Gtk.LevelBar({
                 inverted: true,
                 max_value: this.#otp.period,
@@ -609,13 +606,13 @@ class CopyCodeButton extends Gtk.Button {
         }
 
         if (locked) {
-            if (type == 'TOTP') this.#level.value = 0;
+            if (type === 'TOTP') this.#level.value = 0;
             this.#label.label = _('Unlock');
             this.#label.use_markup = false;
             return;
         }
 
-        if (type == 'TOTP') this.#level.value = remaining;
+        if (type === 'TOTP') this.#level.value = remaining;
         this.#label.label = `<tt>${code}</tt>`;
         this.#label.use_markup = true;
     }
@@ -624,7 +621,7 @@ class CopyCodeButton extends Gtk.Button {
         try {
             this.#otp.secret = await SecretUtils.getSecret(this.#otp);
             const code = this.#otp.code();
-            if (this.#otp.type == 'HOTP')
+            if (this.#otp.type === 'HOTP')
                 this.#otp.counter = await SecretUtils.incrementHOTP(this.#otp);
             const arg = new GLib.Variant('(ssb)', [
                 code,
@@ -730,7 +727,7 @@ class SecretRow extends Adw.ActionRow {
     #down_button;
     #up_button;
 
-    constructor(otp, group, settings) {
+    constructor(otp, group) {
         super({
             title: otp.issuer,
             title_lines: 1,
@@ -802,7 +799,6 @@ class ImportURIsDialog extends Gtk.Dialog {
     }
 
     #buffer;
-    #reject;
     #resolve;
 
     constructor(settings) {
@@ -870,7 +866,7 @@ class ImportURIsDialog extends Gtk.Dialog {
     }
 
     on_response(response) {
-        this.#resolve(response == Gtk.ResponseType.OK ? this.getText() : null);
+        this.#resolve(response === Gtk.ResponseType.OK ? this.getText() : null);
         this.close();
     }
 
@@ -883,9 +879,8 @@ class ImportURIsDialog extends Gtk.Dialog {
         this.modal = !!parent;
         this.visible = true;
 
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             this.#resolve = resolve;
-            this.#reject = reject;
         });
     }
 
@@ -922,15 +917,14 @@ class LockButton extends Gtk.Button {
                 this.tooltip_text = _('Lock OTP secrets');
             }
         } catch (e) {
-            logError(e);
+            console.error(e);
         }
     }
 
     async on_clicked() {
         try {
-            const success = this.#locked
-                ? await SecretUtils.unlockOTPCollection()
-                : await SecretUtils.lockOTPCollection();
+            if (this.#locked) await SecretUtils.unlockOTPCollection();
+            else await SecretUtils.lockOTPCollection();
             await this.updateState();
             this.activate_action('otp.refresh', null);
         } catch (e) {
@@ -1055,13 +1049,13 @@ class SecretsGroup extends Adw.PreferencesGroup {
             items.forEach((item) => {
                 const attr = item.get_attributes();
                 const otp = dict2OTP(attr);
-                const row = new SecretRow(otp, this, this.#settings);
+                const row = new SecretRow(otp, this);
                 this.#rows.push(row);
                 this.add(row);
             });
             this.#rows.forEach((r) => r.updateButtons());
         } catch (e) {
-            logError(e);
+            console.error(e);
         }
     }
 
@@ -1100,10 +1094,11 @@ class SecretsGroup extends Adw.PreferencesGroup {
             for (let i = 0; i < uris.length; ++i) {
                 try {
                     const otp = uri2OTP(uris[i]);
+                    // eslint-disable-next-line no-await-in-loop
                     await SecretUtils.createOTPItem(otp, n + i);
                     ++successes;
                 } catch (e) {
-                    logError(e);
+                    console.error(e);
                 }
             }
             this.root?.add_toast(
@@ -1145,17 +1140,18 @@ class SecretsGroup extends Adw.PreferencesGroup {
             });
 
             const response = await dialog.choose(this.root, null);
-            if (response != delete_response) return;
+            if (response !== delete_response) return;
 
             let removed = 0;
             for (const item of items) {
                 try {
+                    // eslint-disable-next-line no-await-in-loop
                     await SecretUtils.removeOTPItem(
                         dict2OTP(item.get_attributes()),
                     );
                     ++removed;
                 } catch (e) {
-                    logError(e);
+                    console.error(e);
                 }
             }
 
@@ -1176,7 +1172,7 @@ class SecretsGroup extends Adw.PreferencesGroup {
             const otp = row._otp;
             await SecretUtils.updateOTPOrder(otp, idx);
         } catch (e) {
-            logError(e);
+            console.error(e);
         }
     }
 
@@ -1184,16 +1180,17 @@ class SecretsGroup extends Adw.PreferencesGroup {
         try {
             for (let i = 0; i < this.#rows.length; ++i) {
                 const otp = this.#rows[i]._otp;
+                // eslint-disable-next-line no-await-in-loop
                 await SecretUtils.updateOTPOrder(otp, i);
             }
         } catch (e) {
-            logError(e);
+            console.error(e);
         }
     }
 
     moveBy(row, offset) {
         const i = this.#rows.indexOf(row);
-        if (i == -1)
+        if (i === -1)
             throw Error(`Trying to move a row that was not found: ${row}`);
 
         if (isFinite(offset)) {
@@ -1258,7 +1255,7 @@ class SecretsGroup extends Adw.PreferencesGroup {
             if (clipboard1.local) clipboard1.set(null);
             if (clipboard2.local) clipboard2.set(null);
         } catch (e) {
-            logError(e);
+            console.error(e);
         }
         return GLib.SOURCE_REMOVE;
     }
@@ -1272,7 +1269,7 @@ class SecretsGroup extends Adw.PreferencesGroup {
     async editSecret(otp) {
         try {
             otp.secret = await SecretUtils.getSecret(otp);
-            if (otp.type == 'HOTP') {
+            if (otp.type === 'HOTP') {
                 const item = await SecretUtils.getOTPItem(otp);
                 const attr = item.get_attributes();
                 otp.counter = parseInt(attr.counter);
@@ -1329,7 +1326,7 @@ class SecretsGroup extends Adw.PreferencesGroup {
              * WORKAROUND: `.communicate_async()` will randomly fail with a broken pipe
              * error, so we have to use the blocking API instead.
              */
-            const [success, stdout, stderr] = proc.communicate(uri_data, null);
+            const [, stdout, stderr] = proc.communicate(uri_data, null);
 
             const status = proc.get_exit_status();
             if (status) {
@@ -1366,7 +1363,7 @@ class SecretsGroup extends Adw.PreferencesGroup {
             });
 
             const response = await dialog.choose(this.root, null);
-            if (response == delete_response) {
+            if (response === delete_response) {
                 const success = await SecretUtils.removeOTPItem(otp);
                 if (!success)
                     throw new Error(

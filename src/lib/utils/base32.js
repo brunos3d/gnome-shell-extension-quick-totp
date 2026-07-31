@@ -12,14 +12,14 @@ const _ = (x) => x;
 const digits = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
 
 export function decode(input, strict = true) {
-    console.assert(digits.length == 32);
+    console.assert(digits.length === 32);
     let output = [];
 
     // process 40 bits at a time (8 base32 digits)
     for (let i = 0; i < input.length; i += 8) {
         let chunk = input.substring(i, i + 8);
 
-        if (chunk.length != 8) {
+        if (chunk.length !== 8) {
             if (strict)
                 throw new Error(_('Invalid base32 input; missing padding.'));
             else chunk = chunk.padEnd(8, '=');
@@ -31,11 +31,11 @@ export function decode(input, strict = true) {
             let d = chunk[j].toUpperCase();
             let idx = digits.indexOf(d);
 
-            if (d == '=') {
+            if (d === '=') {
                 idx = 0;
                 ++pad;
             }
-            if (idx == -1)
+            if (idx === -1)
                 throw new Error(
                     _('Invalid base32 character at position:') + ` ${i + j}`,
                 );
@@ -43,7 +43,7 @@ export function decode(input, strict = true) {
             value = value * 32 + idx;
         }
 
-        if (pad == 2 || pad == 5 || pad == 7)
+        if (pad === 2 || pad === 5 || pad === 7)
             throw new Error(_('Invalid padding.'));
 
         // store value as little endian

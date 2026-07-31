@@ -67,8 +67,8 @@ function makeSchemaHOTP() {
 }
 
 function makeSchema(otp) {
-    if (otp.type == 'TOTP') return makeSchemaTOTP();
-    if (otp.type == 'HOTP') return makeSchemaHOTP();
+    if (otp.type === 'TOTP') return makeSchemaTOTP();
+    if (otp.type === 'HOTP') return makeSchemaHOTP();
     throw new Error(`BUG: otp.type is ${otp.type}`);
 }
 
@@ -80,7 +80,7 @@ async function findOTPCollection() {
     const collections = service.get_collections();
     // look for the 'OTP' at the hardcoded path
     for (let i = 0; i < collections.length; ++i)
-        if (collections[i].get_object_path() == OTP_COLLECTION_DBUS_PATH)
+        if (collections[i].get_object_path() === OTP_COLLECTION_DBUS_PATH)
             return [service, collections[i]];
     return [service, null];
 }
@@ -102,7 +102,7 @@ async function ensureCollectionExists() {
 export async function isOTPCollectionLocked() {
     // force a new connection, so we get reliable lock status
     Secret.Service.disconnect();
-    const [service, collection] = await findOTPCollection();
+    const [, collection] = await findOTPCollection();
     if (!collection) return false;
     return collection.locked;
 }
@@ -154,14 +154,14 @@ export async function getOTPItems(unlock = false) {
         const items = totp_items.concat(hotp_items);
         items.sort((a, b) => getOrder(a.get_label()) - getOrder(b.get_label()));
         return items;
-    } catch (e) {
+    } catch {
         return [];
     }
 }
 
 export async function getOTPItem(otp) {
     let match = makeAttributesFor(otp);
-    if (otp.type == 'HOTP') delete match.counter; // don't match the counter
+    if (otp.type === 'HOTP') delete match.counter; // don't match the counter
     const [item] = await Secret.password_search(
         makeSchema(otp),
         match,
@@ -174,7 +174,7 @@ export async function getOTPItem(otp) {
 
 // libsecret wants the attributes to all be strings
 function makeAttributesFor(otp) {
-    if (otp.type == 'TOTP')
+    if (otp.type === 'TOTP')
         return {
             type: 'TOTP',
             issuer: otp.issuer,
@@ -183,7 +183,7 @@ function makeAttributesFor(otp) {
             period: otp.period.toString(),
             algorithm: otp.algorithm,
         };
-    if (otp.type == 'HOTP')
+    if (otp.type === 'HOTP')
         return {
             type: 'HOTP',
             issuer: otp.issuer,
@@ -197,9 +197,9 @@ function makeAttributesFor(otp) {
 
 export async function getSecret(otp) {
     const match = makeAttributesFor(otp);
-    if (otp.type == 'HOTP') delete match.counter; // don't match the counter
+    if (otp.type === 'HOTP') delete match.counter; // don't match the counter
     const secret = await Secret.password_lookup(makeSchema(otp), match, null);
-    if (secret == null) {
+    if (secret === null) {
         throw new Error(_('Failed to retrieve secret.'));
     }
     return secret;
@@ -209,7 +209,7 @@ function equalDictionaries(a, b) {
     const ak = Object.keys(a);
     const bk = Object.keys(b);
 
-    if (ak.length != bk.length) return false;
+    if (ak.length !== bk.length) return false;
 
     for (let k of ak) if (a[k] !== b[k]) return false;
     return true;
@@ -222,7 +222,7 @@ export async function updateOTPItem(old_otp, new_otp) {
     );
     const old_attr = makeAttributesFor(old_otp);
     const match = { ...old_attr };
-    if (old_otp.type == 'HOTP') delete match.counter; // don't match the counter
+    if (old_otp.type === 'HOTP') delete match.counter; // don't match the counter
     const [item] = await service.search(
         makeSchema(old_otp),
         match,
@@ -234,7 +234,7 @@ export async function updateOTPItem(old_otp, new_otp) {
     // check if label changed
     const old_label = item.get_label();
     const new_label = makeLabel(new_otp, getOrder(old_label));
-    if (old_label != new_label)
+    if (old_label !== new_label)
         if (!(await item.set_label(new_label, null)))
             throw new Error(_('Failed to set label.'));
 
@@ -246,7 +246,7 @@ export async function updateOTPItem(old_otp, new_otp) {
             throw new Error(_('Failed to set attributes.'));
 
     // check if secret changed
-    if (old_otp.secret != new_otp.secret) {
+    if (old_otp.secret !== new_otp.secret) {
         const secret_value = new Secret.Value(new_otp.secret, -1, 'text/plain');
         if (!(await item.set_secret(secret_value, null)))
             throw new Error(_('Failed to set secret.'));
@@ -259,7 +259,7 @@ export async function updateOTPOrder(otp, order) {
         null,
     );
     const match = makeAttributesFor(otp);
-    if (otp.type == 'HOTP') delete match.counter;
+    if (otp.type === 'HOTP') delete match.counter;
     const [item] = await service.search(
         makeSchema(otp),
         match,
@@ -270,7 +270,7 @@ export async function updateOTPOrder(otp, order) {
 
     const old_label = item.get_label();
     const new_label = makeLabel(otp, order);
-    if (new_label == old_label) return;
+    if (new_label === old_label) return;
     if (!(await item.set_label(new_label, null)))
         throw new Error(_('Failed to set label.'));
 }
@@ -313,6 +313,6 @@ export async function createOTPItem(otp, order) {
 
 export async function removeOTPItem(otp) {
     const match = makeAttributesFor(otp);
-    if (otp.type == 'HOTP') delete match.counter; // don't match the counter
+    if (otp.type === 'HOTP') delete match.counter; // don't match the counter
     return await Secret.password_clear(makeSchema(otp), match, null);
 }

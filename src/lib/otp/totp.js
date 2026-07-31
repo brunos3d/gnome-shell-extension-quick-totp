@@ -30,31 +30,26 @@ export default class TOTP extends OTP.OTP {
         this.type = 'TOTP';
 
         if (uri) {
-            let {
-                host = null,
+            const fields = OTP.parseURI(uri);
+            const { host = null } = fields;
+            if (host.toLowerCase() !== 'totp')
+                throw new Error(_('URI host should be "totp"'));
+            ({
                 issuer = '',
                 name = '',
                 secret = '',
                 digits = 6,
                 period = 30,
                 algorithm = 'SHA-1',
-            } = OTP.parseURI(uri);
-            if (host.toLowerCase() != 'totp')
-                throw new Error(_('URI host should be "totp"'));
-            this.issuer = issuer;
-            this.name = name;
-            this.secret = secret;
-            this.digits = parseInt(digits);
-            this.period = parseInt(period);
-            this.algorithm = OTP.normalized_algorithm(algorithm);
-        } else {
-            this.issuer = issuer;
-            this.name = name;
-            this.secret = secret;
-            this.digits = parseInt(digits);
-            this.period = parseInt(period);
-            this.algorithm = OTP.normalized_algorithm(algorithm);
+            } = fields);
         }
+
+        this.issuer = issuer;
+        this.name = name;
+        this.secret = secret;
+        this.digits = parseInt(digits);
+        this.period = parseInt(period);
+        this.algorithm = OTP.normalized_algorithm(algorithm);
     }
 
     code(time = now()) {
@@ -72,7 +67,7 @@ export default class TOTP extends OTP.OTP {
 
     uri() {
         let args = {};
-        if (this.period != 30) args.period = this.period;
+        if (this.period !== 30) args.period = this.period;
         return super.uri(args);
     }
 

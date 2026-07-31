@@ -147,19 +147,25 @@ are handy when changing code generation.
 
 ## Code style
 
-Formatting is handled by [Prettier](https://prettier.io/) using the settings in
-`.prettierrc`, so you don't have to format by hand. Before committing, run:
+The project follows the
+[GJS style guide](https://gjs.guide/guides/gjs/style-guide.html): 4-space
+indentation, single quotes and semicolons. `.editorconfig` configures editors
+accordingly, Prettier (`.prettierrc`) enforces the formatting, and ESLint
+(`eslint.config.js`, the configuration from the style guide) enforces the rest.
+Before committing, run:
 
 ```sh
-npm install     # once, to get the pinned Prettier version
+npm install     # once, to get the pinned tool versions
 npm run format  # format everything (or: npm run format:check)
+npm run lint    # static analysis with the GJS ESLint rules
 ```
 
-A few conventions Prettier does not enforce, but that we still follow:
+A few conventions the tools do not fully enforce, but that we still follow:
 
 - Prefer `const`, then `let`; never `var`.
 - Private class members use `#` fields.
 - GObject classes are created with `GObject.registerClass`.
+- Use `console.error()`/`console.warn()` for logging, not `log()`/`logError()`.
 - Wrap all user-facing strings in `gettext` (`_()`); backend modules that must
   avoid a hard dependency use the `const _ = x => x;` passthrough so strings are
   still extractable.

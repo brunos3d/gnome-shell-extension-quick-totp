@@ -70,9 +70,9 @@ export default class CodeController {
     // HOTP codes never expire on their own; TOTP codes expire when the current
     // period ends.
     #expired() {
-        if (this.#otp.type == 'HOTP') return true;
+        if (this.#otp.type === 'HOTP') return true;
         if (!this.#code) return true;
-        if (this.#expiry == 0) return true;
+        if (this.#expiry === 0) return true;
         if (this.#expiry < now()) return true;
         return false;
     }
@@ -98,7 +98,7 @@ export default class CodeController {
 
                 this.#otp.secret = await SecretUtils.getSecret(this.#otp);
 
-                if (type == 'TOTP') {
+                if (type === 'TOTP') {
                     const [code, expiry] = this.#otp.code_and_expiry();
                     this.#expiry = expiry;
                     this.#code = code;
@@ -110,7 +110,7 @@ export default class CodeController {
 
             let remaining = 0;
             let fraction = 0;
-            if (type == 'TOTP' && this.#otp.period) {
+            if (type === 'TOTP' && this.#otp.period) {
                 remaining = Math.max(this.#expiry - now(), 0);
                 fraction = remaining / this.#otp.period;
             }
@@ -143,7 +143,9 @@ export default class CodeController {
                     period: this.#otp.period ?? 0,
                     error: e,
                 });
-            } catch (_) {}
+            } catch {
+                // ignore errors thrown by the render callback
+            }
         }
     }
 }
