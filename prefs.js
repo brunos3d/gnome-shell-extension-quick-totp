@@ -772,7 +772,7 @@ class SecretRow extends Adw.ActionRow {
     this.#up_button = null;
     this.#down_button = null;
 
-    this.#copy_code_button.destroy?.();
+    this.#copy_code_button.destroy();
     this.#copy_code_button = null;
   }
 
@@ -1487,7 +1487,7 @@ class OptionsGroup extends Adw.PreferencesGroup {
       valign: Gtk.Align.CENTER,
     });
     remove_all_button.add_css_class("destructive-action");
-    remove_all_button.connect("clicked", () => onRemoveAll?.());
+    remove_all_button.connect("clicked", () => onRemoveAll());
     remove_all_row.add_suffix(remove_all_button);
     this.add(remove_all_row);
   }
