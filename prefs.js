@@ -51,6 +51,19 @@ const EntryRow = Adw.EntryRow ?? MyEntryRow;
 
 const SpinRow = Adw.SpinRow ?? MySpinRow;
 
+// Parse a user-configured command line from GSettings. The commands have no
+// default value, so the user must pick and configure the tools explicitly.
+function parseCommand(settings, key) {
+  const cmd = settings.get_string(key);
+  if (!cmd)
+    throw new Error(
+      _("No command configured. Set one in the Options section."),
+    );
+  const [parsed, args] = GLib.shell_parse_argv(cmd);
+  if (!parsed) throw new Error(_("Failed to parse option:") + ` "${key}"`);
+  return args;
+}
+
 /*
  * Class initialization must only register the GType (see the EGO review
  * guidelines on initialization), so widget actions are installed per instance
@@ -193,9 +206,7 @@ class ScanQRButton extends Gtk.Button {
 
   async on_clicked() {
     try {
-      const qrscan_cmd = this.#settings.get_string("qrscan-cmd");
-      const [parsed, args] = GLib.shell_parse_argv(qrscan_cmd);
-      if (!parsed) throw new Error(_('Failed to parse "qrscan-cmd" option.'));
+      const args = parseCommand(this.#settings, "qrscan-cmd");
 
       const proc = Gio.Subprocess.new(args, Gio.SubprocessFlags.STDOUT_PIPE);
 
@@ -242,10 +253,7 @@ class PasteButton extends Gtk.Button {
 
         const img_bytes = texture.save_to_png_bytes();
 
-        const qrimage_cmd = this.#settings.get_string("qrimage-cmd");
-        const [parsed, args] = GLib.shell_parse_argv(qrimage_cmd);
-        if (!parsed)
-          throw new Error(_('Failed to parse "qrimage-cmd" option.'));
+        const args = parseCommand(this.#settings, "qrimage-cmd");
 
         const proc = Gio.Subprocess.new(
           args,
@@ -1276,9 +1284,7 @@ class SecretsGroup extends Adw.PreferencesGroup {
       const te = new TextEncoder();
       const uri_data = te.encode(uri);
 
-      const qrencode_cmd = this.#settings.get_string("qrencode-cmd");
-      const [parsed, args] = GLib.shell_parse_argv(qrencode_cmd);
-      if (!parsed) throw new Error(_('Failed to parse "qrencode-cmd" option.'));
+      const args = parseCommand(this.#settings, "qrencode-cmd");
 
       const proc = Gio.Subprocess.new(
         args,
@@ -1371,7 +1377,7 @@ class CmdSettingRow extends EntryRow {
     this.add_suffix(
       new Gtk.Button({
         icon_name: "edit-clear-symbolic",
-        tooltip_text: _("Revert option back to the default value."),
+        tooltip_text: _("Clear the command."),
         action_name: "cmd.reset",
         valign: Gtk.Align.CENTER,
       }),
@@ -1405,9 +1411,13 @@ class OptionsGroup extends Adw.PreferencesGroup {
       settings: settings,
       key: "qrencode-cmd",
       title: _("QR generator"),
-      tooltip_text: _(
-        "This command must read text from standard input, and write an image to the standard output.",
-      ),
+      tooltip_text:
+        _(
+          "This command must read text from standard input, and write an image to the standard output.",
+        ) +
+        "\n" +
+        _("Example:") +
+        ' "qrencode --size=10 --output=-"',
     });
     this.add(this.#qrencode);
 
@@ -1415,9 +1425,13 @@ class OptionsGroup extends Adw.PreferencesGroup {
       settings: settings,
       key: "qrimage-cmd",
       title: _("QR reader"),
-      tooltip_text: _(
-        "This command must read an image from the standard input, and print the decoded URI to the standard output.",
-      ),
+      tooltip_text:
+        _(
+          "This command must read an image from the standard input, and print the decoded URI to the standard output.",
+        ) +
+        "\n" +
+        _("Example:") +
+        ' "zbarimg --raw --quiet --nodbus -"',
     });
     this.add(this.#qrimage);
 
@@ -1425,9 +1439,13 @@ class OptionsGroup extends Adw.PreferencesGroup {
       settings: settings,
       key: "qrscan-cmd",
       title: _("QR scanner"),
-      tooltip_text: _(
-        "This command must capture an image from a camera, and print the decoded URI to the standard output.",
-      ),
+      tooltip_text:
+        _(
+          "This command must capture an image from a camera, and print the decoded URI to the standard output.",
+        ) +
+        "\n" +
+        _("Example:") +
+        ' "zbarcam --raw --quiet --oneshot"',
     });
     this.add(this.#qrscan);
 
