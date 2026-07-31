@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-07-30
+
+### Fixed
+
+- Gated the diagnostic logging in the preferences behind the
+  `QUICK_TOTP_DEBUG=1` environment flag, so normal operation stays quiet in
+  the logs (EGO warning about excessive ungated console logging).
+
 ## [1.1.0] - 2026-07-30
 
 Addresses the extensions.gnome.org review feedback and adopts the
@@ -127,6 +135,7 @@ lightweight experience of the original.
 - Import/export concepts and some test fixtures are derived from GNOME
   Authenticator (GPL-3.0-or-later); see `docs/import-export.md`.
 
-[Unreleased]: https://github.com/brunos3d/gnome-shell-extension-quick-totp/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/brunos3d/gnome-shell-extension-quick-totp/compare/v1.1.1...HEAD
+[1.1.1]: https://github.com/brunos3d/gnome-shell-extension-quick-totp/releases/tag/v1.1.1
 [1.1.0]: https://github.com/brunos3d/gnome-shell-extension-quick-totp/releases/tag/v1.1.0
 [1.0.0]: https://github.com/brunos3d/gnome-shell-extension-quick-totp/releases/tag/v1.0.0

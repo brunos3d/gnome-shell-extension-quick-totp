@@ -90,8 +90,19 @@ function makeLabel({ issuer, name }) {
     return `${safe_issuer}: ${safe_name}`;
 }
 
+/*
+ * Diagnostics are gated behind an environment flag so normal operation stays
+ * quiet in the logs (see the EGO review guideline on excessive logging).
+ * Launch the preferences with QUICK_TOTP_DEBUG=1 to see them.
+ */
+const DEBUG = GLib.getenv('QUICK_TOTP_DEBUG') === '1';
+
+function logDebug(error) {
+    if (DEBUG) console.error(error);
+}
+
 function reportError(root, e) {
-    console.error(e);
+    logDebug(e);
     try {
         const dialog = new AlertDialog({
             modal: true,
@@ -100,7 +111,7 @@ function reportError(root, e) {
         });
         dialog.show(root);
     } catch (ee) {
-        console.error(ee);
+        logDebug(ee);
     }
 }
 
@@ -917,7 +928,7 @@ class LockButton extends Gtk.Button {
                 this.tooltip_text = _('Lock OTP secrets');
             }
         } catch (e) {
-            console.error(e);
+            logDebug(e);
         }
     }
 
@@ -1055,7 +1066,7 @@ class SecretsGroup extends Adw.PreferencesGroup {
             });
             this.#rows.forEach((r) => r.updateButtons());
         } catch (e) {
-            console.error(e);
+            logDebug(e);
         }
     }
 
@@ -1098,7 +1109,7 @@ class SecretsGroup extends Adw.PreferencesGroup {
                     await SecretUtils.createOTPItem(otp, n + i);
                     ++successes;
                 } catch (e) {
-                    console.error(e);
+                    logDebug(e);
                 }
             }
             this.root?.add_toast(
@@ -1151,7 +1162,7 @@ class SecretsGroup extends Adw.PreferencesGroup {
                     );
                     ++removed;
                 } catch (e) {
-                    console.error(e);
+                    logDebug(e);
                 }
             }
 
@@ -1172,7 +1183,7 @@ class SecretsGroup extends Adw.PreferencesGroup {
             const otp = row._otp;
             await SecretUtils.updateOTPOrder(otp, idx);
         } catch (e) {
-            console.error(e);
+            logDebug(e);
         }
     }
 
@@ -1184,7 +1195,7 @@ class SecretsGroup extends Adw.PreferencesGroup {
                 await SecretUtils.updateOTPOrder(otp, i);
             }
         } catch (e) {
-            console.error(e);
+            logDebug(e);
         }
     }
 
@@ -1255,7 +1266,7 @@ class SecretsGroup extends Adw.PreferencesGroup {
             if (clipboard1.local) clipboard1.set(null);
             if (clipboard2.local) clipboard2.set(null);
         } catch (e) {
-            console.error(e);
+            logDebug(e);
         }
         return GLib.SOURCE_REMOVE;
     }
