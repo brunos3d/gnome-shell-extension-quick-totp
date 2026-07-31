@@ -19,22 +19,12 @@ import CodeController from '../lib/services/code-controller.js';
 import HOTP from '../lib/otp/hotp.js';
 import * as SecretUtils from '../lib/services/secret-utils.js';
 import TOTP from '../lib/otp/totp.js';
+import { logDebug } from '../lib/utils/debug.js';
 
 import { gettext as _ } from 'resource:///org/gnome/shell/extensions/extension.js';
 
 // St.ScrollView changed its child/scrollbar API in GNOME 46.
 const SHELL_MAJOR = parseInt(Config.PACKAGE_VERSION.split('.')[0]);
-
-/*
- * Diagnostics are gated behind an environment flag so normal operation stays
- * quiet in the logs (see the EGO review guideline on excessive logging).
- * Start gnome-shell with QUICK_TOTP_DEBUG=1 to see them.
- */
-const DEBUG = GLib.getenv('QUICK_TOTP_DEBUG') === '1';
-
-function logDebug(error) {
-    if (DEBUG) console.error(error);
-}
 
 function copyToClipboard(text) {
     // this runs inside gnome-shell, so we use St

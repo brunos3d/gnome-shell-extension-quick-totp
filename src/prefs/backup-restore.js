@@ -26,6 +26,7 @@ import {
     detectFormat,
 } from '../lib/io/formats/registry.js';
 import { prepareImport, storeAccounts } from '../lib/io/import-service.js';
+import { logDebug } from '../lib/utils/debug.js';
 import { gatherAccounts, serializeAccounts } from '../lib/io/export-service.js';
 
 Gio._promisify(Gtk.FileDialog.prototype, 'open', 'open_finish');
@@ -177,7 +178,7 @@ export const BackupRestoreGroup = GObject.registerClass(
                     summary += `  ·  ${_('failed:')} ${failed.length}`;
                 this.#notify(summary);
             } catch (e) {
-                console.error(e);
+                logDebug(e);
                 this.#notify(_('Import failed:') + ` ${e.message}`);
             }
         }
@@ -267,7 +268,7 @@ export const BackupRestoreGroup = GObject.registerClass(
                 writeFile(file, text);
                 this.#notify(_('Exported accounts:') + ` ${accounts.length}`);
             } catch (e) {
-                console.error(e);
+                logDebug(e);
                 this.#notify(_('Export failed:') + ` ${e.message}`);
             }
         }

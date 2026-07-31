@@ -29,6 +29,7 @@ SRC_SOURCES := \
 	src/lib/services/code-controller.js \
 	src/lib/services/secret-utils.js \
 	src/lib/utils/base32.js \
+	src/lib/utils/debug.js \
 	src/prefs/backup-restore.js \
 	src/prefs/widgets/my-alert-dialog.js \
 	src/prefs/widgets/my-entry-row.js \

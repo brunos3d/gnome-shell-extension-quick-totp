@@ -26,6 +26,7 @@ import MySpinRow from './src/prefs/widgets/my-spin-row.js';
 import * as SecretUtils from './src/lib/services/secret-utils.js';
 import TOTP from './src/lib/otp/totp.js';
 import { BackupRestoreGroup } from './src/prefs/backup-restore.js';
+import { logDebug } from './src/lib/utils/debug.js';
 
 Gio._promisify(
     Gio.Subprocess.prototype,
@@ -88,17 +89,6 @@ function makeLabel({ issuer, name }) {
     const safe_issuer = GLib.markup_escape_text(issuer, -1);
     const safe_name = GLib.markup_escape_text(name, -1);
     return `${safe_issuer}: ${safe_name}`;
-}
-
-/*
- * Diagnostics are gated behind an environment flag so normal operation stays
- * quiet in the logs (see the EGO review guideline on excessive logging).
- * Launch the preferences with QUICK_TOTP_DEBUG=1 to see them.
- */
-const DEBUG = GLib.getenv('QUICK_TOTP_DEBUG') === '1';
-
-function logDebug(error) {
-    if (DEBUG) console.error(error);
 }
 
 function reportError(root, e) {
