@@ -75,6 +75,7 @@ $(ZIP_FILE):	$(EXTRA_DIST) \
 		$(GSCHEMA_XML_FILE) \
 		$(PO_FILES) \
 		$(SOURCES) \
+		metadata.json \
 		Makefile
 	gnome-extensions pack --force \
 		--extra-source=src \
