@@ -607,10 +607,9 @@ export default class Indicator extends PanelMenu.Button {
 
   ensureVisible(item) {
     const adjustment =
-      this.#scroll.vadjustment ??
-      this.#scroll.get_vadjustment?.() ??
-      this.#scroll.vscroll?.adjustment;
-    if (!adjustment) return;
+      SHELL_MAJOR >= 46
+        ? this.#scroll.vadjustment
+        : this.#scroll.vscroll.adjustment;
 
     const box = item.get_allocation_box();
     if (box.y1 < adjustment.value) adjustment.value = box.y1;

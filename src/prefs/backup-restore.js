@@ -66,7 +66,7 @@ export const BackupRestoreGroup = GObject.registerClass(
       });
       fromUris.add_prefix(new Gtk.Image({ icon_name: "edit-paste-symbolic" }));
       fromUris.add_suffix(new Gtk.Image({ icon_name: "go-next-symbolic" }));
-      fromUris.connect("activated", () => this.#onImportUris?.());
+      fromUris.connect("activated", () => this.#onImportUris());
       expander.add_row(fromUris);
 
       const fromFile = new Adw.ActionRow({
@@ -142,7 +142,7 @@ export const BackupRestoreGroup = GObject.registerClass(
         if (!(await this.#confirmImport(detected.format, result))) return;
 
         const { added, skipped, failed } = await storeAccounts(result.valid);
-        this.#onChanged?.();
+        this.#onChanged();
 
         let summary = _("Imported accounts:") + ` ${added}`;
         if (skipped > 0)
@@ -265,7 +265,7 @@ export const BackupRestoreGroup = GObject.registerClass(
     }
 
     #notify(message) {
-      this.root?.add_toast?.(new Adw.Toast({ title: message, timeout: 5 }));
+      this.root?.add_toast(new Adw.Toast({ title: message, timeout: 5 }));
     }
   },
 );

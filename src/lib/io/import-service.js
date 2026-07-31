@@ -53,7 +53,7 @@ export function prepareImport(formatId, data) {
  * @param {(done:number, total:number)=>void} [onProgress]
  * @returns {Promise<{added:number, skipped:number, failed:{account:OtpAccount, error:string}[]}>}
  */
-export async function storeAccounts(accounts, onProgress) {
+export async function storeAccounts(accounts, onProgress = () => {}) {
   const existing = await loadExistingKeys();
 
   let added = 0;
@@ -74,7 +74,7 @@ export async function storeAccounts(accounts, onProgress) {
     } catch (e) {
       failed.push({ account, error: e.message });
     }
-    onProgress?.(i + 1, accounts.length);
+    onProgress(i + 1, accounts.length);
   }
 
   return { added, skipped, failed };
