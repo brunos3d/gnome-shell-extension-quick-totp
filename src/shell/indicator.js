@@ -25,6 +25,17 @@ import { gettext as _ } from 'resource:///org/gnome/shell/extensions/extension.j
 // St.ScrollView changed its child/scrollbar API in GNOME 46.
 const SHELL_MAJOR = parseInt(Config.PACKAGE_VERSION.split('.')[0]);
 
+/*
+ * Diagnostics are gated behind an environment flag so normal operation stays
+ * quiet in the logs (see the EGO review guideline on excessive logging).
+ * Start gnome-shell with QUICK_TOTP_DEBUG=1 to see them.
+ */
+const DEBUG = GLib.getenv('QUICK_TOTP_DEBUG') === '1';
+
+function logDebug(error) {
+    if (DEBUG) console.error(error);
+}
+
 function copyToClipboard(text) {
     // this runs inside gnome-shell, so we use St
     let clipboard = St.Clipboard.get_default();
@@ -452,7 +463,7 @@ export default class Indicator extends PanelMenu.Button {
                 },
             );
         } catch (e) {
-            console.error(e);
+            logDebug(e);
         }
     }
 
@@ -489,7 +500,7 @@ export default class Indicator extends PanelMenu.Button {
                 if (!(await SecretUtils.isOTPCollectionLocked()))
                     Main.notify(_('Failed to lock OTP secrets.'));
         } catch (e) {
-            console.error(e);
+            logDebug(e);
             Main.notifyError(_('Error locking OTP secrets.'), _(e.message));
         }
     }
@@ -502,7 +513,7 @@ export default class Indicator extends PanelMenu.Button {
                 if (await SecretUtils.isOTPCollectionLocked())
                     Main.notify(_('Failed to unlock OTP secrets.'));
         } catch (e) {
-            console.error(e);
+            logDebug(e);
             Main.notifyError(_('Error unlocking OTP secrets.'), _(e.message));
         }
     }
@@ -555,7 +566,7 @@ export default class Indicator extends PanelMenu.Button {
             this.updateMaxHeight();
             this.applyFilter();
         } catch (e) {
-            console.error(e);
+            logDebug(e);
             Main.notifyError(_('Error retrieving OTP items.'), _(e.message));
         }
     }
@@ -691,7 +702,7 @@ export default class Indicator extends PanelMenu.Button {
             if (otp.type === 'HOTP') await SecretUtils.incrementHOTP(otp);
             copyToClipboard(code);
         } catch (e) {
-            console.error(e);
+            logDebug(e);
             Main.notifyError(
                 _('Error copying the OTP authentication code.'),
                 _(e.message),
