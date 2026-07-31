@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.2] - 2026-07-30
+
+### Fixed
+
+- Extended the `QUICK_TOTP_DEBUG=1` logging gate from 1.1.1 to the panel
+  indicator and the Backup & Restore group, so no extension code writes to the
+  logs during normal operation.
+
+### Changed
+
+- The gated logger now lives in a shared module (`src/lib/utils/debug.js`)
+  instead of per-file copies.
+
 ## [1.1.1] - 2026-07-30
 
 ### Fixed
@@ -135,7 +148,8 @@ lightweight experience of the original.
 - Import/export concepts and some test fixtures are derived from GNOME
   Authenticator (GPL-3.0-or-later); see `docs/import-export.md`.
 
-[Unreleased]: https://github.com/brunos3d/gnome-shell-extension-quick-totp/compare/v1.1.1...HEAD
+[Unreleased]: https://github.com/brunos3d/gnome-shell-extension-quick-totp/compare/v1.1.2...HEAD
+[1.1.2]: https://github.com/brunos3d/gnome-shell-extension-quick-totp/releases/tag/v1.1.2
 [1.1.1]: https://github.com/brunos3d/gnome-shell-extension-quick-totp/releases/tag/v1.1.1
 [1.1.0]: https://github.com/brunos3d/gnome-shell-extension-quick-totp/releases/tag/v1.1.0
 [1.0.0]: https://github.com/brunos3d/gnome-shell-extension-quick-totp/releases/tag/v1.0.0

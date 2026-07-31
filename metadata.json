@@ -5,6 +5,6 @@
     "url": "https://github.com/brunos3d/gnome-shell-extension-quick-totp",
     "gettext-domain": "quick-totp@brunosilva.io",
     "settings-schema": "org.gnome.shell.extensions.quick-totp",
-    "version-name": "1.1.1",
+    "version-name": "1.1.2",
     "shell-version": ["45", "46", "47", "48", "49", "50"]
 }

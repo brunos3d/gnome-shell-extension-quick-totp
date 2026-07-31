@@ -1,6 +1,6 @@
 {
     "name": "quick-totp",
-    "version": "1.1.1",
+    "version": "1.1.2",
     "description": "Quick TOTP — a GNOME Shell extension for TOTP/HOTP two-factor authentication codes.",
     "private": true,
     "type": "module",
