@@ -12,28 +12,28 @@
  * container) are not JSON and are rejected by the JSON decoder.
  */
 
-import { makeAccount } from "../shared/otp-account.js";
-import { asArray, parseJson } from "../shared/json.js";
+import { makeAccount } from '../shared/otp-account.js';
+import { asArray, parseJson } from '../shared/json.js';
 
 export function parseAndOTP(data) {
-  const root = parseJson(data);
-  if (!Array.isArray(root))
-    throw new Error("Not a valid andOTP backup (expected a JSON array).");
+    const root = parseJson(data);
+    if (!Array.isArray(root))
+        throw new Error('Not a valid andOTP backup (expected a JSON array).');
 
-  return root.map((entry) => {
-    const type = String(entry?.type ?? "TOTP").toUpperCase();
-    return makeAccount({
-      type: type === "HOTP" ? "HOTP" : "TOTP",
-      steam: type === "STEAM",
-      issuer: entry?.issuer,
-      name: entry?.label,
-      secret: entry?.secret,
-      algorithm: entry?.algorithm,
-      digits: entry?.digits,
-      period: entry?.period,
-      counter: entry?.counter,
+    return root.map((entry) => {
+        const type = String(entry?.type ?? 'TOTP').toUpperCase();
+        return makeAccount({
+            type: type === 'HOTP' ? 'HOTP' : 'TOTP',
+            steam: type === 'STEAM',
+            issuer: entry?.issuer,
+            name: entry?.label,
+            secret: entry?.secret,
+            algorithm: entry?.algorithm,
+            digits: entry?.digits,
+            period: entry?.period,
+            counter: entry?.counter,
+        });
     });
-  });
 }
 
 /**
@@ -41,22 +41,22 @@ export function parseAndOTP(data) {
  * the first tag rather than a dedicated field, and there is no counter.
  */
 export function parseAuthenticatorLegacy(data) {
-  const root = parseJson(data);
-  if (!Array.isArray(root))
-    throw new Error("Not a valid Authenticator (Legacy) backup.");
+    const root = parseJson(data);
+    if (!Array.isArray(root))
+        throw new Error('Not a valid Authenticator (Legacy) backup.');
 
-  return root.map((entry) => {
-    const type = String(entry?.type ?? "TOTP").toUpperCase();
-    const tags = asArray(entry?.tags);
-    return makeAccount({
-      type: type === "HOTP" ? "HOTP" : "TOTP",
-      steam: type === "STEAM",
-      issuer: tags.length > 0 ? tags[0] : "",
-      name: entry?.label,
-      secret: entry?.secret,
-      algorithm: entry?.algorithm,
-      digits: entry?.digits,
-      period: entry?.period,
+    return root.map((entry) => {
+        const type = String(entry?.type ?? 'TOTP').toUpperCase();
+        const tags = asArray(entry?.tags);
+        return makeAccount({
+            type: type === 'HOTP' ? 'HOTP' : 'TOTP',
+            steam: type === 'STEAM',
+            issuer: tags.length > 0 ? tags[0] : '',
+            name: entry?.label,
+            secret: entry?.secret,
+            algorithm: entry?.algorithm,
+            digits: entry?.digits,
+            period: entry?.period,
+        });
     });
-  });
 }

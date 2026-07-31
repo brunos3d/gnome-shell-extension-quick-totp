@@ -12,33 +12,33 @@
  * why encrypted formats are out of scope for a pure-gjs extension.
  */
 
-import { makeAccount } from "../shared/otp-account.js";
-import { asArray, parseJson } from "../shared/json.js";
+import { makeAccount } from '../shared/otp-account.js';
+import { asArray, parseJson } from '../shared/json.js';
 
 export function parseAegis(data) {
-  const root = parseJson(data);
-  if (!root || typeof root !== "object" || typeof root.db !== "object") {
-    if (root && typeof root.db === "string") {
-      throw new Error(
-        "This Aegis vault is encrypted. Export an unencrypted vault to import it.",
-      );
+    const root = parseJson(data);
+    if (!root || typeof root !== 'object' || typeof root.db !== 'object') {
+        if (root && typeof root.db === 'string') {
+            throw new Error(
+                'This Aegis vault is encrypted. Export an unencrypted vault to import it.',
+            );
+        }
+        throw new Error('Not a valid Aegis vault.');
     }
-    throw new Error("Not a valid Aegis vault.");
-  }
 
-  return asArray(root.db.entries).map((entry) => {
-    const info = entry?.info ?? {};
-    const type = String(entry?.type ?? "totp").toLowerCase();
-    return makeAccount({
-      type: type === "hotp" ? "HOTP" : "TOTP",
-      steam: type === "steam",
-      issuer: entry?.issuer,
-      name: entry?.name,
-      secret: info.secret,
-      algorithm: info.algo,
-      digits: info.digits,
-      period: info.period,
-      counter: info.counter,
+    return asArray(root.db.entries).map((entry) => {
+        const info = entry?.info ?? {};
+        const type = String(entry?.type ?? 'totp').toLowerCase();
+        return makeAccount({
+            type: type === 'hotp' ? 'HOTP' : 'TOTP',
+            steam: type === 'steam',
+            issuer: entry?.issuer,
+            name: entry?.name,
+            secret: info.secret,
+            algorithm: info.algo,
+            digits: info.digits,
+            period: info.period,
+            counter: info.counter,
+        });
     });
-  });
 }

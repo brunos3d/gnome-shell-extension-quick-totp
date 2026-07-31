@@ -10,7 +10,7 @@
  * identically under Node test harnesses and GNOME Shell's gjs.
  */
 
-import { makeAccount } from "../shared/otp-account.js";
+import { makeAccount } from '../shared/otp-account.js';
 
 /**
  * Parse a single otpauth:// URI into a normalized account.
@@ -18,30 +18,30 @@ import { makeAccount } from "../shared/otp-account.js";
  * @returns {OtpAccount}
  */
 export function parseUri(uri) {
-  const str = String(uri ?? "").trim();
-  const match = /^otpauth:\/\/([^/?#]+)\/?([^?#]*)(?:\?([^#]*))?/i.exec(str);
-  if (!match) throw new Error('Not an "otpauth://" URI.');
+    const str = String(uri ?? '').trim();
+    const match = /^otpauth:\/\/([^/?#]+)\/?([^?#]*)(?:\?([^#]*))?/i.exec(str);
+    if (!match) throw new Error('Not an "otpauth://" URI.');
 
-  const host = decodeURIComponent(match[1]).toLowerCase();
-  if (host !== "totp" && host !== "hotp" && host !== "steam") {
-    throw new Error(`Unsupported otpauth type "${host}".`);
-  }
+    const host = decodeURIComponent(match[1]).toLowerCase();
+    if (host !== 'totp' && host !== 'hotp' && host !== 'steam') {
+        throw new Error(`Unsupported otpauth type "${host}".`);
+    }
 
-  const query = parseQuery(match[3] ?? "");
-  const { issuer: labelIssuer, name } = splitLabel(match[2] ?? "");
+    const query = parseQuery(match[3] ?? '');
+    const { issuer: labelIssuer, name } = splitLabel(match[2] ?? '');
 
-  const steam = host === "steam";
-  return makeAccount({
-    type: steam ? "TOTP" : host.toUpperCase(),
-    steam,
-    issuer: query.issuer ?? labelIssuer,
-    name,
-    secret: query.secret,
-    algorithm: query.algorithm,
-    digits: query.digits,
-    period: query.period,
-    counter: query.counter,
-  });
+    const steam = host === 'steam';
+    return makeAccount({
+        type: steam ? 'TOTP' : host.toUpperCase(),
+        steam,
+        issuer: query.issuer ?? labelIssuer,
+        name,
+        secret: query.secret,
+        algorithm: query.algorithm,
+        digits: query.digits,
+        period: query.period,
+        counter: query.counter,
+    });
 }
 
 /**
@@ -52,53 +52,53 @@ export function parseUri(uri) {
  * @returns {{accounts: OtpAccount[], errors: {line: number, error: string}[]}}
  */
 export function parseUriList(text) {
-  const accounts = [];
-  const errors = [];
-  const lines = String(text ?? "").split(/\r?\n/);
-  lines.forEach((raw, index) => {
-    const line = raw.trim();
-    if (line === "" || line.startsWith("#")) return;
-    try {
-      accounts.push(parseUri(line));
-    } catch (e) {
-      errors.push({ line: index + 1, error: e.message });
-    }
-  });
-  return { accounts, errors };
+    const accounts = [];
+    const errors = [];
+    const lines = String(text ?? '').split(/\r?\n/);
+    lines.forEach((raw, index) => {
+        const line = raw.trim();
+        if (line === '' || line.startsWith('#')) return;
+        try {
+            accounts.push(parseUri(line));
+        } catch (e) {
+            errors.push({ line: index + 1, error: e.message });
+        }
+    });
+    return { accounts, errors };
 }
 
 // "Issuer:Account" (or just "Account"). The colon is literal in the path; each
 // side is percent-decoded independently.
 function splitLabel(rawLabel) {
-  const label = rawLabel.replace(/^\//, "");
-  const colon = label.indexOf(":");
-  if (colon === -1) {
-    return { issuer: "", name: safeDecode(label) };
-  }
-  return {
-    issuer: safeDecode(label.slice(0, colon)).trim(),
-    name: safeDecode(label.slice(colon + 1)).trim(),
-  };
+    const label = rawLabel.replace(/^\//, '');
+    const colon = label.indexOf(':');
+    if (colon === -1) {
+        return { issuer: '', name: safeDecode(label) };
+    }
+    return {
+        issuer: safeDecode(label.slice(0, colon)).trim(),
+        name: safeDecode(label.slice(colon + 1)).trim(),
+    };
 }
 
 function parseQuery(queryString) {
-  const result = {};
-  for (const pair of queryString.split("&")) {
-    if (!pair) continue;
-    const eq = pair.indexOf("=");
-    if (eq === -1) continue;
-    const key = safeDecode(pair.slice(0, eq));
-    // application/x-www-form-urlencoded: "+" means space in query values.
-    const value = safeDecode(pair.slice(eq + 1).replace(/\+/g, " "));
-    if (key) result[key] = value;
-  }
-  return result;
+    const result = {};
+    for (const pair of queryString.split('&')) {
+        if (!pair) continue;
+        const eq = pair.indexOf('=');
+        if (eq === -1) continue;
+        const key = safeDecode(pair.slice(0, eq));
+        // application/x-www-form-urlencoded: "+" means space in query values.
+        const value = safeDecode(pair.slice(eq + 1).replace(/\+/g, ' '));
+        if (key) result[key] = value;
+    }
+    return result;
 }
 
 function safeDecode(value) {
-  try {
-    return decodeURIComponent(value);
-  } catch {
-    return value;
-  }
+    try {
+        return decodeURIComponent(value);
+    } catch {
+        return value;
+    }
 }

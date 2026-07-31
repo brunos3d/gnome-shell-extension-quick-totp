@@ -109,19 +109,19 @@ inside a `.zip`; extract the JSON first.
 
 ```json
 {
-  "app": "Quick TOTP",
-  "version": 1,
-  "accounts": [
-    {
-      "type": "TOTP",
-      "issuer": "Example",
-      "name": "me",
-      "secret": "JBSWY3DPEHPK3PXP",
-      "digits": 6,
-      "algorithm": "SHA-1",
-      "period": 30
-    }
-  ]
+    "app": "Quick TOTP",
+    "version": 1,
+    "accounts": [
+        {
+            "type": "TOTP",
+            "issuer": "Example",
+            "name": "me",
+            "secret": "JBSWY3DPEHPK3PXP",
+            "digits": 6,
+            "algorithm": "SHA-1",
+            "period": 30
+        }
+    ]
 }
 ```
 

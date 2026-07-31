@@ -7,13 +7,13 @@ The Steam Guard mobile app uses mostly standard TOTP:
 
 - Steam Guard parameters:
 
-  - Type: TOTP
+    - Type: TOTP
 
-  - Digits: 5
+    - Digits: 5
 
-  - Period: 30 seconds
+    - Period: 30 seconds
 
-  - Algorithm: SHA-1
+    - Algorithm: SHA-1
 
 - Steam Guard uses decimal digits and letters to display authentication codes. To make
   the TOTP extension show the codes in the same way, you **must** set the **Issuer** to
@@ -33,8 +33,8 @@ obtain it, but here is one that's known to work:
   your phone is `arm64` or `x86`/`x86_64`, it's probably `arm`. There's no risk in
   downloading the wrong architecture, it will simply not execute if you make a mistake.
 
-  > Note that the latest frida version might not work with your Android version. You might need
-  > to try older versions until you find one that works.
+    > Note that the latest frida version might not work with your Android version. You might need
+    > to try older versions until you find one that works.
 
 - `adb`: It's usually part of `android-tools` or `android-tools-adb` package.
 
@@ -46,72 +46,72 @@ obtain it, but here is one that's known to work:
 
        unxz frida-server-X.Y.Z-android-ARCH.xz
 
-   Example:
+    Example:
 
         unxz frida-server-16.5.9-android-arm.xz
 
 2. Save the following Python script, to a `dump.py` file:
 
-   ```python
-   #!/bin/env python3
+    ```python
+    #!/bin/env python3
 
-   import json
-   import frida
-   import sys
+    import json
+    import frida
+    import sys
 
-   package = "com.valvesoftware.android.steam.community"
-   cmd = """
-   'use strict;'
+    package = "com.valvesoftware.android.steam.community"
+    cmd = """
+    'use strict;'
 
-   if (Java.available) {
-     Java.perform(function() {
+    if (Java.available) {
+      Java.perform(function() {
 
-       //Cipher stuff
-       const Cipher = Java.use('javax.crypto.Cipher');
+        //Cipher stuff
+        const Cipher = Java.use('javax.crypto.Cipher');
 
-       Cipher.doFinal.overload('[B').implementation = function (input) {
-           var result = this.doFinal.overload('[B').call(this, input);
-           send(result);
-       }
+        Cipher.doFinal.overload('[B').implementation = function (input) {
+            var result = this.doFinal.overload('[B').call(this, input);
+            send(result);
+        }
 
-     }
-   )}
-   """
+      }
+    )}
+    """
 
-   def parse_hook(cmd_):
-       print('[*] Parsing hook...')
-       script = session.create_script(cmd_)
-       script = session.create_script(cmd_)
-       script.on('message', on_message)
-       script.load()
+    def parse_hook(cmd_):
+        print('[*] Parsing hook...')
+        script = session.create_script(cmd_)
+        script = session.create_script(cmd_)
+        script.on('message', on_message)
+        script.load()
 
-   def on_message(message, _):
-       try:
-           if message:
-               if message['type'] == 'send':
-                   result = "".join(chr(i) for i in message['payload'])
-                   print(json.dumps(json.loads(result), indent=2, ensure_ascii=False))
-       except Exception as e:
-           print(e)
+    def on_message(message, _):
+        try:
+            if message:
+                if message['type'] == 'send':
+                    result = "".join(chr(i) for i in message['payload'])
+                    print(json.dumps(json.loads(result), indent=2, ensure_ascii=False))
+        except Exception as e:
+            print(e)
 
-   if __name__ == '__main__':
-       try:
-           print('[*] Spawning', package)
-           dev = frida.get_usb_device()
-           pid = dev.spawn(package)
-           session = dev.attach(pid)
-           parse_hook(cmd)
-           dev.resume(pid)
-           print('')
-           sys.stdin.read()
+    if __name__ == '__main__':
+        try:
+            print('[*] Spawning', package)
+            dev = frida.get_usb_device()
+            pid = dev.spawn(package)
+            session = dev.attach(pid)
+            parse_hook(cmd)
+            dev.resume(pid)
+            print('')
+            sys.stdin.read()
 
-       except KeyboardInterrupt:
-           sys.exit(0)
-       except Exception as e:
-           print(e)
-   ```
+        except KeyboardInterrupt:
+            sys.exit(0)
+        except Exception as e:
+            print(e)
+    ```
 
-   Make it executable by running `chmod +x dump.py`.
+    Make it executable by running `chmod +x dump.py`.
 
 3. On your phone's app settings, use "Force Stop" to completely stop the Steam app.
 
@@ -129,7 +129,7 @@ obtain it, but here is one that's known to work:
 
        adb push frida-server-X.Y.Z-android-ARCH /data/local/tmp/
 
-   Example:
+    Example:
 
        adb push frida-server-16.5.9-android-arm /data/local/tmp/
 
@@ -138,13 +138,13 @@ obtain it, but here is one that's known to work:
        adb root
        adb shell
 
-   or
+    or
 
        adb shell
        su
 
-   You might see a prompt on your phone to authorize root access for the adb shell. Make
-   sure you allow root access.
+    You might see a prompt on your phone to authorize root access for the adb shell. Make
+    sure you allow root access.
 
 5. Go to where you copied `frida-server` and execute it:
 
@@ -152,9 +152,9 @@ obtain it, but here is one that's known to work:
        chmod +x frida-server-X.Y.Z-android-ARCH
        ./frida-server-X.Y.Z-android-ARCH
 
-   If you see any error messages, this probably means this version of `frida-server` is
-   not compatible. Go download a different version and try again. You can press `Ctrl+C`
-   to stop `frida-server`.
+    If you see any error messages, this probably means this version of `frida-server` is
+    not compatible. Go download a different version and try again. You can press `Ctrl+C`
+    to stop `frida-server`.
 
 6. Run the `dump.py` script:
 
@@ -164,23 +164,23 @@ obtain it, but here is one that's known to work:
    to generate an authentication code. It will fail to show you the authentication code,
    but the script will print out the `shared_secret` that you need:
 
-   ```json
-   {
-     "accounts": {
-       "12345678901234567890": {
-         "shared_secret": "ABC123abc123ABC123abc123ABC=",
-         "identity_secret": "...",
-         "secret_1": "...",
-         "serial_number": "...",
-         "revocation_code": "...",
-         "account_name": "...",
-         "token_gid": "...",
-         "steamguard_scheme": 2,
-         "steamid": "..."
-       }
-     }
-   }
-   ```
+    ```json
+    {
+        "accounts": {
+            "12345678901234567890": {
+                "shared_secret": "ABC123abc123ABC123abc123ABC=",
+                "identity_secret": "...",
+                "secret_1": "...",
+                "serial_number": "...",
+                "revocation_code": "...",
+                "account_name": "...",
+                "token_gid": "...",
+                "steamguard_scheme": 2,
+                "steamid": "..."
+            }
+        }
+    }
+    ```
 
 8. Use the `shared_secret` value as the TOTP secret, making sure to select `Base64`.
 
