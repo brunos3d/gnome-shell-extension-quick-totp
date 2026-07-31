@@ -52,7 +52,7 @@ of any network communication.
   Shell runtime lacks the required cryptographic primitives; this keeps the
   security surface small and avoids bundling crypto into a shell extension. See
   [`docs/import-export.md`](docs/import-export.md) and
-  [`src/io/crypto/README.md`](src/io/crypto/README.md).
+  [`src/lib/io/crypto/README.md`](src/lib/io/crypto/README.md).
 
 ## Priority
 

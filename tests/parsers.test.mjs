@@ -9,17 +9,17 @@
 import { describe, it, assert, assertEqual } from "./lib/harness.js";
 import { fixture } from "./lib/fixtures.js";
 
-import { parseUri, parseUriList } from "../src/io/parsers/otpauth-uri.js";
-import { parseGoogleMigration } from "../src/io/parsers/google-migration.js";
-import { parseAegis } from "../src/io/parsers/aegis.js";
+import { parseUri, parseUriList } from "../src/lib/io/parsers/otpauth-uri.js";
+import { parseGoogleMigration } from "../src/lib/io/parsers/google-migration.js";
+import { parseAegis } from "../src/lib/io/parsers/aegis.js";
 import {
   parseAndOTP,
   parseAuthenticatorLegacy,
-} from "../src/io/parsers/andotp.js";
-import { parseFreeOTPPlus } from "../src/io/parsers/freeotp-plus.js";
-import { parseBitwarden } from "../src/io/parsers/bitwarden.js";
-import { parseRaivo } from "../src/io/parsers/raivo.js";
-import { parsePlainJson } from "../src/io/parsers/plain-json.js";
+} from "../src/lib/io/parsers/andotp.js";
+import { parseFreeOTPPlus } from "../src/lib/io/parsers/freeotp-plus.js";
+import { parseBitwarden } from "../src/lib/io/parsers/bitwarden.js";
+import { parseRaivo } from "../src/lib/io/parsers/raivo.js";
+import { parsePlainJson } from "../src/lib/io/parsers/plain-json.js";
 
 describe("otpauth:// URI", () => {
   it("parses a TOTP URI with all fields", () => {

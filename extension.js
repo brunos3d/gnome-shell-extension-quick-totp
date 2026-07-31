@@ -6,7 +6,7 @@
 
 import { Extension } from "resource:///org/gnome/shell/extensions/extension.js";
 
-import Indicator from "./src/ui/indicator.js";
+import Indicator from "./src/shell/indicator.js";
 
 export default class QuickTotpExtension extends Extension {
   enable() {

@@ -17,15 +17,15 @@ import {
   gettext as _,
 } from "resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js";
 
-import * as Base32 from "./src/utils/base32.js";
-import CodeController from "./src/services/code-controller.js";
-import HOTP from "./src/otp/hotp.js";
-import MyAlertDialog from "./src/ui/widgets/my-alert-dialog.js";
-import MyEntryRow from "./src/ui/widgets/my-entry-row.js";
-import MySpinRow from "./src/ui/widgets/my-spin-row.js";
-import * as SecretUtils from "./src/services/secret-utils.js";
-import TOTP from "./src/otp/totp.js";
-import { BackupRestoreGroup } from "./src/ui/backup-restore.js";
+import * as Base32 from "./src/lib/utils/base32.js";
+import CodeController from "./src/lib/services/code-controller.js";
+import HOTP from "./src/lib/otp/hotp.js";
+import MyAlertDialog from "./src/prefs/widgets/my-alert-dialog.js";
+import MyEntryRow from "./src/prefs/widgets/my-entry-row.js";
+import MySpinRow from "./src/prefs/widgets/my-spin-row.js";
+import * as SecretUtils from "./src/lib/services/secret-utils.js";
+import TOTP from "./src/lib/otp/totp.js";
+import { BackupRestoreGroup } from "./src/prefs/backup-restore.js";
 
 Gio._promisify(
   Gio.Subprocess.prototype,
@@ -1474,7 +1474,7 @@ class TOTPPreferencesPage extends Adw.PreferencesPage {
       theme.add_resource_path(res_path);
 
     this.#provider = new Gtk.CssProvider();
-    this.#provider.load_from_path(`${path}/src/ui/prefs.css`);
+    this.#provider.load_from_path(`${path}/src/prefs/prefs.css`);
     Gtk.StyleContext.add_provider_for_display(
       Gdk.Display.get_default(),
       this.#provider,
