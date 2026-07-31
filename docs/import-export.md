@@ -24,11 +24,11 @@ the existing **Import** / **Add secret** actions.
 
 ## Architecture
 
-All parsing and serialization lives in `src/io/`, split by responsibility so no
+All parsing and serialization lives in `src/lib/io/`, split by responsibility so no
 importer logic leaks into the UI:
 
 ```
-src/io/
+src/lib/io/
   shared/       canonical account model, validators, base64, protobuf, json, uuid
   parsers/      one module per format: bytes/text -> accounts
   serializers/  one module per format: accounts -> bytes/text
@@ -133,7 +133,7 @@ inside a `.zip`; extract the JSON first.
   them would require an unwanted crypto dependency in a shell extension. Export
   an **unencrypted** variant from the source app, or extract the JSON, then
   import that. Quick TOTP rejects encrypted files with a clear message rather
-  than failing silently. Details: [`src/io/crypto/README.md`](../src/io/crypto/README.md).
+  than failing silently. Details: [`src/lib/io/crypto/README.md`](../src/lib/io/crypto/README.md).
 - **Icons, notes, tags, and groups** carried by some formats are not imported or
   exported — only the fields needed to generate codes are kept.
 - **Raivo `.zip`** must be extracted to its inner JSON before importing.

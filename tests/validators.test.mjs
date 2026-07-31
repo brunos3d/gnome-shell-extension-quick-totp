@@ -10,14 +10,14 @@ import {
   assertEqual,
   assertThrows,
 } from "./lib/harness.js";
-import { makeAccount } from "../src/io/shared/otp-account.js";
+import { makeAccount } from "../src/lib/io/shared/otp-account.js";
 import {
   validateAccount,
   partitionValid,
   validateBase32Secret,
-} from "../src/io/shared/validators.js";
-import { parseAegis } from "../src/io/parsers/aegis.js";
-import { parseAndOTP } from "../src/io/parsers/andotp.js";
+} from "../src/lib/io/shared/validators.js";
+import { parseAegis } from "../src/lib/io/parsers/aegis.js";
+import { parseAndOTP } from "../src/lib/io/parsers/andotp.js";
 
 describe("validation", () => {
   it("accepts a well-formed account", () => {

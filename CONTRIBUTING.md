@@ -61,9 +61,9 @@ tests/                    Dependency-free test suite (node tests/run.mjs).
 docs/                     Longer-form documentation (e.g. import-export.md).
 ```
 
-The import/export engine under `src/io/` is pure JavaScript with no GNOME
+The import/export engine under `src/lib/io/` is pure JavaScript with no GNOME
 dependencies, so it can be unit-tested with plain `node`. Only the UI
-(`src/ui/backup-restore.js`) and the two services touch GTK/libsecret. Adding a
+(`src/prefs/backup-restore.js`) and the two services touch GTK/libsecret. Adding a
 new format is a self-contained change: add a parser and/or serializer, then one
 entry in `formats/registry.js`. See [`docs/import-export.md`](docs/import-export.md).
 

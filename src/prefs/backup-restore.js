@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
  * The "Backup & Restore" preferences group: a native Adwaita front-end over the
- * toolkit-agnostic import/export engine in src/io/. All parsing/serialization
+ * toolkit-agnostic import/export engine in src/lib/io/. All parsing/serialization
  * lives in the engine; this file only drives file dialogs, confirmations, and
  * result feedback.
  *
@@ -24,9 +24,9 @@ import {
   EXPORT_FORMATS,
   Source,
   detectFormat,
-} from "../io/formats/registry.js";
-import { prepareImport, storeAccounts } from "../io/import-service.js";
-import { gatherAccounts, serializeAccounts } from "../io/export-service.js";
+} from "../lib/io/formats/registry.js";
+import { prepareImport, storeAccounts } from "../lib/io/import-service.js";
+import { gatherAccounts, serializeAccounts } from "../lib/io/export-service.js";
 
 Gio._promisify(Gtk.FileDialog.prototype, "open", "open_finish");
 Gio._promisify(Gtk.FileDialog.prototype, "save", "save_finish");

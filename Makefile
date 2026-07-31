@@ -19,20 +19,22 @@ PO_FILES := $(wildcard po/*.po)
 
 # extension.js and prefs.js must live at the extension root; everything else
 # lives under src/ and is bundled by packing the whole directory.
+# src/shell/ is only loaded by the gnome-shell process, src/prefs/ only by the
+# preferences process, and src/lib/ is toolkit-agnostic code shared by both.
 SOURCES := extension.js prefs.js
 SRC_SOURCES := \
-	src/otp/hotp.js \
-	src/otp/otp.js \
-	src/otp/totp.js \
-	src/services/code-controller.js \
-	src/services/secret-utils.js \
-	src/ui/backup-restore.js \
-	src/ui/indicator.js \
-	src/ui/widgets/my-alert-dialog.js \
-	src/ui/widgets/my-entry-row.js \
-	src/ui/widgets/my-spin-row.js \
-	src/utils/base32.js
-SRC_CSS := src/ui/prefs.css
+	src/lib/otp/hotp.js \
+	src/lib/otp/otp.js \
+	src/lib/otp/totp.js \
+	src/lib/services/code-controller.js \
+	src/lib/services/secret-utils.js \
+	src/lib/utils/base32.js \
+	src/prefs/backup-restore.js \
+	src/prefs/widgets/my-alert-dialog.js \
+	src/prefs/widgets/my-entry-row.js \
+	src/prefs/widgets/my-spin-row.js \
+	src/shell/indicator.js
+SRC_CSS := src/prefs/prefs.css
 
 
 GRESOURCE_XML := icons.gresource.xml

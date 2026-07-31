@@ -7,19 +7,19 @@
  */
 
 import { describe, it, assert, assertEqual } from "./lib/harness.js";
-import { makeAccount } from "../src/io/shared/otp-account.js";
+import { makeAccount } from "../src/lib/io/shared/otp-account.js";
 
-import { buildUriList } from "../src/io/serializers/otpauth-uri.js";
-import { serializeAegis } from "../src/io/serializers/aegis.js";
-import { serializeAndOTP } from "../src/io/serializers/andotp.js";
-import { serializeFreeOTPPlus } from "../src/io/serializers/freeotp-plus.js";
-import { serializePlainJson } from "../src/io/serializers/plain-json.js";
+import { buildUriList } from "../src/lib/io/serializers/otpauth-uri.js";
+import { serializeAegis } from "../src/lib/io/serializers/aegis.js";
+import { serializeAndOTP } from "../src/lib/io/serializers/andotp.js";
+import { serializeFreeOTPPlus } from "../src/lib/io/serializers/freeotp-plus.js";
+import { serializePlainJson } from "../src/lib/io/serializers/plain-json.js";
 
-import { parseUriList } from "../src/io/parsers/otpauth-uri.js";
-import { parseAegis } from "../src/io/parsers/aegis.js";
-import { parseAndOTP } from "../src/io/parsers/andotp.js";
-import { parseFreeOTPPlus } from "../src/io/parsers/freeotp-plus.js";
-import { parsePlainJson } from "../src/io/parsers/plain-json.js";
+import { parseUriList } from "../src/lib/io/parsers/otpauth-uri.js";
+import { parseAegis } from "../src/lib/io/parsers/aegis.js";
+import { parseAndOTP } from "../src/lib/io/parsers/andotp.js";
+import { parseFreeOTPPlus } from "../src/lib/io/parsers/freeotp-plus.js";
+import { parsePlainJson } from "../src/lib/io/parsers/plain-json.js";
 
 const SAMPLE = [
   makeAccount({

@@ -15,10 +15,10 @@ import * as Main from "resource:///org/gnome/shell/ui/main.js";
 import * as PanelMenu from "resource:///org/gnome/shell/ui/panelMenu.js";
 import * as PopupMenu from "resource:///org/gnome/shell/ui/popupMenu.js";
 
-import CodeController from "../services/code-controller.js";
-import HOTP from "../otp/hotp.js";
-import * as SecretUtils from "../services/secret-utils.js";
-import TOTP from "../otp/totp.js";
+import CodeController from "../lib/services/code-controller.js";
+import HOTP from "../lib/otp/hotp.js";
+import * as SecretUtils from "../lib/services/secret-utils.js";
+import TOTP from "../lib/otp/totp.js";
 
 import { gettext as _ } from "resource:///org/gnome/shell/extensions/extension.js";
 
