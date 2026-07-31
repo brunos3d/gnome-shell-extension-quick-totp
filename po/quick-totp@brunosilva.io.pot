@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: Quick TOTP\n"
 "Report-Msgid-Bugs-To: https://github.com/brunos3d/gnome-shell-extension-"
 "quick-totp\n"
-"POT-Creation-Date: 2026-07-13 12:46-0300\n"
+"POT-Creation-Date: 2026-07-30 23:11-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,574 +18,574 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: prefs.js:66 src/ui/indicator.js:225
+#: prefs.js:60
+msgid "No command configured. Set one in the Options section."
+msgstr ""
+
+#: prefs.js:63
+msgid "Failed to parse option:"
+msgstr ""
+
+#: prefs.js:99 src/shell/indicator.js:225
 msgid "Error"
 msgstr ""
 
-#: prefs.js:167
+#: prefs.js:200
 msgid "Scan QR code."
 msgstr ""
 
-#: prefs.js:178
-msgid "Failed to parse \"qrscan-cmd\" option."
-msgstr ""
-
-#: prefs.js:203
+#: prefs.js:234
 msgid "Paste either the \"otpauth://\" URI, or the QR code image."
 msgstr ""
 
-#: prefs.js:228
-msgid "Failed to parse \"qrimage-cmd\" option."
-msgstr ""
-
-#: prefs.js:307
+#: prefs.js:339
 msgid "Type"
 msgstr ""
 
-#: prefs.js:308
+#: prefs.js:340
 msgid "Select between time-based or counter-based OTP."
 msgstr ""
 
-#: prefs.js:315
+#: prefs.js:347
 msgid "Issuer"
 msgstr ""
 
-#: prefs.js:318
+#: prefs.js:350
 msgid ""
 "The name of the organization (Google, Facebook, etc) that issued the OTP."
 msgstr ""
 
-#: prefs.js:325
+#: prefs.js:357
 msgid "Name"
 msgstr ""
 
-#: prefs.js:332
+#: prefs.js:364
 msgid "Secret"
 msgstr ""
 
-#: prefs.js:334
+#: prefs.js:366
 msgid "The shared secret key."
 msgstr ""
 
-#: prefs.js:339
+#: prefs.js:371
 msgid "How the secret key is encoded."
 msgstr ""
 
-#: prefs.js:346
+#: prefs.js:378
 msgid "Digits"
 msgstr ""
 
-#: prefs.js:350
+#: prefs.js:382
 msgid "How many digits in the code."
 msgstr ""
 
-#: prefs.js:356
+#: prefs.js:388
 msgid "Period"
 msgstr ""
 
-#: prefs.js:358
+#: prefs.js:390
 msgid "Time between code updates, in seconds."
 msgstr ""
 
-#: prefs.js:368
+#: prefs.js:400
 msgid "Counter"
 msgstr ""
 
-#: prefs.js:370
+#: prefs.js:402
 msgid ""
 "This counter must be synchronized with the server, and it increments every "
 "time a code is generated."
 msgstr ""
 
-#: prefs.js:387
+#: prefs.js:419
 msgid "Algorithm"
 msgstr ""
 
-#: prefs.js:391
+#: prefs.js:423
 msgid "The hash algorithm used to generate codes."
 msgstr ""
 
-#: prefs.js:396 prefs.js:816 prefs.js:1077 prefs.js:1285
+#: prefs.js:428 prefs.js:846 prefs.js:1119 prefs.js:1325
 msgid "_Cancel"
 msgstr ""
 
-#: prefs.js:398
+#: prefs.js:430
 msgid "_OK"
 msgstr ""
 
-#: prefs.js:514
+#: prefs.js:540
 msgid "Copy code to clipboard."
 msgstr ""
 
-#: prefs.js:533 prefs.js:573
+#: prefs.js:559 prefs.js:599
 msgid "Unlock"
 msgstr ""
 
-#: prefs.js:591 src/ui/indicator.js:33
+#: prefs.js:617 src/shell/indicator.js:33
 msgid "OTP code copied to clipboard."
 msgstr ""
 
-#: prefs.js:610
+#: prefs.js:636
 msgid "QR code"
 msgstr ""
 
-#: prefs.js:631 src/ui/widgets/my-alert-dialog.js:51
+#: prefs.js:657 src/prefs/widgets/my-alert-dialog.js:51
 msgid "_Close"
 msgstr ""
 
-#: prefs.js:654
+#: prefs.js:680
 msgid ""
 "Move this secret up; hold down the SHIFT key to move to the top of the list."
 msgstr ""
 
-#: prefs.js:657
+#: prefs.js:683
 msgid ""
 "Move this secret down; hold down the SHIFT key to move to the bottom of the "
 "list."
 msgstr ""
 
-#: prefs.js:728
+#: prefs.js:754
 msgid "_Edit..."
 msgstr ""
 
-#: prefs.js:730
+#: prefs.js:756
 msgid "_Copy to clipboard"
 msgstr ""
 
-#: prefs.js:732
+#: prefs.js:758
 msgid "Export to _QR code..."
 msgstr ""
 
-#: prefs.js:734
+#: prefs.js:760
 msgid "_Remove"
 msgstr ""
 
-#: prefs.js:774
+#: prefs.js:796
 msgid "Importing \"otpauth://\" URIs"
 msgstr ""
 
-#: prefs.js:795
+#: prefs.js:825
 msgid "Paste all \"otpauth://\" URIs you want to import, one per line."
 msgstr ""
 
-#: prefs.js:818
+#: prefs.js:848
 msgid "_Import"
 msgstr ""
 
-#: prefs.js:870 src/ui/indicator.js:346
+#: prefs.js:900 src/shell/indicator.js:346
 msgid "Unlock OTP secrets..."
 msgstr ""
 
-#: prefs.js:873 src/ui/indicator.js:340
+#: prefs.js:903 src/shell/indicator.js:340
 msgid "Lock OTP secrets"
 msgstr ""
 
-#: prefs.js:931
+#: prefs.js:935
 msgid "Secrets"
 msgstr ""
 
-#: prefs.js:932
+#: prefs.js:936
 msgid "A list of all OTP secrets from the keyring."
 msgstr ""
 
-#: prefs.js:952
+#: prefs.js:994
 msgid "Add secret..."
 msgstr ""
 
-#: prefs.js:961
+#: prefs.js:1003
 msgid "Refresh secrets."
 msgstr ""
 
-#: prefs.js:1008
+#: prefs.js:1050
 msgid "Creating new OTP secret"
 msgstr ""
 
-#: prefs.js:1018
+#: prefs.js:1060
 msgid "Created new secret."
 msgstr ""
 
-#: prefs.js:1046
+#: prefs.js:1088
 msgid "Imported secrets:"
 msgstr ""
 
-#: prefs.js:1061
+#: prefs.js:1103
 msgid "There are no secrets to remove."
 msgstr ""
 
-#: prefs.js:1069
+#: prefs.js:1111
 msgid "Remove all OTP secrets?"
 msgstr ""
 
-#: prefs.js:1071
+#: prefs.js:1113
 msgid "This permanently deletes all"
 msgstr ""
 
-#: prefs.js:1073
+#: prefs.js:1115
 msgid "OTP secrets from the keyring. This cannot be undone."
 msgstr ""
 
-#: prefs.js:1077
+#: prefs.js:1119
 msgid "_Delete All"
 msgstr ""
 
-#: prefs.js:1094
+#: prefs.js:1136
 msgid "Removed secrets:"
 msgstr ""
 
-#: prefs.js:1211
+#: prefs.js:1253
 msgid "Editing OTP secret"
 msgstr ""
 
-#: prefs.js:1231
+#: prefs.js:1273
 msgid "Copied secret URI to clipboard."
 msgstr ""
 
-#: prefs.js:1247
-msgid "Failed to parse \"qrencode-cmd\" option."
-msgstr ""
-
-#: prefs.js:1285
+#: prefs.js:1325
 msgid "_Delete"
 msgstr ""
 
-#: prefs.js:1288
+#: prefs.js:1328
 msgid "Deleting OTP secret"
 msgstr ""
 
-#: prefs.js:1289
+#: prefs.js:1329
 msgid "Deleting secret:"
 msgstr ""
 
-#: prefs.js:1300
+#: prefs.js:1340
 msgid "Failed to remove secret. Is it locked?"
 msgstr ""
 
-#: prefs.js:1302
+#: prefs.js:1342
 msgid "Deleted secret:"
 msgstr ""
 
-#: prefs.js:1335
-msgid "Revert option back to the default value."
+#: prefs.js:1380
+msgid "Clear the command."
 msgstr ""
 
-#: prefs.js:1362
+#: prefs.js:1407
 msgid "Options"
 msgstr ""
 
-#: prefs.js:1368
+#: prefs.js:1413
 msgid "QR generator"
 msgstr ""
 
-#: prefs.js:1370
+#: prefs.js:1416
 msgid ""
 "This command must read text from standard input, and write an image to the "
 "standard output."
 msgstr ""
 
-#: prefs.js:1378
+#: prefs.js:1419 prefs.js:1433 prefs.js:1447
+msgid "Example:"
+msgstr ""
+
+#: prefs.js:1427
 msgid "QR reader"
 msgstr ""
 
-#: prefs.js:1380
+#: prefs.js:1430
 msgid ""
 "This command must read an image from the standard input, and print the "
 "decoded URI to the standard output."
 msgstr ""
 
-#: prefs.js:1388
+#: prefs.js:1441
 msgid "QR scanner"
 msgstr ""
 
-#: prefs.js:1390
+#: prefs.js:1444
 msgid ""
 "This command must capture an image from a camera, and print the decoded URI "
 "to the standard output."
 msgstr ""
 
-#: prefs.js:1396
+#: prefs.js:1453
 msgid "Clipboard clear delay"
 msgstr ""
 
-#: prefs.js:1398
+#: prefs.js:1455
 msgid "Sensitive data is cleared from the clipboard after this many seconds."
 msgstr ""
 
-#: prefs.js:1401
+#: prefs.js:1458
 msgid ""
 "When exporting sensitive data (\"otpauth://\" URIs) they will be cleared "
 "from the clipboard after this time has passed. Authentication codes are not "
 "cleared."
 msgstr ""
 
-#: prefs.js:1425
+#: prefs.js:1482
 msgid "Remove all secrets"
 msgstr ""
 
-#: prefs.js:1426
+#: prefs.js:1483
 msgid "Permanently delete every OTP secret from the keyring."
 msgstr ""
 
-#: prefs.js:1429
+#: prefs.js:1486
 msgid "Remove All"
 msgstr ""
 
-#: src/otp/hotp.js:67
+#: src/lib/otp/hotp.js:67
 msgid "URI host should be \"hotp\""
 msgstr ""
 
-#: src/otp/otp.js:35
+#: src/lib/otp/otp.js:35
 msgid "Invalid algorithm."
 msgstr ""
 
-#: src/otp/otp.js:103
+#: src/lib/otp/otp.js:103
 msgid "Failed to parse URI."
 msgstr ""
 
-#: src/otp/otp.js:105
+#: src/lib/otp/otp.js:105
 msgid "URI scheme should be \"otpauth://...\""
 msgstr ""
 
-#: src/otp/otp.js:106
+#: src/lib/otp/otp.js:106
 msgid "Unexpected port number in URI."
 msgstr ""
 
-#: src/otp/totp.js:43
+#: src/lib/otp/totp.js:43
 msgid "URI host should be \"totp\""
 msgstr ""
 
-#: src/services/secret-utils.js:171
+#: src/lib/services/secret-utils.js:171
 msgid "Failed to lookup secret."
 msgstr ""
 
-#: src/services/secret-utils.js:203
+#: src/lib/services/secret-utils.js:203
 msgid "Failed to retrieve secret."
 msgstr ""
 
-#: src/services/secret-utils.js:232 src/services/secret-utils.js:269
-#: src/services/secret-utils.js:291
+#: src/lib/services/secret-utils.js:232 src/lib/services/secret-utils.js:269
+#: src/lib/services/secret-utils.js:291
 msgid "Failed to lookup item."
 msgstr ""
 
-#: src/services/secret-utils.js:239 src/services/secret-utils.js:275
+#: src/lib/services/secret-utils.js:239 src/lib/services/secret-utils.js:275
 msgid "Failed to set label."
 msgstr ""
 
-#: src/services/secret-utils.js:246
+#: src/lib/services/secret-utils.js:246
 msgid "Failed to set attributes."
 msgstr ""
 
-#: src/services/secret-utils.js:252
+#: src/lib/services/secret-utils.js:252
 msgid "Failed to set secret."
 msgstr ""
 
-#: src/services/secret-utils.js:298
+#: src/lib/services/secret-utils.js:298
 msgid "Failed to set counter."
 msgstr ""
 
-#: src/ui/backup-restore.js:44
+#: src/lib/utils/base32.js:23
+msgid "Invalid base32 input; missing padding."
+msgstr ""
+
+#: src/lib/utils/base32.js:39
+msgid "Invalid base32 character at position:"
+msgstr ""
+
+#: src/lib/utils/base32.js:46
+msgid "Invalid padding."
+msgstr ""
+
+#: src/prefs/backup-restore.js:44
 msgid "Backup & Restore"
 msgstr ""
 
-#: src/ui/backup-restore.js:45
+#: src/prefs/backup-restore.js:45
 msgid "Import and export your OTP accounts in many formats."
 msgstr ""
 
-#: src/ui/backup-restore.js:56
+#: src/prefs/backup-restore.js:56
 msgid "Restore / Import"
 msgstr ""
 
-#: src/ui/backup-restore.js:57
+#: src/prefs/backup-restore.js:57
 msgid "Add accounts from another app or a backup file"
 msgstr ""
 
-#: src/ui/backup-restore.js:63
+#: src/prefs/backup-restore.js:63
 msgid "Import otpauth:// URIs…"
 msgstr ""
 
-#: src/ui/backup-restore.js:64
+#: src/prefs/backup-restore.js:64
 msgid "Paste one or more otpauth:// URIs, or scan a QR code"
 msgstr ""
 
-#: src/ui/backup-restore.js:73
+#: src/prefs/backup-restore.js:73
 msgid "Import from a file…"
 msgstr ""
 
-#: src/ui/backup-restore.js:76
+#: src/prefs/backup-restore.js:76
 msgid ""
 "Aegis, andOTP, FreeOTP+, Bitwarden, GNOME Authenticator, Raivo OTP, Google "
 "Authenticator, Quick TOTP JSON, or a plain URI list."
 msgstr ""
 
-#: src/ui/backup-restore.js:92
+#: src/prefs/backup-restore.js:92
 msgid "Backup / Export"
 msgstr ""
 
-#: src/ui/backup-restore.js:93
+#: src/prefs/backup-restore.js:93
 msgid "Save your accounts to a file (unencrypted)"
 msgstr ""
 
-#: src/ui/backup-restore.js:116
+#: src/prefs/backup-restore.js:116
 msgid "Import OTP accounts"
 msgstr ""
 
-#: src/ui/backup-restore.js:131
+#: src/prefs/backup-restore.js:131
 msgid "Could not recognize this file as a supported OTP backup."
 msgstr ""
 
-#: src/ui/backup-restore.js:138
+#: src/prefs/backup-restore.js:138
 msgid "No valid accounts were found in this file."
 msgstr ""
 
-#: src/ui/backup-restore.js:147
+#: src/prefs/backup-restore.js:147
 msgid "Imported accounts:"
 msgstr ""
 
-#: src/ui/backup-restore.js:149
+#: src/prefs/backup-restore.js:149
 msgid "skipped (already present):"
 msgstr ""
 
-#: src/ui/backup-restore.js:151
+#: src/prefs/backup-restore.js:151
 msgid "failed:"
 msgstr ""
 
-#: src/ui/backup-restore.js:155
+#: src/prefs/backup-restore.js:155
 msgid "Import failed:"
 msgstr ""
 
-#: src/ui/backup-restore.js:162
+#: src/prefs/backup-restore.js:162
 msgid "Format:"
 msgstr ""
 
-#: src/ui/backup-restore.js:163
+#: src/prefs/backup-restore.js:163
 msgid "Accounts to import:"
 msgstr ""
 
-#: src/ui/backup-restore.js:167
+#: src/prefs/backup-restore.js:167
 msgid "Duplicates in file (merged):"
 msgstr ""
 
-#: src/ui/backup-restore.js:171
+#: src/prefs/backup-restore.js:171
 msgid "Invalid entries (skipped):"
 msgstr ""
 
-#: src/ui/backup-restore.js:175
+#: src/prefs/backup-restore.js:175
 msgid "Import OTP accounts?"
 msgstr ""
 
-#: src/ui/backup-restore.js:180 src/ui/backup-restore.js:254
+#: src/prefs/backup-restore.js:180 src/prefs/backup-restore.js:254
 msgid "Cancel"
 msgstr ""
 
-#: src/ui/backup-restore.js:181
+#: src/prefs/backup-restore.js:181
 msgid "Import"
 msgstr ""
 
-#: src/ui/backup-restore.js:196
+#: src/prefs/backup-restore.js:196
 msgid "OTP backups (JSON, text, URIs)"
 msgstr ""
 
-#: src/ui/backup-restore.js:202
+#: src/prefs/backup-restore.js:202
 msgid "All files"
 msgstr ""
 
-#: src/ui/backup-restore.js:215
+#: src/prefs/backup-restore.js:215
 msgid "There are no accounts to export."
 msgstr ""
 
-#: src/ui/backup-restore.js:223
+#: src/prefs/backup-restore.js:223
 msgid "Export OTP accounts"
 msgstr ""
 
-#: src/ui/backup-restore.js:235
+#: src/prefs/backup-restore.js:235
 msgid "Exported accounts:"
 msgstr ""
 
-#: src/ui/backup-restore.js:238
+#: src/prefs/backup-restore.js:238
 msgid "Export failed:"
 msgstr ""
 
-#: src/ui/backup-restore.js:245
+#: src/prefs/backup-restore.js:245
 msgid "Export as unencrypted file?"
 msgstr ""
 
-#: src/ui/backup-restore.js:247
+#: src/prefs/backup-restore.js:247
 msgid "account(s)"
 msgstr ""
 
-#: src/ui/backup-restore.js:249
+#: src/prefs/backup-restore.js:249
 msgid ""
 "The exported file will contain your OTP secrets in clear text. Store it "
 "somewhere safe and delete it when you no longer need it."
 msgstr ""
 
-#: src/ui/backup-restore.js:255
+#: src/prefs/backup-restore.js:255
 msgid "Export"
 msgstr ""
 
-#: src/ui/indicator.js:233
+#: src/shell/indicator.js:233
 msgid "Locked"
 msgstr ""
 
-#: src/ui/indicator.js:297
+#: src/shell/indicator.js:297
 msgid "Type to search…"
 msgstr ""
 
-#: src/ui/indicator.js:353
+#: src/shell/indicator.js:353
 msgid "Settings..."
 msgstr ""
 
-#: src/ui/indicator.js:359
+#: src/shell/indicator.js:359
 msgid "OTP Secrets"
 msgstr ""
 
-#: src/ui/indicator.js:394 src/ui/indicator.js:586
+#: src/shell/indicator.js:394 src/shell/indicator.js:586
 msgid "No OTP secrets."
 msgstr ""
 
-#: src/ui/indicator.js:473
+#: src/shell/indicator.js:473
 msgid "Show OTP codes"
 msgstr ""
 
-#: src/ui/indicator.js:474
+#: src/shell/indicator.js:474
 msgid "Hide OTP codes"
 msgstr ""
 
-#: src/ui/indicator.js:484
+#: src/shell/indicator.js:484
 msgid "Failed to lock OTP secrets."
 msgstr ""
 
-#: src/ui/indicator.js:487
+#: src/shell/indicator.js:487
 msgid "Error locking OTP secrets."
 msgstr ""
 
-#: src/ui/indicator.js:497
+#: src/shell/indicator.js:497
 msgid "Failed to unlock OTP secrets."
 msgstr ""
 
-#: src/ui/indicator.js:500
+#: src/shell/indicator.js:500
 msgid "Error unlocking OTP secrets."
 msgstr ""
 
-#: src/ui/indicator.js:553
+#: src/shell/indicator.js:553
 msgid "Error retrieving OTP items."
 msgstr ""
 
-#: src/ui/indicator.js:589
+#: src/shell/indicator.js:589
 msgid "No matching OTP secrets."
 msgstr ""
 
-#: src/ui/indicator.js:691
+#: src/shell/indicator.js:690
 msgid "Error copying the OTP authentication code."
-msgstr ""
-
-#: src/utils/base32.js:23
-msgid "Invalid base32 input; missing padding."
-msgstr ""
-
-#: src/utils/base32.js:39
-msgid "Invalid base32 character at position:"
-msgstr ""
-
-#: src/utils/base32.js:46
-msgid "Invalid padding."
 msgstr ""
