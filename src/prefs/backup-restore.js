@@ -177,7 +177,7 @@ export const BackupRestoreGroup = GObject.registerClass(
                     summary += `  ·  ${_('failed:')} ${failed.length}`;
                 this.#notify(summary);
             } catch (e) {
-                logError(e);
+                console.error(e);
                 this.#notify(_('Import failed:') + ` ${e.message}`);
             }
         }
@@ -267,7 +267,7 @@ export const BackupRestoreGroup = GObject.registerClass(
                 writeFile(file, text);
                 this.#notify(_('Exported accounts:') + ` ${accounts.length}`);
             } catch (e) {
-                logError(e);
+                console.error(e);
                 this.#notify(_('Export failed:') + ` ${e.message}`);
             }
         }

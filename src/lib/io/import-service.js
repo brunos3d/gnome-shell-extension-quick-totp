@@ -67,6 +67,7 @@ export async function storeAccounts(accounts, onProgress = () => {}) {
             if (existing.has(key)) {
                 skipped++;
             } else {
+                // eslint-disable-next-line no-await-in-loop
                 await SecretUtils.createOTPItem(toOtp(account), -1);
                 existing.add(key);
                 added++;

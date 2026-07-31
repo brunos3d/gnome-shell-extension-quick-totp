@@ -13,7 +13,7 @@
  * attribution.
  */
 
-import { parseUri, parseUriList } from '../parsers/otpauth-uri.js';
+import { parseUriList } from '../parsers/otpauth-uri.js';
 import { parseGoogleMigration } from '../parsers/google-migration.js';
 import { parseAegis } from '../parsers/aegis.js';
 import { parseAndOTP, parseAuthenticatorLegacy } from '../parsers/andotp.js';

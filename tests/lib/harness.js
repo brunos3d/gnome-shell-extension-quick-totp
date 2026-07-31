@@ -62,6 +62,7 @@ export async function run() {
     for (const suite of suites) {
         for (const test of suite.tests) {
             try {
+                // eslint-disable-next-line no-await-in-loop
                 await test.fn();
                 passed++;
             } catch (e) {

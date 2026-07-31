@@ -34,6 +34,7 @@ export async function gatherAccounts() {
             counter: attrs.counter,
             algorithm: attrs.algorithm,
         };
+        // eslint-disable-next-line no-await-in-loop
         const secret = await SecretUtils.getSecret(otpLike);
         accounts.push(makeAccount({ ...otpLike, secret }));
     }

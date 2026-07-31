@@ -62,7 +62,7 @@ const CountdownIndicator = GObject.registerClass(
             const style_class = `totp-countdown ${state}`;
             let changed = false;
 
-            if (this.style_class != style_class) {
+            if (this.style_class !== style_class) {
                 this.style_class = style_class;
                 changed = true;
             }
@@ -186,7 +186,7 @@ const OTPMenuItem = GObject.registerClass(
 
             // Status: subtle countdown ring, right-aligned and vertically centered.
             this.#countdown = new CountdownIndicator();
-            if (otp.type != 'TOTP') this.#countdown.visible = false;
+            if (otp.type !== 'TOTP') this.#countdown.visible = false;
             this.add_child(this.#countdown);
 
             this.connect('activate', () => on_activate(this.otp));
@@ -210,7 +210,7 @@ const OTPMenuItem = GObject.registerClass(
         }
 
         #renderCode() {
-            if (this.#code == null) {
+            if (this.#code === null) {
                 this.#code_label.text = '…'; // still loading
                 return;
             }
@@ -232,16 +232,16 @@ const OTPMenuItem = GObject.registerClass(
                 this.#code = null;
                 this.#code_label.text = _('Locked');
                 this.#remaining_label.text = '';
-                if (type == 'TOTP') this.#countdown.setState(0, 0);
+                if (type === 'TOTP') this.#countdown.setState(0, 0);
                 return;
             }
 
             this.#code = code ?? null;
             this.#renderCode();
 
-            if (type == 'TOTP') {
+            if (type === 'TOTP') {
                 const secs = Math.ceil(remaining);
-                this.#remaining_label.text = `${secs} s`;
+                this.#remaining_label.text = `${secs} s`;
                 this.#countdown.setState(fraction, remaining);
             } else {
                 this.#remaining_label.text = '';
@@ -452,7 +452,7 @@ export default class Indicator extends PanelMenu.Button {
                 },
             );
         } catch (e) {
-            logError(e);
+            console.error(e);
         }
     }
 
@@ -489,7 +489,7 @@ export default class Indicator extends PanelMenu.Button {
                 if (!(await SecretUtils.isOTPCollectionLocked()))
                     Main.notify(_('Failed to lock OTP secrets.'));
         } catch (e) {
-            logError(e);
+            console.error(e);
             Main.notifyError(_('Error locking OTP secrets.'), _(e.message));
         }
     }
@@ -502,7 +502,7 @@ export default class Indicator extends PanelMenu.Button {
                 if (await SecretUtils.isOTPCollectionLocked())
                     Main.notify(_('Failed to unlock OTP secrets.'));
         } catch (e) {
-            logError(e);
+            console.error(e);
             Main.notifyError(_('Error unlocking OTP secrets.'), _(e.message));
         }
     }
@@ -518,9 +518,9 @@ export default class Indicator extends PanelMenu.Button {
             secrets.forEach((x) => {
                 let otp = null;
                 let args = x.get_attributes();
-                if (args.type == 'TOTP') otp = new TOTP(args);
-                if (args.type == 'HOTP') otp = new HOTP(args);
-                if (otp == null) throw Error(`BUG: args.type is ${args.type}`);
+                if (args.type === 'TOTP') otp = new TOTP(args);
+                if (args.type === 'HOTP') otp = new HOTP(args);
+                if (otp === null) throw Error(`BUG: args.type is ${args.type}`);
 
                 const label = makeLabel(otp);
 
@@ -528,7 +528,7 @@ export default class Indicator extends PanelMenu.Button {
                 // attribute plus the visible label.
                 const parts = [];
                 for (const [key, value] of Object.entries(args)) {
-                    if (key == 'secret' || !value) continue;
+                    if (key === 'secret' || !value) continue;
                     parts.push(value);
                 }
                 parts.push(label);
@@ -555,7 +555,7 @@ export default class Indicator extends PanelMenu.Button {
             this.updateMaxHeight();
             this.applyFilter();
         } catch (e) {
-            logError(e);
+            console.error(e);
             Main.notifyError(_('Error retrieving OTP items.'), _(e.message));
         }
     }
@@ -583,15 +583,15 @@ export default class Indicator extends PanelMenu.Button {
 
         let visible = 0;
         for (const item of this.#otp_items) {
-            const match = query == '' || item.haystack.includes(query);
+            const match = query === '' || item.haystack.includes(query);
             item.visible = match;
             if (match) ++visible;
         }
 
-        if (this.#otp_items.length == 0) {
+        if (this.#otp_items.length === 0) {
             this.#empty_label.text = _('No OTP secrets.');
             this.#empty_item.visible = true;
-        } else if (visible == 0) {
+        } else if (visible === 0) {
             this.#empty_label.text = _('No matching OTP secrets.');
             this.#empty_item.visible = true;
         } else {
@@ -606,7 +606,7 @@ export default class Indicator extends PanelMenu.Button {
 
     focusFirstItem() {
         const items = this.visibleItems();
-        if (items.length == 0) return false;
+        if (items.length === 0) return false;
         this.focusItem(items[0]);
         return true;
     }
@@ -645,7 +645,7 @@ export default class Indicator extends PanelMenu.Button {
 
             case Clutter.KEY_Escape:
                 // First Escape clears the search; a second one closes the menu.
-                if (this.#search_entry.get_text() != '') {
+                if (this.#search_entry.get_text() !== '') {
                     this.#search_entry.set_text('');
                     return Clutter.EVENT_STOP;
                 }
@@ -688,10 +688,10 @@ export default class Indicator extends PanelMenu.Button {
         try {
             otp.secret = await SecretUtils.getSecret(otp);
             const code = otp.code();
-            if (otp.type == 'HOTP') await SecretUtils.incrementHOTP(otp);
+            if (otp.type === 'HOTP') await SecretUtils.incrementHOTP(otp);
             copyToClipboard(code);
         } catch (e) {
-            logError(e);
+            console.error(e);
             Main.notifyError(
                 _('Error copying the OTP authentication code.'),
                 _(e.message),
