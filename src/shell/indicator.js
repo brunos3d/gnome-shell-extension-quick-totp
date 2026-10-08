@@ -144,9 +144,14 @@ const OTPMenuItem = GObject.registerClass(
                 }),
             );
 
+            // The `vertical` property of St widgets was replaced by `orientation`
+            // in GNOME 48 and removed in GNOME 51, so neither works alone across
+            // the supported shells. See the gjs.guide 48/51 upgrade notes.
             const text_box = new St.BoxLayout({
                 style_class: 'totp-text-box',
-                vertical: true,
+                ...(SHELL_MAJOR >= 48
+                    ? { orientation: Clutter.Orientation.VERTICAL }
+                    : { vertical: true }),
                 x_expand: true,
                 y_align: Clutter.ActorAlign.CENTER,
             });
