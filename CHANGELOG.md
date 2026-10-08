@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.3]
+
+### Fixed
+
+- Panel menu rows failed to build on GNOME Shell 51 with
+  `No property vertical on StBoxLayout`, which broke the OTP list.
+
+### Changed
+
+- The panel item's text box now sets its orientation through
+  `Clutter.Orientation` on GNOME Shell 48 and newer, matching the guide's
+  GNOME 48 migration, since the `vertical` property of St widgets was removed
+  in GNOME Shell 51. Older shells keep using `vertical`, which is guarded at
+  runtime so GNOME Shell 45–47 stays supported.
+
 ## [1.1.2] - 2026-07-30
 
 ### Fixed
